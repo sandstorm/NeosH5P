@@ -1,0 +1,19 @@
+Neos:
+  Neos:
+    modules:
+      'h5p':
+        label: 'H5P Rich Content'
+        controller: 'Sandstorm\NeosH5P\Controller\Backend\H5PBackendController'
+        description: 'foo'
+        icon: icon-briefcase
+#        submodules:
+#          workspaces:
+#            label: 'Neos.Neos:Modules:workspaces.label'
+#            controller: 'Neos\Neos\Controller\Module\Management\WorkspacesController'
+#            description: 'Neos.Neos:Modules:workspaces.description'
+#            icon: icon-th-large
+#          history:
+#            label: 'Neos.Neos:Modules:history.label'
+#            controller: 'Neos\Neos\Controller\Module\Management\HistoryController'
+#            description: 'Neos.Neos:Modules:history.description'
+#            icon: icon-calendar

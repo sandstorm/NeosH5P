@@ -4,7 +4,9 @@
     "description": "H5P Platform Integration Plugin for Neos CMS",
     "license": "MIT",
     "require": {
-        "neos/neos": "*"
+        "neos/neos": "*",
+        "h5p/h5p-core": "~1.17.0",
+        "h5p/h5p-editor": "~1.17.0"
     },
     "autoload": {
         "psr-4": {
