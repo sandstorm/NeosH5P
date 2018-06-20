@@ -1,0 +1,14 @@
+{
+    "name": "sandstorm/neos-h5p",
+    "type": "neos-plugin",
+    "description": "H5P Platform Integration Plugin for Neos CMS",
+    "license": "MIT",
+    "require": {
+        "neos/neos": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sandstorm\\NeosH5P\\": "Classes"
+        }
+    }
+}
