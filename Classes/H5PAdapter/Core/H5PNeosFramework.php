@@ -1,8 +1,7 @@
 <?php
 namespace Sandstorm\NeosH5P\H5PAdapter\Core;
 
-// TODO: remove abstract once we fix the annotation problem
-abstract class H5PNeosFramework implements \H5PFrameworkInterface {
+class H5PNeosFramework implements \H5PFrameworkInterface {
     /**
      * Returns info for the current platform
      *

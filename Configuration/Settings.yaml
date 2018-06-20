@@ -17,3 +17,11 @@ Neos:
 #            controller: 'Neos\Neos\Controller\Module\Management\HistoryController'
 #            description: 'Neos.Neos:Modules:history.description'
 #            icon: icon-calendar
+
+
+  Flow:
+    # We need the tag "@variable" as an ignored annotation, because otherwise the parsing of the
+    # H5PFrameworkInterface causes an reflection error
+    reflection:
+      ignoredTags:
+        'variable': true
