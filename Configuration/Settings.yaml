@@ -25,3 +25,22 @@ Neos:
     reflection:
       ignoredTags:
         'variable': true
+
+
+    resource:
+      storages:
+        h5pLibraryStorage:
+          storage: 'Sandstorm\NeosH5P\Resource\Storage\ExtractedH5PFileStorage'
+
+      collections:
+        h5p:
+          storage: 'h5pLibraryStorage'
+          target: 'localWebDirectoryH5PTarget'
+
+      targets:
+        localWebDirectoryH5PTarget:
+          target: 'Neos\Flow\ResourceManagement\Target\FileSystemTarget'
+          targetOptions:
+            path: '%FLOW_PATH_WEB%_Resources/Static/H5P/'
+            baseUri: '_Resources/Static/H5P/'
+            subdivideHashPathSegment: false
