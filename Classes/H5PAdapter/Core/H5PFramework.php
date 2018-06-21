@@ -9,7 +9,7 @@ use Sandstorm\NeosH5P\H5PAdapter\Core\Traits\FileTrait;
 use Sandstorm\NeosH5P\H5PAdapter\Core\Traits\LibraryModelTrait;
 use Sandstorm\NeosH5P\H5PAdapter\Core\Traits\SystemTrait;
 
-class Framework implements \H5PFrameworkInterface {
+class H5PFramework implements \H5PFrameworkInterface {
     use SystemTrait;
     use FileTrait;
     use AuthorizationTrait;

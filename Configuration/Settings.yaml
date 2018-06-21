@@ -20,8 +20,8 @@ Neos:
 
 
   Flow:
-    # We need the tag "@variable" as an ignored annotation, because otherwise the parsing of the
-    # H5PFrameworkInterface causes an reflection error
+    # We need the tag "@variable" as an ignored annotation, because otherwise parsing of the
+    # H5PFrameworkInterface causes a reflection error
     reflection:
       ignoredTags:
         'variable': true

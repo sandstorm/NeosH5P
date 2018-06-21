@@ -7,7 +7,6 @@ namespace Sandstorm\NeosH5P\H5PAdapter\Core\Traits;
  */
 trait FileTrait
 {
-
     /**
      * Get URL to file in the specific library
      * @param string $libraryFolderName

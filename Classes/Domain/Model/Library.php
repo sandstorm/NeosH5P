@@ -39,7 +39,7 @@ KEY runnable (runnable)
  * @package Sandstorm\NeosH5P\Domain\Model
  * @Flow\Entity
  */
-class H5PLibrary {
+class Library {
 
     /**
      * @Flow\Identity

@@ -20,17 +20,6 @@ class EditorStorage implements \H5peditorStorage {
     }
 
     /**
-     * "Callback" for mark the given file as a permanent file.
-     * Used when saving content that has new uploaded files.
-     *
-     * @param int $fileId
-     */
-    public function keepFile($fileId)
-    {
-        // TODO: Implement keepFile() method.
-    }
-
-    /**
      * Decides which content types the editor should have.
      *
      * Two usecases:
@@ -46,6 +35,17 @@ class EditorStorage implements \H5peditorStorage {
     public function getLibraries($libraries = NULL)
     {
         // TODO: Implement getLibraries() method.
+    }
+
+    /**
+     * "Callback" for mark the given file as a permanent file.
+     * Used when saving content that has new uploaded files.
+     *
+     * @param int $fileId
+     */
+    public function keepFile($fileId)
+    {
+        // TODO: Implement keepFile() method.
     }
 
     /**

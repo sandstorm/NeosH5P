@@ -5,27 +5,26 @@ use Neos\Flow\Annotations as Flow;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class H5PLibraryDependency
+ * Class H5PLibraryTranslation
  * @package Sandstorm\NeosH5P\Domain\Model
  * @Flow\Entity
  */
-class H5PLibraryDependency {
+class LibraryTranslation {
 
     /**
-     * @var H5PLibrary
-     * @ORM\ManyToOne(inversedBy="libraryDependencies")
+     * @var Library
+     * @ORM\ManyToOne(inversedBy="libraryTranslations")
      */
     protected $library;
 
     /**
-     * @var H5PLibrary
-     * @ORM\ManyToOne
+     * @var string
      */
-    protected $requiredLibrary;
+    protected $languageCode;
 
     /**
      * @var string
-     * @ORM\Column(nullable=false)
+     * @ORM\Column(type="text")
      */
-    protected $dependencyType;
+    protected $translation;
 }
