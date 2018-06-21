@@ -3,7 +3,7 @@ namespace Sandstorm\NeosH5P\H5PAdapter\Editor;
 
 use H5peditorFile;
 
-class H5PNeosEditorStorage implements \H5peditorStorage {
+class EditorStorage implements \H5peditorStorage {
     /**
      * Load language file(JSON) from database.
      * This is used to translate the editor fields(title, description etc.)

@@ -1,7 +1,7 @@
 <?php
 namespace Sandstorm\NeosH5P\H5PAdapter\Editor;
 
-class H5PNeosEditorAjax implements \H5PEditorAjaxInterface {
+class EditorAjax implements \H5PEditorAjaxInterface {
     /**
      * Gets latest library versions that exists locally
      *
