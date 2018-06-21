@@ -7,7 +7,8 @@
         "neos/neos": "*",
         "h5p/h5p-core": "~1.17.0",
         "h5p/h5p-editor": "~1.17.0",
-        "ext-zip": "*"
+        "ext-zip": "*",
+        "php": ">=7.1.0"
     },
     "autoload": {
         "psr-4": {
