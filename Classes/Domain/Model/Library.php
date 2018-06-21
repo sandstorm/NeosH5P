@@ -1,69 +1,150 @@
 <?php
 namespace Sandstorm\NeosH5P\Domain\Model;
 
-use Doctrine\Common\Collections\Collection;
 use Neos\Flow\Annotations as Flow;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 
 /**
- *
- *
- * id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-created_at TIMESTAMP NOT NULL,
-updated_at TIMESTAMP NOT NULL,
-name VARCHAR(127) NOT NULL,
-title VARCHAR(255) NOT NULL,
-major_version INT UNSIGNED NOT NULL,
-minor_version INT UNSIGNED NOT NULL,
-patch_version INT UNSIGNED NOT NULL,
-runnable INT UNSIGNED NOT NULL,
-restricted INT UNSIGNED NOT NULL DEFAULT 0,
-fullscreen INT UNSIGNED NOT NULL,
-embed_types VARCHAR(255) NOT NULL,
-preloaded_js TEXT NULL,
-preloaded_css TEXT NULL,
-drop_library_css TEXT NULL,
-semantics TEXT NOT NULL,
-tutorial_url VARCHAR(1023) NOT NULL,
-has_icon INT UNSIGNED NOT NULL DEFAULT 0,
-PRIMARY KEY  (id),
-KEY name_version (name,major_version,minor_version,patch_version),
-KEY runnable (runnable)
- *
- *
- *
- */
-
-/**
- * Class H5PLibrary
- * @package Sandstorm\NeosH5P\Domain\Model
  * @Flow\Entity
  */
 class Library {
 
     /**
-     * @Flow\Identity
+     * @var \DateTime
+     * @ORM\Column(type="datetimetz", nullable=false)
      */
-    protected $id;
+    protected $createdAt;
+
+    /**
+     * @var \DateTime
+     * @ORM\Column(type="datetimetz", nullable=false)
+     */
+    protected $updatedAt;
 
     /**
      * @var string
      * @ORM\Column(nullable=false)
      */
-    protected $createdAt;
-
-    // -------------------- RELATIONS ----------------
+    protected $name;
 
     /**
-     * @var Collection<H5PLibraryDependency>
+     * @var string
+     * @ORM\Column(nullable=false)
+     */
+    protected $title;
+
+    /**
+     * @var int
+     * @ORM\Column(nullable=false)
+     */
+    protected $majorVersion;
+
+    /**
+     * @var int
+     * @ORM\Column(nullable=false)
+     */
+    protected $minorVersion;
+
+    /**
+     * @var int
+     * @ORM\Column(nullable=false)
+     */
+    protected $patchVersion;
+
+    /**
+     * @var bool
+     * @ORM\Column(nullable=false)
+     */
+    protected $runnable;
+
+    /**
+     * @var bool
+     * @ORM\Column(nullable=false)
+     */
+    protected $restricted;
+
+    /**
+     * @var bool
+     * @ORM\Column(nullable=false)
+     */
+    protected $fullscreen;
+
+    /**
+     * @var string
+     * @ORM\Column(nullable=false)
+     */
+    protected $embedTypes;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=false)
+     */
+    protected $preloadedJs;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=false)
+     */
+    protected $preloadedCss;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=false)
+     * This field is apparently not used
+     */
+    protected $dropLibraryCss;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=false)
+     */
+    protected $semantics;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=false)
+     */
+    protected $tutorialUrl;
+
+    /**
+     * @var bool
+     * @ORM\Column(nullable=false)
+     */
+    protected $hasIcon;
+
+
+
+    // Inversed relations (not in DB)
+
+    /**
+     * @var Collection<Content>
+     * @ORM\OneToMany(mappedBy="library")
+     */
+    protected $contents;
+
+    /**
+     * @var Collection<ContentDependency>
+     * @ORM\OneToMany(mappedBy="library", cascade={"persist", "remove"})
+     */
+    protected $contentDependencies;
+
+    /**
+     * @var Collection<LibraryDependency>
      * @ORM\OneToMany(mappedBy="library", cascade={"persist", "remove"})
      */
     protected $libraryDependencies;
 
     /**
-     * @var Collection<H5PLibraryTranslation>
+     * @var Collection<LibraryTranslation>
      * @ORM\OneToMany(mappedBy="library", cascade={"persist", "remove"})
      */
     protected $libraryTranslations;
+
+    /**
+     * @var Collection<CachedAsset>
+     * @ORM\OneToMany(mappedBy="library", cascade={"persist", "remove"})
+     */
+    protected $cachedAssets;
 
 }

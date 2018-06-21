@@ -5,20 +5,20 @@ use Neos\Flow\Annotations as Flow;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class H5PLibraryDependency
- * @package Sandstorm\NeosH5P\Domain\Model
  * @Flow\Entity
  */
 class LibraryDependency {
 
     /**
      * @var Library
+     * @ORM\Id
      * @ORM\ManyToOne(inversedBy="libraryDependencies")
      */
     protected $library;
 
     /**
      * @var Library
+     * @ORM\Id
      * @ORM\ManyToOne
      */
     protected $requiredLibrary;
