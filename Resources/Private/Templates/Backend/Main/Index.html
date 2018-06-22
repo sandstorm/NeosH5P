@@ -1,0 +1,57 @@
+{namespace neos=Neos\Neos\ViewHelpers}
+<div class="neos-content neos-indented neos-fluid-container">
+    <f:if condition="{moduleConfiguration.submodules}">
+        <div class="neos-row-fluid">
+            <f:for each="{moduleConfiguration.submodules}" key="submoduleIdentifier" as="submoduleConfiguration"
+                   iteration="iterator">
+                <f:render section="submodule" arguments="{_all}"/>
+            </f:for>
+        </div>
+    </f:if>
+</div>
+
+<f:section name="submodule">
+    <div class="neos-span4">
+        <div class="widget {f:if(condition: submoduleConfiguration.actions, then: 'has-footer')}">
+            <div class="widget-header">
+                <f:if condition="{submoduleConfiguration.icon}">
+                    <i class="{submoduleConfiguration.icon} neos-pull-left"></i>
+                </f:if>
+                <h3>
+                    <neos:link.module path="{moduleConfiguration.path}/{submoduleIdentifier}">
+                        <neos:backend.translate source="Modules" id="{submoduleConfiguration.label}"/>
+                    </neos:link.module>
+                </h3>
+            </div>
+            <f:if condition="{submoduleConfiguration.description}">
+                <div class="widget-body">
+                    <p>
+                        <neos:backend.translate source="Modules" id="{submoduleConfiguration.description}"/>
+                    </p>
+                </div>
+            </f:if>
+            <f:if condition="{submoduleConfiguration.actions}">
+                <div class="widget-footer">
+                    <f:for each="{submoduleConfiguration.actions}" as="actionConfiguration" key="submoduleAction">
+                        <neos:link.module
+                            title="{neos:backend.translate(id: actionConfiguration.title, source: 'Modules')}"
+                            class="neos-button neos-button-primary"
+                            path="{f:if(condition: actionConfiguration.path, then: actionConfiguration.path, else: '{moduleConfiguration.path}/{submoduleIdentifier}/{submoduleAction -> f:format.case(mode: \'lower\')}')}">
+                            <neos:backend.translate source="Modules" id="{actionConfiguration.label}"/>
+                        </neos:link.module>
+                    </f:for>
+                </div>
+            </f:if>
+        </div>
+    </div>
+    <f:if condition="{iterator.cycle} % 3">
+        <f:else>
+            <f:if condition="{iterator.isLast}">
+                <f:else>
+                    </div>
+                    <div class="neos-row-fluid">
+                </f:else>
+            </f:if>
+        </f:else>
+    </f:if>
+</f:section>
