@@ -150,7 +150,7 @@ class ExtractedH5PFileStorage implements StorageInterface
                 $object->setMd5(md5($fileContents));
                 $object->setFileSize(strlen($fileContents));
                 $object->setStream($stream);
-                $object->setRelativePublicationPath($item->getId() . '/' . dirname($pathAndFilenameInZip) . '/');
+                $object->setRelativePublicationPath('libraries/' . dirname($pathAndFilenameInZip) . '/');
                 yield $object;
 
                 if (is_callable($callback)) {

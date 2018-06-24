@@ -32,9 +32,9 @@ class FakeLibraryRepository
      */
     public function findAll(): array
     {
-        $resource = $this->resourceManager->importResource($this->packageManager->getPackage('Sandstorm.NeosH5P')->getPackagePath() . 'Resources/Private/ExampleH5P/memory-game-5-708.h5p');
+        $resource = $this->resourceManager->importResource($this->packageManager->getPackage('Sandstorm.NeosH5P')->getPackagePath() . 'Resources/Private/ExampleH5P/MultiChoice.h5p');
         return [
-            new FakeLibrary('H5P.MemoryGame', $resource)
+            new FakeLibrary('H5P.MultiChoice', $resource)
         ];
     }
 }
