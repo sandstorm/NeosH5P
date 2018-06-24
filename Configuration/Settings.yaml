@@ -45,16 +45,54 @@ Neos:
       storages:
         h5pLibraryStorage:
           storage: 'Sandstorm\NeosH5P\Resource\Storage\ExtractedH5PFileStorage'
+        h5pCoreStorage:
+          storage: 'Sandstorm\NeosH5P\Resource\Storage\H5PPackageFileStorage'
+          storageOptions:
+            path: '%FLOW_PATH_PACKAGES%Libraries/h5p/h5p-core/'
+            subfolders:
+              - 'fonts'
+              - 'images'
+              - 'js'
+              - 'styles'
+        h5pEditorStorage:
+          storage: 'Sandstorm\NeosH5P\Resource\Storage\H5PPackageFileStorage'
+          storageOptions:
+            path: '%FLOW_PATH_PACKAGES%Libraries/h5p/h5p-editor/'
+            subfolders:
+              - 'ckeditor'
+              - 'images'
+              - 'language'
+              - 'libs'
+              - 'scripts'
+              - 'styles'
 
       collections:
-        h5p:
+        h5p-libraries:
           storage: 'h5pLibraryStorage'
-          target: 'localWebDirectoryH5PTarget'
+          target: 'h5pLibraryTarget'
+        h5p-core-files:
+          storage: 'h5pCoreStorage'
+          target: 'h5pCoreTarget'
+        h5p-editor-files:
+          storage: 'h5pEditorStorage'
+          target: 'h5pEditorTarget'
 
       targets:
-        localWebDirectoryH5PTarget:
+        h5pLibraryTarget:
           target: 'Neos\Flow\ResourceManagement\Target\FileSystemTarget'
           targetOptions:
             path: '%FLOW_PATH_WEB%_Resources/Static/H5P/'
             baseUri: '_Resources/Static/H5P/'
+            subdivideHashPathSegment: false
+        h5pCoreTarget:
+          target: 'Neos\Flow\ResourceManagement\Target\FileSystemTarget'
+          targetOptions:
+            path: '%FLOW_PATH_WEB%_Resources/Static/H5P/h5p-core/'
+            baseUri: '_Resources/Static/H5P/h5p-core/'
+            subdivideHashPathSegment: false
+        h5pEditorTarget:
+          target: 'Neos\Flow\ResourceManagement\Target\FileSystemTarget'
+          targetOptions:
+            path: '%FLOW_PATH_WEB%_Resources/Static/H5P/h5p-editor/'
+            baseUri: '_Resources/Static/H5P/h5p-editor/'
             subdivideHashPathSegment: false
