@@ -1,6 +1,7 @@
 <?php
 namespace Sandstorm\NeosH5P\Domain\Model;
 
+use Doctrine\Common\Collections\Collection;
 use Neos\Flow\Annotations as Flow;
 use Doctrine\ORM\Mapping as ORM;
 use Neos\Flow\ResourceManagement\PersistentResource;
@@ -19,10 +20,8 @@ class CachedAsset {
     protected $resource;
 
     /**
-     * @var Library
-     * @ORM\ManyToOne(inversedBy="cachedAssets")
-     * @ORM\JoinColumn(onDelete="cascade")
+     * @var Collection<Library>
+     * @ORM\ManyToMany(mappedBy="cachedAssets")
      */
-    protected $library;
-
+    protected $libraries;
 }

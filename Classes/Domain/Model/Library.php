@@ -143,7 +143,7 @@ class Library {
 
     /**
      * @var Collection<CachedAsset>
-     * @ORM\OneToMany(mappedBy="library", cascade={"persist", "remove"})
+     * @ORM\ManyToMany(inversedBy="libraries", cascade={"persist"})
      */
     protected $cachedAssets;
 
