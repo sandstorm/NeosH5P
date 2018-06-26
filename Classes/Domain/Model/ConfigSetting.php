@@ -4,53 +4,52 @@ namespace Sandstorm\NeosH5P\Domain\Model;
 use Neos\Flow\Annotations as Flow;
 use Doctrine\ORM\Mapping as ORM;
 
-
 /**
  * @Flow\Entity
  */
 class ConfigSetting {
 
     /**
+     * @ORM\Id
      * @var string
      */
-    protected $key;
+    protected $configKey;
 
     /**
      * @var string
      * @ORM\Column(type="text")
      */
-    protected $value;
+    protected $configValue;
 
     /**
      * @return string
      */
-    public function getKey(): string
+    public function getConfigKey(): string
     {
-        return $this->key;
+        return $this->configKey;
     }
 
     /**
-     * @param string $key
+     * @param string $configKey
      */
-    public function setKey(string $key): void
+    public function setConfigKey(string $configKey): void
     {
-        $this->key = $key;
+        $this->configKey = $configKey;
     }
 
     /**
      * @return string
      */
-    public function getValue(): string
+    public function getConfigValue(): string
     {
-        return $this->value;
+        return $this->configValue;
     }
 
     /**
-     * @param string $value
+     * @param string $configValue
      */
-    public function setValue(string $value): void
+    public function setConfigValue(string $configValue): void
     {
-        $this->value = $value;
+        $this->configValue = $configValue;
     }
-
 }

@@ -2,10 +2,16 @@
 
 namespace Sandstorm\NeosH5P\H5PAdapter\Core;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Neos\Flow\Package\PackageManagerInterface;
+use Neos\Flow\Persistence\Exception\IllegalObjectTypeException;
+use Neos\Flow\Persistence\PersistenceManagerInterface;
 use Sandstorm\NeosH5P\Domain\Model\ConfigSetting;
-use Sandstorm\NeosH5P\Domain\Repository\ConfigSettingRepository;
 use Neos\Flow\Annotations as Flow;
+use Sandstorm\NeosH5P\Domain\Model\ContentTypeCacheEntry;
+use Sandstorm\NeosH5P\Domain\Repository\ConfigSettingRepository;
+use Sandstorm\NeosH5P\Domain\Repository\ContentTypeCacheEntryRepository;
 
 /**
  * @Flow\Scope("singleton")
@@ -20,9 +26,21 @@ class H5PFramework implements \H5PFrameworkInterface
 
     /**
      * @Flow\Inject
+     * @var PersistenceManagerInterface
+     */
+    protected $persistenceManager;
+
+    /**
+     * @Flow\Inject
      * @var ConfigSettingRepository
      */
     protected $configSettingRepository;
+
+    /**
+     * @Flow\Inject
+     * @var ContentTypeCacheEntryRepository
+     */
+    protected $contentTypeCacheEntryRepository;
 
 
     /**
@@ -292,6 +310,7 @@ class H5PFramework implements \H5PFrameworkInterface
     public function loadLibraries()
     {
         // TODO: Implement loadLibraries() method.
+        return [];
     }
 
     /**
@@ -544,6 +563,7 @@ class H5PFramework implements \H5PFrameworkInterface
     public function getLibraryStats($type)
     {
         // TODO: Implement getLibraryStats() method.
+        return [];
     }
 
     /**
@@ -553,6 +573,7 @@ class H5PFramework implements \H5PFrameworkInterface
     public function getLibraryContentCount()
     {
         // TODO: Implement getLibraryContentCount() method.
+        return 0;
     }
 
     /**
@@ -577,10 +598,10 @@ class H5PFramework implements \H5PFrameworkInterface
     public function getOption($name, $default = NULL)
     {
         /** @var ConfigSetting $configSetting */
-        $configSetting = $this->configSettingRepository->findOneByKey($name);
+        $configSetting = $this->configSettingRepository->findOneByConfigKey($name);
 
         if ($configSetting != null) {
-            return $configSetting->getValue();
+            return $configSetting->getConfigValue();
         }
 
         return $default;
@@ -594,10 +615,22 @@ class H5PFramework implements \H5PFrameworkInterface
      *   Identifier for the setting
      * @param mixed $value Data
      *   Whatever we want to store as the setting
+     * @throws IllegalObjectTypeException
      */
     public function setOption($name, $value)
     {
-        // TODO: Implement setOption() method.
+        /** @var ConfigSetting $configSetting */
+        $configSetting = $this->configSettingRepository->findOneByConfigKey($name);
+
+        if ($configSetting != null) {
+            $configSetting->setConfigValue($value);
+            $this->configSettingRepository->update($configSetting);
+        } else {
+            $configSetting = new ConfigSetting();
+            $configSetting->setConfigKey($name);
+            $configSetting->setConfigValue($value);
+            $this->configSettingRepository->add($configSetting);
+        }
     }
 
     /**
@@ -637,7 +670,14 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function replaceContentTypeCache($contentTypeCache)
     {
-        // TODO: Implement replaceContentTypeCache() method.
+        // Remove all entries and persist
+        $this->contentTypeCacheEntryRepository->removeAll();
+        $this->persistenceManager->persistAll();
+
+        // Create new entries
+        foreach ($contentTypeCache->contentTypes as $contentType) {
+            $this->contentTypeCacheEntryRepository->add(ContentTypeCacheEntry::create($contentType));
+        }
     }
 
 
@@ -731,7 +771,26 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function fetchExternalData($url, $data = NULL, $blocking = TRUE, $stream = NULL)
     {
-        // TODO: Implement fetchExternalData() method.
+        $client = new Client();
+        $options = [
+            // if $blocking is set, we want to do a synchronous request
+            'synchronous' => $blocking,
+            // if we have something in $stream, we pass it into the sink
+            'sink' => $stream,
+            // post data goes in form_params
+            'form_params' => $data
+        ];
+
+        try {
+            // if $data is provided, we do a POST request - otherwise it's a GET
+            $response = $client->request($data === null ? 'GET' : 'POST', $url, $options);
+            if ($response->getStatusCode() === 200) {
+                return $response->getBody()->getSize() ? $response->getBody()->getContents() : true;
+            }
+        } catch (GuzzleException $e) {
+            $this->setErrorMessage($e->getMessage(), 'failed-fetching-external-data');
+        }
+        return false;
     }
 
 
@@ -845,5 +904,6 @@ class H5PFramework implements \H5PFrameworkInterface
     public function getNumAuthors()
     {
         // TODO: Implement getNumAuthors() method.
+        return 0;
     }
 }

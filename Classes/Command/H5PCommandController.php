@@ -37,6 +37,9 @@ class H5PCommandController extends CommandController
         // Setup, needed for CLI request
         $_SERVER['REQUEST_METHOD'] = 'POST';
 
+        // Make sure content type cache is updated first
+        $this->h5pCore->updateContentTypeCache();
+
         // Start the library import
         $this->h5peditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $machineName);
     }
@@ -47,6 +50,7 @@ class H5PCommandController extends CommandController
     public function refreshContentTypeCacheCommand()
     {
         $this->h5pCore->updateContentTypeCache();
+        $this->outputLine('Content Type Cache update finished.');
     }
 
 }

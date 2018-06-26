@@ -7,6 +7,6 @@ use Neos\Flow\Annotations as Flow;
 /**
  * @Flow\Scope("singleton")
  */
-class HubCachedLibraryRepository extends Repository {
+class ContentTypeCacheEntryRepository extends Repository {
 
 }
