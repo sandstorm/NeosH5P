@@ -1,6 +1,8 @@
 <?php
 namespace Sandstorm\NeosH5P\H5PAdapter\Core;
 
+use Neos\Flow\Annotations as Flow;
+
 /**
  * @Flow\Scope("singleton")
  */

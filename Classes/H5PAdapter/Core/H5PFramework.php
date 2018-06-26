@@ -8,7 +8,11 @@ use Sandstorm\NeosH5P\H5PAdapter\Core\Traits\HttpRequestTrait;
 use Sandstorm\NeosH5P\H5PAdapter\Core\Traits\FileTrait;
 use Sandstorm\NeosH5P\H5PAdapter\Core\Traits\LibraryModelTrait;
 use Sandstorm\NeosH5P\H5PAdapter\Core\Traits\SystemTrait;
+use Neos\Flow\Annotations as Flow;
 
+/**
+ * @Flow\Scope("singleton")
+ */
 class H5PFramework implements \H5PFrameworkInterface {
     use SystemTrait;
     use FileTrait;

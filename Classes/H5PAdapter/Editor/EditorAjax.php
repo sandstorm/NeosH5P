@@ -1,6 +1,11 @@
 <?php
 namespace Sandstorm\NeosH5P\H5PAdapter\Editor;
 
+use Neos\Flow\Annotations as Flow;
+
+/**
+ * @Flow\Scope("singleton")
+ */
 class EditorAjax implements \H5PEditorAjaxInterface {
     /**
      * Gets latest library versions that exists locally

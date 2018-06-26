@@ -2,7 +2,11 @@
 namespace Sandstorm\NeosH5P\H5PAdapter\Editor;
 
 use H5peditorFile;
+use Neos\Flow\Annotations as Flow;
 
+/**
+ * @Flow\Scope("singleton")
+ */
 class EditorStorage implements \H5peditorStorage {
     /**
      * Load language file(JSON) from database.
