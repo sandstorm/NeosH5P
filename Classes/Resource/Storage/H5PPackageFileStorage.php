@@ -136,7 +136,7 @@ class H5PPackageFileStorage implements StorageInterface
         foreach ($this->subfolders as $subfoldername) {
             $absolutePath = $this->path . $subfoldername;
             foreach (Files::getRecursiveDirectoryGenerator($absolutePath) as $resourcePathAndFilename) {
-                $object = $this->createStorageObject($resourcePathAndFilename, $subfoldername);
+                $object = $this->createStorageObject($resourcePathAndFilename, basename($this->path) . '/' . $subfoldername);
                 yield $object;
                 if (is_callable($callback)) {
                     call_user_func($callback, $iteration, $object);

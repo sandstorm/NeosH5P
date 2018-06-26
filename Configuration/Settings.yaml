@@ -1,3 +1,9 @@
+Sandstorm:
+  NeosH5P:
+    # URL of the h5p public folder. Can be absolute or relative to the base Uri.
+    # Needs to match the baseUri for the custom targets all the way down.
+    h5pPublicFolderUrl: &h5pPublicFolderUrl '_Resources/Static/H5P/'
+
 Neos:
   Neos:
     modules:
@@ -82,17 +88,17 @@ Neos:
           target: 'Neos\Flow\ResourceManagement\Target\FileSystemTarget'
           targetOptions:
             path: '%FLOW_PATH_WEB%_Resources/Static/H5P/'
-            baseUri: '_Resources/Static/H5P/'
+            baseUri: *h5pPublicFolderUrl
             subdivideHashPathSegment: false
         h5pCoreTarget:
           target: 'Neos\Flow\ResourceManagement\Target\FileSystemTarget'
           targetOptions:
-            path: '%FLOW_PATH_WEB%_Resources/Static/H5P/h5p-core/'
-            baseUri: '_Resources/Static/H5P/h5p-core/'
+            path: '%FLOW_PATH_WEB%_Resources/Static/H5P/'
+            baseUri: *h5pPublicFolderUrl
             subdivideHashPathSegment: false
         h5pEditorTarget:
           target: 'Neos\Flow\ResourceManagement\Target\FileSystemTarget'
           targetOptions:
-            path: '%FLOW_PATH_WEB%_Resources/Static/H5P/h5p-editor/'
-            baseUri: '_Resources/Static/H5P/h5p-editor/'
+            path: '%FLOW_PATH_WEB%_Resources/Static/H5P/'
+            baseUri: *h5pPublicFolderUrl
             subdivideHashPathSegment: false

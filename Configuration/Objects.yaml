@@ -1,0 +1,28 @@
+H5PCore:
+  scope: singleton
+  factoryObjectName: Sandstorm\NeosH5P\H5PAdapter\Core\H5PCoreFactory
+  factoryMethodName: getCore
+  arguments:
+    1:
+      setting: Sandstorm.NeosH5P.h5pPublicFolderUrl
+
+H5PValidator:
+  arguments: &frameworkAndCore
+    1:
+      object: Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework
+    2:
+      object: H5PCore
+
+H5PStorage:
+  arguments: *frameworkAndCore
+
+H5PContentValidator:
+  arguments: *frameworkAndCore
+
+H5PExport:
+  arguments: *frameworkAndCore
+
+H5peditor:
+  scope: singleton
+  factoryObjectName: Sandstorm\NeosH5P\H5PAdapter\Editor\H5PEditorFactory
+  factoryMethodName: getEditor

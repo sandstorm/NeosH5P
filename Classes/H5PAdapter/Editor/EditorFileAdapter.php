@@ -7,7 +7,7 @@ use Neos\Flow\Annotations as Flow;
 /**
  * @Flow\Scope("singleton")
  */
-class EditorStorage implements \H5peditorStorage {
+class EditorFileAdapter implements \H5peditorStorage {
     /**
      * Load language file(JSON) from database.
      * This is used to translate the editor fields(title, description etc.)

@@ -3,9 +3,15 @@
 namespace Sandstorm\NeosH5P\Command;
 
 use Neos\Flow\Cli\CommandController;
+use Neos\Flow\Annotations as Flow;
 
 class H5PCommandController extends CommandController
 {
+    /**
+     * @var \H5peditor
+     * @Flow\Inject(lazy=false)
+     */
+    protected $h5peditor;
 
     /**
      * Clears all EditorTempfiles from the database and file system.
@@ -22,7 +28,8 @@ class H5PCommandController extends CommandController
      */
     public function installLibraryCommand(string $machineName)
     {
-        $this->outputLine($machineName);
+        // TODO
+//        $this->h5peditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $machineName);
     }
 
 }
