@@ -18,7 +18,11 @@ trait SystemTrait
      */
     public function getPlatformInfo()
     {
-        // TODO: Implement getPlatformInfo() method.
+        return [
+            "name" => "Neos",
+            "version" => $this->packageManager->getPackage("Neos.Neos")->getInstalledVersion(),
+            "h5pVersion" => $this->packageManager->getPackage("Sandstorm.NeosH5P")->getInstalledVersion()
+        ];
     }
 
     /**

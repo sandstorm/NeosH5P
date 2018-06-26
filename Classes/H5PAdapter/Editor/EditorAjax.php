@@ -50,7 +50,8 @@ class EditorAjax implements \H5PEditorAjaxInterface {
      */
     public function validateEditorToken($token)
     {
-        // TODO: Implement validateEditorToken() method.
+        // TODO
+        return true;
     }
 
 }

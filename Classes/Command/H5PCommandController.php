@@ -14,6 +14,12 @@ class H5PCommandController extends CommandController
     protected $h5peditor;
 
     /**
+     * @var \H5PCore
+     * @Flow\Inject(lazy=false)
+     */
+    protected $h5pCore;
+
+    /**
      * Clears all EditorTempfiles from the database and file system.
      */
     public function cleanEditorTempFilesCommand()
@@ -33,6 +39,14 @@ class H5PCommandController extends CommandController
 
         // Start the library import
         $this->h5peditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $machineName);
+    }
+
+    /**
+     * Refreshes the library cache from the H5P hub
+     */
+    public function refreshContentTypeCacheCommand()
+    {
+        $this->h5pCore->updateContentTypeCache();
     }
 
 }
