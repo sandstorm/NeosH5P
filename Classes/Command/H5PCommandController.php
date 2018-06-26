@@ -28,8 +28,11 @@ class H5PCommandController extends CommandController
      */
     public function installLibraryCommand(string $machineName)
     {
-        // TODO
-//        $this->h5peditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $machineName);
+        // Setup, needed for CLI request
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+
+        // Start the library import
+        $this->h5peditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $machineName);
     }
 
 }
