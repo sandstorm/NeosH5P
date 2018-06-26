@@ -3,6 +3,9 @@
 namespace Sandstorm\NeosH5P\H5PAdapter\Core;
 
 use Neos\Flow\Package\PackageManagerInterface;
+use Sandstorm\NeosH5P\Domain\Model\ConfigSetting;
+use Sandstorm\NeosH5P\Domain\Repository\ConfigSettingRepository;
+use Neos\Flow\Annotations as Flow;
 
 /**
  * @Flow\Scope("singleton")
@@ -14,6 +17,12 @@ class H5PFramework implements \H5PFrameworkInterface
      * @var PackageManagerInterface
      */
     protected $packageManager;
+
+    /**
+     * @Flow\Inject
+     * @var ConfigSettingRepository
+     */
+    protected $configSettingRepository;
 
     public function getPlatformInfo()
     {
@@ -201,7 +210,13 @@ class H5PFramework implements \H5PFrameworkInterface
 
     public function getOption($name, $default = NULL)
     {
-        // TODO: Implement getOption() method.
+        $configSetting = $this->configSettingRepository->findOneByKey($name);
+
+        if ($configSetting != null) {
+            return $configSetting->getValue();
+        }
+
+        return $default;
     }
 
     public function setOption($name, $value)
