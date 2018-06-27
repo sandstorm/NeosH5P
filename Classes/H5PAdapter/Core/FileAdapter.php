@@ -3,24 +3,87 @@
 namespace Sandstorm\NeosH5P\H5PAdapter\Core;
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Exception;
+use Neos\Flow\ResourceManagement\ResourceManager;
 use Neos\Utility\Exception\FilesException;
 use Neos\Utility\Files;
+use Sandstorm\NeosH5P\Domain\Model\Library;
+use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
 
 /**
  * @Flow\Scope("singleton")
  */
 class FileAdapter implements \H5PFileStorage
 {
+    /**
+     * @Flow\Inject
+     * @var ResourceManager
+     */
+    protected $resourceManager;
+
+    /**
+     * @Flow\Inject
+     * @var LibraryRepository
+     */
+    protected $libraryRepository;
 
     /**
      * Store the library folder.
      *
      * @param array $library
      *  Library properties
+     * @throws Exception
      */
-    public function saveLibrary($library)
+    public function saveLibrary($libraryData)
     {
-        // TODO: Implement saveLibrary() method.
+        $zipFileName = $this->zipDirectory($libraryData['uploadDirectory']);
+
+        // Import the resource into the collection "h5p libraries"
+        $resource = $this->resourceManager->importResource(
+            $zipFileName,
+            'h5p-libraries'
+        );
+
+        /** @var Library $library */
+        $library = $this->libraryRepository->findByIdentifier($libraryData['libraryId']);
+        $library->setZippedLibraryFile($resource);
+        die('TODO');
+    }
+
+    /**
+     * @param $directoryPath directory to zip.
+     * @return string name of zipped file
+     */
+    private function zipDirectory($directoryPath): string
+    {
+        // ZIP everything in the library's upload directory and save it as a resource
+        $zipFileName = $directoryPath . '.zip';
+        $zip = new \ZipArchive();
+        $zip->open($zipFileName, \ZipArchive::CREATE);
+
+        // Create recursive directory iterator
+        /** @var \SplFileInfo[] $files */
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directoryPath),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($files as $name => $file) {
+            if ($file->isDir()) {
+                continue;
+            }
+
+            // Get real and relative path for current file
+            $filePath = $file->getRealPath();
+            $relativePath = substr($filePath, strlen($directoryPath) + 1);
+
+            // Add current file to archive
+            $zip->addFile($filePath, $relativePath);
+        }
+
+        // Zip archive will be created only after closing object
+        $zip->close();
+        return $zipFileName;
     }
 
     /**

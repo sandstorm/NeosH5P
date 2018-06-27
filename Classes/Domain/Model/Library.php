@@ -154,7 +154,7 @@ class Library
      * @var PersistentResource
      * @ORM\OneToOne(cascade={"persist", "remove"})
      */
-    protected $zippedLibraryFiles;
+    protected $zippedLibraryFile;
 
     /**
      * Creates a library from a metadata array.
@@ -616,5 +616,21 @@ class Library
     public function setCachedAssets(Collection $cachedAssets): void
     {
         $this->cachedAssets = $cachedAssets;
+    }
+
+    /**
+     * @return PersistentResource
+     */
+    public function getZippedLibraryFile(): PersistentResource
+    {
+        return $this->zippedLibraryFile;
+    }
+
+    /**
+     * @param PersistentResource $zippedLibraryFile
+     */
+    public function setZippedLibraryFile(PersistentResource $zippedLibraryFile): void
+    {
+        $this->zippedLibraryFile = $zippedLibraryFile;
     }
 }

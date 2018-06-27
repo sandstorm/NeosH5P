@@ -6,6 +6,7 @@ use Neos\Flow\Annotations as Flow;
 use Neos\Flow\ResourceManagement\CollectionInterface;
 use Neos\Flow\ResourceManagement\PersistentResource;
 use Neos\Flow\ResourceManagement\ResourceManager;
+use Neos\Flow\ResourceManagement\ResourceRepository;
 use Neos\Flow\ResourceManagement\Storage\StorageInterface;
 use Neos\Flow\ResourceManagement\Storage\StorageObject;
 use Neos\Flow\Utility\Environment;
@@ -42,9 +43,9 @@ class ExtractedH5PFileStorage implements StorageInterface
 
     /**
      * @Flow\Inject
-     * @var FakeLibraryRepository
+     * @var ResourceRepository
      */
-    protected $fakeLibraryRepository;
+    protected $resourceRepository;
 
     /**
      * Constructor
@@ -126,10 +127,10 @@ class ExtractedH5PFileStorage implements StorageInterface
      */
     public function getObjectsByCollection(CollectionInterface $collection, callable $callback = null)
     {
+        $iterator = $this->resourceRepository->findByCollectionNameIterator($collection->getName());
         $iteration = 0;
-        $library = $this->fakeLibraryRepository->findAll();
-        foreach ($library as $item) {
-            $h5pPathAndFilename = $item->getH5pFile()->createTemporaryLocalCopy();
+        foreach ($this->resourceRepository->iterate($iterator, $callback) as $resource) {
+            $h5pPathAndFilename = $resource->createTemporaryLocalCopy();
             $zipArchive = new \ZipArchive();
 
             $zipArchive->open($h5pPathAndFilename);
