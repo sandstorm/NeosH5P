@@ -9,6 +9,14 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class LibraryTranslation {
 
+    public static function create(Library $library, string $languageCode, string $translation) : LibraryTranslation {
+        $translationInstance = new LibraryTranslation();
+        $translationInstance->setLibrary($library);
+        $translationInstance->setLanguageCode($languageCode);
+        $translationInstance->setTranslation($translation);
+        return $translationInstance;
+    }
+
     /**
      * @var Library
      * @ORM\Id
@@ -28,4 +36,54 @@ class LibraryTranslation {
      * @ORM\Column(type="text", nullable=false)
      */
     protected $translation;
+
+    /**
+     * @return Library
+     */
+    public function getLibrary(): Library
+    {
+        return $this->library;
+    }
+
+    /**
+     * @param Library $library
+     */
+    public function setLibrary(Library $library): void
+    {
+        $this->library = $library;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLanguageCode(): string
+    {
+        return $this->languageCode;
+    }
+
+    /**
+     * @param string $languageCode
+     */
+    public function setLanguageCode(string $languageCode): void
+    {
+        $this->languageCode = $languageCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTranslation(): string
+    {
+        return $this->translation;
+    }
+
+    /**
+     * @param string $translation
+     */
+    public function setTranslation(string $translation): void
+    {
+        $this->translation = $translation;
+    }
+
+
 }

@@ -4,20 +4,47 @@ namespace Sandstorm\NeosH5P\H5PAdapter\Core;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Neos\Flow\Exception;
+use Neos\Flow\ObjectManagement\DependencyInjection\DependencyProxy;
+use Neos\Flow\ObjectManagement\ObjectManagerInterface;
 use Neos\Flow\Package\PackageManagerInterface;
 use Neos\Flow\Persistence\Exception\IllegalObjectTypeException;
 use Neos\Flow\Persistence\PersistenceManagerInterface;
+use Neos\Flow\Persistence\QueryInterface;
 use Sandstorm\NeosH5P\Domain\Model\ConfigSetting;
 use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Model\ContentTypeCacheEntry;
+use Sandstorm\NeosH5P\Domain\Model\Library;
+use Sandstorm\NeosH5P\Domain\Model\LibraryDependency;
+use Sandstorm\NeosH5P\Domain\Model\LibraryTranslation;
 use Sandstorm\NeosH5P\Domain\Repository\ConfigSettingRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ContentTypeCacheEntryRepository;
+use Sandstorm\NeosH5P\Domain\Repository\LibraryDependencyRepository;
+use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
+use Sandstorm\NeosH5P\Domain\Repository\LibraryTranslationRepository;
 
 /**
  * @Flow\Scope("singleton")
  */
 class H5PFramework implements \H5PFrameworkInterface
 {
+    /**
+     * @Flow\Inject
+     * @var ObjectManagerInterface
+     */
+    protected $objectManager;
+
+    /**
+     * !!! DO NOT ACCESS THIS DIRECTLY!
+     * Use $this->>getInjectedH5PCore instead. Reason: This object exposes public properties (such as "fs" for the file
+     * storage adapter) which, when accessed, do not trigger the activation of the dependency proxy (only method calls
+     * do that). So we need to make sure the dependency proxy is resolved before accessing the H5PCore object.
+     *
+     * @Flow\Inject
+     * @var \H5PCore
+     */
+    protected $h5pCore;
+
     /**
      * @Flow\Inject
      * @var PackageManagerInterface
@@ -29,6 +56,24 @@ class H5PFramework implements \H5PFrameworkInterface
      * @var PersistenceManagerInterface
      */
     protected $persistenceManager;
+
+    /**
+     * @Flow\Inject
+     * @var LibraryRepository
+     */
+    protected $libraryRepository;
+
+    /**
+     * @Flow\Inject
+     * @var LibraryDependencyRepository
+     */
+    protected $libraryDependencyRepository;
+
+    /**
+     * @Flow\Inject
+     * @var LibraryTranslationRepository
+     */
+    protected $libraryTranslationRepository;
 
     /**
      * @Flow\Inject
@@ -46,11 +91,62 @@ class H5PFramework implements \H5PFrameworkInterface
     /**
      * ================================================================================================================
      * ================================================================================================================
+     * Non-Injected Properties
+     * ================================================================================================================
+     * ================================================================================================================
+     */
+
+
+    /**
+     * Path to a temporary folder where uploaded H5P content is processed.
+     * Needs to be stable during one request.
+     *
+     * @var string
+     */
+    protected $uploadedH5pFolderPath;
+
+    /**
+     * Path to a temporary H5P file.
+     * Needs to be stable during one request.
+     *
+     * @var string
+     */
+    protected $uploadedH5pPath;
+
+    /**
+     * Error and info message store.
+     * Needs to be stable during one request.
+     *
+     * @var array
+     */
+    protected $messages;
+
+
+    /**
+     * ================================================================================================================
+     * ================================================================================================================
+     * Custom Methods / Helper Functions
+     * ================================================================================================================
+     * ================================================================================================================
+     */
+    protected function getInjectedH5PCore(): \H5PCore
+    {
+        if ($this->h5pCore instanceof DependencyProxy) {
+            $this->h5pCore->_activateDependency();
+        }
+        return $this->h5pCore;
+    }
+
+    /**
+     * ================================================================================================================
+     * ================================================================================================================
      * Authorization
      * ================================================================================================================
      * ================================================================================================================
-     *
-     * /**
+     */
+
+
+    /**
      * Is the current user allowed to update libraries?
      *
      * @return boolean
@@ -328,7 +424,29 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function getLibraryId($machineName, $majorVersion = NULL, $minorVersion = NULL)
     {
-        // TODO: Implement getLibraryId() method.
+        $criteria = ['name' => $machineName];
+        if ($majorVersion) {
+            $criteria['majorVersion'] = $majorVersion;
+        }
+        if ($minorVersion) {
+            $criteria['minorVersion'] = $minorVersion;
+        }
+
+        $libraries = $this->libraryRepository->findBy(
+            $criteria,
+            [
+                'majorVersion' => QueryInterface::ORDER_DESCENDING,
+                'minorVersion' => QueryInterface::ORDER_DESCENDING,
+                'patchVersion' => QueryInterface::ORDER_DESCENDING,
+            ]
+        );
+
+        if (count($libraries) > 0) {
+            /** @var Library $library */
+            $library = $libraries[0];
+            return $this->persistenceManager->getIdentifierByObject($library);
+        }
+        return false;
     }
 
     /**
@@ -346,7 +464,16 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function isPatchedLibrary($library)
     {
-        // TODO: Implement isPatchedLibrary() method.
+        $criteria = [
+            'name' => $library['machineName'],
+            'majorVersion' => $library['majorVersion'],
+            'minorVersion' => $library['minorVersion'],
+            'patchVersion' => $library['patchVersion']
+        ];
+
+        $existingLibraries = $this->libraryRepository->findBy($criteria);
+
+        return count($existingLibraries) > 0;
     }
 
     /**
@@ -354,7 +481,7 @@ class H5PFramework implements \H5PFrameworkInterface
      *
      * Also fills in the libraryId in the libraryData object if the object is new
      *
-     * @param object $libraryData
+     * @param array $libraryData
      *   Associative array containing:
      *   - libraryId: The id of the library if it is an existing library.
      *   - title: The library's name
@@ -375,11 +502,44 @@ class H5PFramework implements \H5PFrameworkInterface
      *   - language(optional): associative array containing:
      *     - languageCode: Translation in json format
      * @param bool $new
+     * @throws Exception
      * @return
      */
     public function saveLibraryData(&$libraryData, $new = TRUE)
     {
-        // TODO: Implement saveLibraryData() method.
+        $library = null;
+        if ($new) {
+            $library = Library::createFromMetadata($libraryData);
+            $this->libraryRepository->add($library);
+            $libraryData['libraryId'] = $this->persistenceManager->getIdentifierByObject($library);
+        } else {
+            /** @var Library $library */
+            $library = $this->libraryRepository->findByIdentifier($libraryData['libraryId']);
+            if ($library === null) {
+                throw new Exception("Library with ID " . $libraryData['libraryId'] . "could not be found!");
+            }
+            Library::updateFromMetadata($libraryData, $library);
+            $this->libraryRepository->update($library);
+            $this->deleteLibraryDependencies($libraryData['libraryId']);
+        }
+
+        // TODO: Log an H5P Event here, once we implement this.
+
+        // Update languages
+        $translations = $this->libraryTranslationRepository->findByLibrary($library);
+        /** @var LibraryTranslation $translation */
+        foreach ($translations as $translation) {
+            $this->libraryTranslationRepository->remove($translation);
+        }
+        // Persist before we create new translations
+        $this->persistenceManager->persistAll();
+
+        if (isset($libraryData['language'])) {
+            foreach ($libraryData['language'] as $languageCode => $translation) {
+                $libraryTranslation = LibraryTranslation::create($library, $languageCode, $translation);
+                $this->libraryTranslationRepository->add($libraryTranslation);
+            }
+        }
     }
 
     /**
@@ -524,7 +684,15 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function deleteLibraryDependencies($libraryId)
     {
-        // TODO: Implement deleteLibraryDependencies() method.
+        $library = $this->libraryRepository->findByIdentifier($libraryId);
+        if ($library === null) {
+            return;
+        }
+        $dependencies = $this->libraryDependencyRepository->findByLibrary($library);
+        /** @var LibraryDependency $dependency */
+        foreach ($dependencies as $dependency) {
+            $this->libraryDependencyRepository->remove($dependency);
+        }
     }
 
     /**
@@ -709,7 +877,10 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function getUploadedH5pFolderPath()
     {
-        // TODO: Implement getUploadedH5pFolderPath() method.
+        if (!$this->uploadedH5pFolderPath) {
+            $this->uploadedH5pFolderPath = $this->getInjectedH5PCore()->fs->getTmpPath();
+        }
+        return $this->uploadedH5pFolderPath;
     }
 
     /**
@@ -720,7 +891,10 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function getUploadedH5pPath()
     {
-        // TODO: Implement getUploadedH5pPath() method.
+        if (!$this->uploadedH5pPath) {
+            $this->uploadedH5pPath = $this->getInjectedH5PCore()->fs->getTmpPath() . '.h5p';
+        }
+        return $this->uploadedH5pPath;
     }
 
     /**
@@ -735,10 +909,15 @@ class H5PFramework implements \H5PFrameworkInterface
      *   A string of file extensions separated by whitespace
      * @param string $defaultLibraryWhitelist
      *   A string of file extensions separated by whitespace
+     * @return string
      */
     public function getWhitelist($isLibrary, $defaultContentWhitelist, $defaultLibraryWhitelist)
     {
-        // TODO: Implement getWhitelist() method.
+        $whitelist = $defaultContentWhitelist;
+        if ($isLibrary) {
+            $whitelist .= ' ' . $defaultLibraryWhitelist;
+        }
+        return $whitelist;
     }
 
     /**
@@ -828,7 +1007,10 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function setErrorMessage($message, $code = NULL)
     {
-        // TODO: Implement setErrorMessage() method.
+        $this->messages['error'][] = (object)[
+            'code' => $code,
+            'message' => $message
+        ];
     }
 
     /**
@@ -839,7 +1021,7 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function setInfoMessage($message)
     {
-        // TODO: Implement setInfoMessage() method.
+        $this->messages['info'][] = $message;
     }
 
     /**
@@ -850,7 +1032,12 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function getMessages($type)
     {
-        // TODO: Implement getMessages() method.
+        if (empty($this->messages[$type])) {
+            return null;
+        }
+        $messages = $this->messages[$type];
+        $this->messages[$type] = [];
+        return $messages;
     }
 
     /**
@@ -871,7 +1058,7 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function t($message, $replacements = array())
     {
-        // TODO: Implement t() method.
+        return $message;
     }
 
     /**

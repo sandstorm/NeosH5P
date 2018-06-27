@@ -2,11 +2,20 @@
 namespace Sandstorm\NeosH5P\H5PAdapter\Editor;
 
 use Neos\Flow\Annotations as Flow;
+use Sandstorm\NeosH5P\Domain\Model\ContentTypeCacheEntry;
+use Sandstorm\NeosH5P\Domain\Repository\ContentTypeCacheEntryRepository;
 
 /**
  * @Flow\Scope("singleton")
  */
 class EditorAjax implements \H5PEditorAjaxInterface {
+
+    /**
+     * @Flow\Inject
+     * @var ContentTypeCacheEntryRepository
+     */
+    protected $contentTypeCacheEntryRepository;
+
     /**
      * Gets latest library versions that exists locally
      *
@@ -27,7 +36,11 @@ class EditorAjax implements \H5PEditorAjaxInterface {
      */
     public function getContentTypeCache($machineName = NULL)
     {
-        // TODO: Implement getContentTypeCache() method.
+        if($machineName != null) {
+            return $this->contentTypeCacheEntryRepository->findOneByMachineName($machineName);
+        }
+
+        throw new \Exception("content type without machine name is not implemented yet in our EditorAjax class!");
     }
 
     /**

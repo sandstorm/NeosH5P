@@ -1,12 +1,17 @@
 <?php
+
 namespace Sandstorm\NeosH5P\H5PAdapter\Core;
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Utility\Exception\FilesException;
+use Neos\Utility\Files;
 
 /**
  * @Flow\Scope("singleton")
  */
-class FileAdapter implements \H5PFileStorage {
+class FileAdapter implements \H5PFileStorage
+{
+
     /**
      * Store the library folder.
      *
@@ -58,12 +63,14 @@ class FileAdapter implements \H5PFileStorage {
     /**
      * Get path to a new unique tmp folder.
      *
-     * @return string
-     *  Path
+     * @return string Path
+     * @throws FilesException
      */
     public function getTmpPath()
     {
-        // TODO: Implement getTmpPath() method.
+        $tmpDir = FLOW_PATH_DATA . 'Temporary/H5P';
+        Files::createDirectoryRecursively($tmpDir);
+        return $tmpDir . '/' . uniqid('h5p-');
     }
 
     /**
