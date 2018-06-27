@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Neos\Flow\Annotations as Flow;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use Neos\Flow\ResourceManagement\PersistentResource;
 
 /**
  * @Flow\Entity
@@ -148,6 +149,12 @@ class Library
      * @ORM\ManyToMany(inversedBy="libraries", cascade={"persist"})
      */
     protected $cachedAssets;
+
+    /**
+     * @var PersistentResource
+     * @ORM\OneToOne(cascade={"persist", "remove"})
+     */
+    protected $zippedLibraryFiles;
 
     /**
      * Creates a library from a metadata array.
