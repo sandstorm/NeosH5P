@@ -40,7 +40,7 @@ class EditorAjax implements \H5PEditorAjaxInterface {
             return $this->contentTypeCacheEntryRepository->findOneByMachineName($machineName);
         }
 
-        throw new \Exception("content type without machine name is not implemented yet in our EditorAjax class!");
+        return $this->contentTypeCacheEntryRepository->getContentTypeCacheObjects();
     }
 
     /**

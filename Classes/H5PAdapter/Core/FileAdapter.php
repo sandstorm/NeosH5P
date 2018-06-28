@@ -45,7 +45,7 @@ class FileAdapter implements \H5PFileStorage
     }
 
     /**
-     * @param $directoryPath directory to zip.
+     * @param $directoryPath string directory to zip.
      * @return string name of zipped file
      */
     private function zipDirectory($directoryPath): string

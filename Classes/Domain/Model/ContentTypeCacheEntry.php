@@ -1,4 +1,5 @@
 <?php
+
 namespace Sandstorm\NeosH5P\Domain\Model;
 
 use Neos\Flow\Annotations as Flow;
@@ -8,7 +9,16 @@ use Neos\Utility\ObjectAccess;
 /**
  * @Flow\Entity
  */
-class ContentTypeCacheEntry {
+class ContentTypeCacheEntry
+{
+    /**
+     * This is the "Entry ID" we pass to H5P. H5P expects an int here, but we cannot use this as a technical primary
+     * key because doctrine doesnt handle it correctly. So this is a unique key.
+     *
+     * @var int
+     * @ORM\Column(nullable=false, columnDefinition="INT AUTO_INCREMENT UNIQUE")
+     */
+    protected $entryId;
 
     /**
      * @var string
@@ -159,6 +169,42 @@ class ContentTypeCacheEntry {
         $entry->setCategories(json_encode(isset($contentTypeCacheObject->categories) ? $contentTypeCacheObject->categories : []));
         $entry->setOwner($contentTypeCacheObject->owner);
         return $entry;
+    }
+
+    /**
+     * Returns the library cache entry in a format that H5P expects.
+     * @return \stdClass
+     */
+    public function toStdClass(): \stdClass
+    {
+        return (object)[
+            'id' => $this->getEntryId(),
+            'machine_name' => $this->getMachineName(),
+            'major_version' => $this->getMajorVersion(),
+            'minor_version' => $this->getMinorVersion(),
+            'patch_version' => $this->getPatchVersion(),
+            'h5p_major_version' => $this->getH5pMajorVersion(),
+            'h5p_minor_version' => $this->getH5pMinorVersion(),
+            'title' => $this->getTitle(),
+            'summary' => $this->getSummary(),
+            'description' => $this->getDescription(),
+            'icon' => $this->getIcon(),
+            'created_at' => $this->getCreatedAt()->getTimestamp(),
+            'updated_at' => $this->getUpdatedAt()->getTimestamp(),
+            'is_recommended' => $this->isRecommended(),
+            'popularity' => $this->getPopularity(),
+            'screenshots' => $this->getScreenshots(),
+            'license' => $this->getLicense(),
+            'owner' => $this->getOwner()
+        ];
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getEntryId()
+    {
+        return $this->entryId;
     }
 
     /**
