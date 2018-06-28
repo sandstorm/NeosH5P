@@ -42,6 +42,7 @@ class FileAdapter implements \H5PFileStorage
         /** @var Library $library */
         $library = $this->libraryRepository->findOneByLibraryId($libraryData['libraryId']);
         $library->setZippedLibraryFile($resource);
+        $this->libraryRepository->update($library);
     }
 
     /**

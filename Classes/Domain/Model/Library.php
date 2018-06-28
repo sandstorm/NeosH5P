@@ -531,7 +531,7 @@ class Library
     /**
      * @return bool
      */
-    public function isHasIcon(): bool
+    public function hasIcon(): bool
     {
         return $this->hasIcon;
     }

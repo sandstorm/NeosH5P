@@ -1,14 +1,24 @@
 <?php
+
 namespace Sandstorm\NeosH5P\H5PAdapter\Editor;
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Persistence\QueryInterface;
 use Sandstorm\NeosH5P\Domain\Model\ContentTypeCacheEntry;
+use Sandstorm\NeosH5P\Domain\Model\Library;
 use Sandstorm\NeosH5P\Domain\Repository\ContentTypeCacheEntryRepository;
+use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
 
 /**
  * @Flow\Scope("singleton")
  */
-class EditorAjax implements \H5PEditorAjaxInterface {
+class EditorAjax implements \H5PEditorAjaxInterface
+{
+    /**
+     * @Flow\Inject
+     * @var LibraryRepository
+     */
+    protected $libraryRepository;
 
     /**
      * @Flow\Inject
@@ -23,7 +33,30 @@ class EditorAjax implements \H5PEditorAjaxInterface {
      */
     public function getLatestLibraryVersions()
     {
-        // TODO: Implement getLatestLibraryVersions() method.
+        $librariesOrderedByMajorAndMinorVersion = $this->libraryRepository->findBy([], [
+            'name' => QueryInterface::ORDER_DESCENDING,
+            'majorVersion' => QueryInterface::ORDER_DESCENDING,
+            'minorVersion' => QueryInterface::ORDER_DESCENDING
+        ]);
+
+        $versionInformation = [];
+        /** @var Library $library */
+        foreach ($librariesOrderedByMajorAndMinorVersion as $library) {
+            if(array_key_exists($library->getName(), $versionInformation)) {
+                continue;
+            }
+            $versionInformation[] = (object)[
+                'id' => $library->getLibraryId(),
+                'machine_name' => $library->getName(),
+                'title' => $library->getTitle(),
+                'major_version' => $library->getMajorVersion(),
+                'minor_version' => $library->getMinorVersion(),
+                'patch_version' => $library->getPatchVersion(),
+                'restricted' => $library->isRestricted(),
+                'has_icon' => $library->hasIcon()
+            ];
+        }
+        return $versionInformation;
     }
 
     /**
@@ -36,7 +69,7 @@ class EditorAjax implements \H5PEditorAjaxInterface {
      */
     public function getContentTypeCache($machineName = NULL)
     {
-        if($machineName != null) {
+        if ($machineName != null) {
             return $this->contentTypeCacheEntryRepository->findOneByMachineName($machineName);
         }
 
