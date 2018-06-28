@@ -13,6 +13,14 @@ use Neos\Flow\ResourceManagement\PersistentResource;
  */
 class Library
 {
+    /**
+     * This is the "Library ID" we pass to H5P. H5P expects an int here, but we cannot use this as a technical primary
+     * key because doctrine doesnt handle it correctly. So this is a unique key.
+     *
+     * @var int
+     * @ORM\Column(nullable=false, columnDefinition="INT AUTO_INCREMENT UNIQUE")
+     */
+    protected $libraryId;
 
     /**
      * @var \DateTime
@@ -213,11 +221,9 @@ class Library
         $library->setPatchVersion($libraryData['patchVersion']);
         $library->setRunnable($libraryData['runnable']);
         $library->setHasIcon($libraryData['hasIcon'] ? true : false);
-
         if (isset($libraryData['semantics'])) {
             $library->setSemantics($libraryData['semantics']);
         }
-
         if (isset($libraryData['fullscreen'])) {
             $library->setFullscreen($libraryData['fullscreen']);
         }
@@ -619,9 +625,9 @@ class Library
     }
 
     /**
-     * @return PersistentResource
+     * @return PersistentResource|null
      */
-    public function getZippedLibraryFile(): PersistentResource
+    public function getZippedLibraryFile()
     {
         return $this->zippedLibraryFile;
     }
@@ -632,5 +638,13 @@ class Library
     public function setZippedLibraryFile(PersistentResource $zippedLibraryFile): void
     {
         $this->zippedLibraryFile = $zippedLibraryFile;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getLibraryId()
+    {
+        return $this->libraryId;
     }
 }

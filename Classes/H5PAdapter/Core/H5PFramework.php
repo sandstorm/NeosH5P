@@ -444,7 +444,7 @@ class H5PFramework implements \H5PFrameworkInterface
         if (count($libraries) > 0) {
             /** @var Library $library */
             $library = $libraries[0];
-            return $this->persistenceManager->getIdentifierByObject($library);
+            return $library->getLibraryId();
         }
         return false;
     }
@@ -511,12 +511,16 @@ class H5PFramework implements \H5PFrameworkInterface
         if ($new) {
             $library = Library::createFromMetadata($libraryData);
             $this->libraryRepository->add($library);
-            $libraryData['libraryId'] = $this->persistenceManager->getIdentifierByObject($library);
+            // Persist and re-read the entity to generate the library ID in the DB and fill the field
+            $this->persistenceManager->persistAll();
+            $this->persistenceManager->clearState();
+            $library = $this->libraryRepository->findByIdentifier($this->persistenceManager->getIdentifierByObject($library));
+            $libraryData['libraryId'] = $library->getLibraryId();
         } else {
             /** @var Library $library */
-            $library = $this->libraryRepository->findByIdentifier($libraryData['libraryId']);
+            $library = $this->libraryRepository->findOneByLibraryId($libraryData['libraryId']);
             if ($library === null) {
-                throw new Exception("Library with ID " . $libraryData['libraryId'] . "could not be found!");
+                throw new Exception("Library with ID " . $libraryData['libraryId'] . " could not be found!");
             }
             Library::updateFromMetadata($libraryData, $library);
             $this->libraryRepository->update($library);
@@ -684,7 +688,7 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function deleteLibraryDependencies($libraryId)
     {
-        $library = $this->libraryRepository->findByIdentifier($libraryId);
+        $library = $this->libraryRepository->findOneByLibraryId($libraryId);
         if ($library === null) {
             return;
         }

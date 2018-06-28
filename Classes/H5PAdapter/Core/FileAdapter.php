@@ -30,24 +30,18 @@ class FileAdapter implements \H5PFileStorage
     /**
      * Store the library folder.
      *
-     * @param array $library
+     * @param array $libraryData
      *  Library properties
      * @throws Exception
      */
     public function saveLibrary($libraryData)
     {
         $zipFileName = $this->zipDirectory($libraryData['uploadDirectory']);
-
-        // Import the resource into the collection "h5p libraries"
-        $resource = $this->resourceManager->importResource(
-            $zipFileName,
-            'h5p-libraries'
-        );
+        $resource = $this->resourceManager->importResource($zipFileName);
 
         /** @var Library $library */
-        $library = $this->libraryRepository->findByIdentifier($libraryData['libraryId']);
+        $library = $this->libraryRepository->findOneByLibraryId($libraryData['libraryId']);
         $library->setZippedLibraryFile($resource);
-        die('TODO');
     }
 
     /**
