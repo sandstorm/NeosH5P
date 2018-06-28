@@ -1,13 +1,17 @@
 <?php
+
 namespace Sandstorm\NeosH5P\H5PAdapter\Editor;
 
 use H5peditorFile;
 use Neos\Flow\Annotations as Flow;
+use Neos\Utility\Exception\FilesException;
+use Neos\Utility\Files;
 
 /**
  * @Flow\Scope("singleton")
  */
-class EditorFileAdapter implements \H5peditorStorage {
+class EditorFileAdapter implements \H5peditorStorage
+{
     /**
      * Load language file(JSON) from database.
      * This is used to translate the editor fields(title, description etc.)
@@ -100,7 +104,16 @@ class EditorFileAdapter implements \H5peditorStorage {
      */
     public static function removeTemporarilySavedFiles($filePath)
     {
-        // TODO: Implement removeTemporarilySavedFiles() method.
+        if (is_dir($filePath)) {
+            try {
+                Files::removeDirectoryRecursively($filePath);
+            } catch (FilesException $e) {
+                // Swallow - temp dir is regarded as trash anyway and should be deleted regularly (e.g. on deployment)
+            }
+        }
+        else {
+            unlink($filePath);
+        }
     }
 
 }
