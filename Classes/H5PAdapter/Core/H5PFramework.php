@@ -568,10 +568,42 @@ class H5PFramework implements \H5PFrameworkInterface
      *   - editor
      *   - preloaded
      *   - dynamic
+     * @throws Exception
      */
     public function saveLibraryDependencies($libraryId, $dependencies, $dependency_type)
     {
-        // TODO: Implement saveLibraryDependencies() method.
+        $dependingLibrary = $this->libraryRepository->findOneByLibraryId($libraryId);
+        if ($dependingLibrary === null) {
+            throw new Exception("The Library with ID " . $libraryId . " could not be found.");
+        }
+
+        foreach ($dependencies as $dependency) {
+            // Load the library we're depending on
+            /** @var Library $requiredLibrary */
+            $requiredLibrary = $this->libraryRepository->findOneBy([
+                'name' => $dependency['machineName'],
+                'majorVersion' => $dependency['majorVersion'],
+                'minorVersion' => $dependency['minorVersion']
+            ]);
+            // We don't have this library and thus can't register a dependency
+            if ($requiredLibrary === null) {
+                continue;
+            }
+            /** @var LibraryDependency $existingDependency */
+            $existingDependency = $this->libraryDependencyRepository->findOneBy([
+                'library' => $dependingLibrary,
+                'requiredLibrary' => $requiredLibrary
+            ]);
+            if ($existingDependency !== null) {
+                // Dependency exists, only update the type
+                $existingDependency->setDependencyType($dependency_type);
+                $this->libraryDependencyRepository->update($existingDependency);
+            } else {
+                // Depedency does not exist, create it
+                $dependency = new LibraryDependency($dependingLibrary, $requiredLibrary, $dependency_type);
+                $this->libraryDependencyRepository->add($dependency);
+            }
+        }
     }
 
     /**
@@ -704,6 +736,9 @@ class H5PFramework implements \H5PFrameworkInterface
         foreach ($dependencies as $dependency) {
             $this->libraryDependencyRepository->remove($dependency);
         }
+
+        // Make sure we persist here, because new dependencies can be created right afterwards
+        $this->persistenceManager->persistAll();
     }
 
     /**
@@ -841,7 +876,7 @@ class H5PFramework implements \H5PFrameworkInterface
 
         /** @var Library $library */
         $library = $this->libraryRepository->findOneByLibraryId($library_id);
-        if($library === null) {
+        if ($library === null) {
             return $removedKeys;
         }
 
