@@ -60,6 +60,10 @@ Neos:
       storages:
         h5pLibraryStorage:
           storage: 'Sandstorm\NeosH5P\Resource\Storage\ExtractedH5PLibraryStorage'
+          storageOptions:
+            publishingSubfolder: 'libraries'
+            resourceGetterMethod: 'getZippedLibraryFile'
+            itemFolderNameMethod: 'getNameAndVersionString'
         h5pCoreStorage:
           storage: 'Sandstorm\NeosH5P\Resource\Storage\H5PPackageFileStorage'
           storageOptions:

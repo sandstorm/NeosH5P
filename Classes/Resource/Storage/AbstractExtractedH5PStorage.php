@@ -4,22 +4,26 @@ namespace Sandstorm\NeosH5P\Resource\Storage;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Exception;
+use Neos\Flow\Persistence\Doctrine\Repository;
 use Neos\Flow\ResourceManagement\CollectionInterface;
 use Neos\Flow\ResourceManagement\PersistentResource;
 use Neos\Flow\ResourceManagement\ResourceManager;
 use Neos\Flow\ResourceManagement\Storage\StorageInterface;
 use Neos\Flow\ResourceManagement\Storage\StorageObject;
 use Neos\Flow\Utility\Environment;
-use Neos\Utility\Exception\FilesException;
-use Neos\Utility\Files;
-use Neos\Utility\Unicode\Functions as UnicodeFunctions;
 
 /**
- * Read-only storage for H5P core packages ; making some subfolders exposed in the web root.
+ * Abstract base class for the extracted file storages for Library and Content.
+ * Expects three storage Options:
  *
- * @Flow\Scope("singleton")
+ * - Subfolder of the H5P Public web directory to publish to. Example:
+ *   publishingSubfolder: 'libraries'
+ * - Name of the method that yields the zipped PersistentResource which should be extracted. Example:
+ *   resourceGetterMethod: 'getZippedLibraryFile'
+ * - Method that returns the name of the directory for each individual extracted item. Example:
+ *   itemFolderNameMethod: 'getNameAndVersionString'
  */
-class H5PPackageFileStorage implements StorageInterface
+abstract class AbstractExtractedH5PStorage implements StorageInterface
 {
     /**
      * Name which identifies this resource storage
@@ -46,19 +50,29 @@ class H5PPackageFileStorage implements StorageInterface
     protected $options;
 
     /**
+     * Subclasses must inject the repository from which the asset resources should come here.
+     * (Will be a LibraryRepository or a ContentRepository)
+     * @api
+     *
+     * @var Repository
+     */
+    protected $repository;
+
+    /**
      * Constructor
      *
      * @param string $name Name of this storage instance, according to the resource settings
      * @param array $options Options for this storage
-     * @throws Exception
+     * @throws \Neos\Flow\Exception
      */
     public function __construct($name, array $options = [])
     {
         $this->name = $name;
         foreach ($options as $key => $value) {
             switch ($key) {
-                case 'path':
-                case 'subfolders':
+                case 'publishingSubfolder':
+                case 'resourceGetterMethod':
+                case 'itemFolderNameMethod':
                     $this->options[$key] = $value;
                     break;
                 default:
@@ -110,6 +124,7 @@ class H5PPackageFileStorage implements StorageInterface
      * Retrieve all Objects stored in this storage.
      *
      * @return \Generator<StorageObject>
+     * @throws \Neos\Flow\ResourceManagement\Exception
      * @api
      */
     public function getObjects()
@@ -124,50 +139,51 @@ class H5PPackageFileStorage implements StorageInterface
      *
      * @param CollectionInterface $collection
      * @param callable $callback Function called after each iteration
-     * @throws FilesException
+     * @throws \Neos\Flow\ResourceManagement\Exception
      * @return \Generator<StorageObject>
      * @api
      */
     public function getObjectsByCollection(CollectionInterface $collection, callable $callback = null)
     {
         $iteration = 0;
+        $items = $this->repository->findAll();
+        foreach ($items as $item) {
+            $resourceGetterMethod = $this->options['resourceGetterMethod'];
+            $h5pPathAndFilename = $item->$resourceGetterMethod()->createTemporaryLocalCopy();
+            $zipArchive = new \ZipArchive();
 
-        foreach ($this->options['subfolders'] as $subfoldername) {
-            $absolutePath = $this->options['path'] . $subfoldername;
-            foreach (Files::getRecursiveDirectoryGenerator($absolutePath) as $resourcePathAndFilename) {
-                $object = $this->createStorageObject($resourcePathAndFilename, basename($this->options['path']) . '/' . $subfoldername);
+            $zipArchive->open($h5pPathAndFilename);
+            for ($i = 0; $i < $zipArchive->numFiles; $i++) {
+                $pathAndFilenameInZip = $zipArchive->getNameIndex($i);
+                if (substr($pathAndFilenameInZip, -1) === '/') {
+                    // Skip directories (everything ending with "/")
+                    continue;
+                }
+                $fileContents = stream_get_contents($zipArchive->getStream($pathAndFilenameInZip));
+
+                $stream = fopen('php://memory', 'r+');
+                fwrite($stream, $fileContents);
+                rewind($stream);
+                $object = new StorageObject();
+                $object->setFilename($pathAndFilenameInZip);
+                $object->setSha1(sha1($fileContents));
+                $object->setMd5(md5($fileContents));
+                $object->setFileSize(strlen($fileContents));
+                $object->setStream($stream);
+                $itemFolderNameMethod = $this->options['itemFolderNameMethod'];
+                $object->setRelativePublicationPath(
+                    DIRECTORY_SEPARATOR . $this->options['publishingSubfolder'] .
+                    DIRECTORY_SEPARATOR . $item->$itemFolderNameMethod() .
+                    DIRECTORY_SEPARATOR . dirname($pathAndFilenameInZip) .
+                    DIRECTORY_SEPARATOR);
                 yield $object;
+
                 if (is_callable($callback)) {
                     call_user_func($callback, $iteration, $object);
                 }
                 $iteration++;
             }
+            $zipArchive->close();
         }
-    }
-
-    /**
-     * Create a storage object for the given static resource path.
-     *
-     * @param string $resourcePathAndFilename
-     * @param string $relativePublicationPath
-     * @return StorageObject
-     */
-    protected function createStorageObject($resourcePathAndFilename, string $relativePublicationPath)
-    {
-        $pathInfo = UnicodeFunctions::pathinfo($resourcePathAndFilename);
-
-        $object = new StorageObject();
-        $object->setFilename($pathInfo['basename']);
-        $object->setSha1(sha1_file($resourcePathAndFilename));
-        $object->setMd5(md5_file($resourcePathAndFilename));
-        $object->setFileSize(filesize($resourcePathAndFilename));
-        if (isset($pathInfo['dirname'])) {
-            $object->setRelativePublicationPath($relativePublicationPath . '/');
-        }
-        $object->setStream(function () use ($resourcePathAndFilename) {
-            return fopen($resourcePathAndFilename, 'r');
-        });
-
-        return $object;
     }
 }
