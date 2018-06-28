@@ -1,6 +1,7 @@
 <?php
 namespace Sandstorm\NeosH5P\Domain\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Neos\Flow\Annotations as Flow;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
@@ -119,4 +120,281 @@ class Content {
      */
     protected $contentUserDatas;
 
+    public function __construct()
+    {
+        $this->contentDependencies = new ArrayCollection();
+        $this->contentUserDatas = new ArrayCollection();
+    }
+
+    /**
+     * @return Library
+     */
+    public function getLibrary(): Library
+    {
+        return $this->library;
+    }
+
+    /**
+     * @param Library $library
+     */
+    public function setLibrary(Library $library): void
+    {
+        $this->library = $library;
+    }
+
+    /**
+     * @return Account
+     */
+    public function getAccount(): Account
+    {
+        return $this->account;
+    }
+
+    /**
+     * @param Account $account
+     */
+    public function setAccount(Account $account): void
+    {
+        $this->account = $account;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime $createdAt
+     */
+    public function setCreatedAt(\DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getUpdatedAt(): \DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param \DateTime $updatedAt
+     */
+    public function setUpdatedAt(\DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle(string $title): void
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return string
+     */
+    public function getParameters(): string
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @param string $parameters
+     */
+    public function setParameters(string $parameters): void
+    {
+        $this->parameters = $parameters;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFiltered(): string
+    {
+        return $this->filtered;
+    }
+
+    /**
+     * @param string $filtered
+     */
+    public function setFiltered(string $filtered): void
+    {
+        $this->filtered = $filtered;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    /**
+     * @param string $slug
+     */
+    public function setSlug(string $slug): void
+    {
+        $this->slug = $slug;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmbedType(): string
+    {
+        return $this->embedType;
+    }
+
+    /**
+     * @param string $embedType
+     */
+    public function setEmbedType(string $embedType): void
+    {
+        $this->embedType = $embedType;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDisable(): bool
+    {
+        return $this->disable;
+    }
+
+    /**
+     * @param bool $disable
+     */
+    public function setDisable(bool $disable): void
+    {
+        $this->disable = $disable;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContentType(): string
+    {
+        return $this->contentType;
+    }
+
+    /**
+     * @param string $contentType
+     */
+    public function setContentType(string $contentType): void
+    {
+        $this->contentType = $contentType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAuthor(): string
+    {
+        return $this->author;
+    }
+
+    /**
+     * @param string $author
+     */
+    public function setAuthor(string $author): void
+    {
+        $this->author = $author;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLicense(): string
+    {
+        return $this->license;
+    }
+
+    /**
+     * @param string $license
+     */
+    public function setLicense(string $license): void
+    {
+        $this->license = $license;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKeywords(): string
+    {
+        return $this->keywords;
+    }
+
+    /**
+     * @param string $keywords
+     */
+    public function setKeywords(string $keywords): void
+    {
+        $this->keywords = $keywords;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getContentDependencies(): Collection
+    {
+        return $this->contentDependencies;
+    }
+
+    /**
+     * @param Collection $contentDependencies
+     */
+    public function setContentDependencies(Collection $contentDependencies): void
+    {
+        $this->contentDependencies = $contentDependencies;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getContentUserDatas(): Collection
+    {
+        return $this->contentUserDatas;
+    }
+
+    /**
+     * @param Collection $contentUserDatas
+     */
+    public function setContentUserDatas(Collection $contentUserDatas): void
+    {
+        $this->contentUserDatas = $contentUserDatas;
+    }
 }

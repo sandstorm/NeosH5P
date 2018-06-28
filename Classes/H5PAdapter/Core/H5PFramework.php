@@ -13,12 +13,14 @@ use Neos\Flow\Persistence\PersistenceManagerInterface;
 use Neos\Flow\Persistence\QueryInterface;
 use Sandstorm\NeosH5P\Domain\Model\ConfigSetting;
 use Neos\Flow\Annotations as Flow;
+use Sandstorm\NeosH5P\Domain\Model\Content;
 use Sandstorm\NeosH5P\Domain\Model\ContentTypeCacheEntry;
 use Sandstorm\NeosH5P\Domain\Model\Library;
 use Sandstorm\NeosH5P\Domain\Model\LibraryDependency;
 use Sandstorm\NeosH5P\Domain\Model\LibraryTranslation;
 use Sandstorm\NeosH5P\Domain\Repository\CachedAssetRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ConfigSettingRepository;
+use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ContentTypeCacheEntryRepository;
 use Sandstorm\NeosH5P\Domain\Repository\LibraryDependencyRepository;
 use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
@@ -57,6 +59,12 @@ class H5PFramework implements \H5PFrameworkInterface
      * @var PersistenceManagerInterface
      */
     protected $persistenceManager;
+
+    /**
+     * @Flow\Inject
+     * @var ContentRepository
+     */
+    protected $contentRepository;
 
     /**
      * @Flow\Inject
@@ -344,10 +352,21 @@ class H5PFramework implements \H5PFrameworkInterface
      * and the parameters re-filtered.
      *
      * @param int $library_id
+     * @throws Exception
      */
     public function clearFilteredParameters($library_id)
     {
-        // TODO: Implement clearFilteredParameters() method.
+        /** @var Library $library */
+        $library = $this->libraryRepository->findOneByLibraryId($library_id);
+        if ($library === null) {
+            throw new Exception("Library with ID " . $library_id . " could not be found!");
+        }
+        $contentsOfThisLibrary = $this->contentRepository->findByLibrary($library);
+        /** @var Content $content */
+        foreach ($contentsOfThisLibrary as $content) {
+            $content->setFiltered('');
+            $this->contentRepository->update($content);
+        }
     }
 
     /**
