@@ -794,11 +794,10 @@ class H5PFramework implements \H5PFrameworkInterface
             $configSetting->setConfigValue($value);
             $this->configSettingRepository->update($configSetting);
         } else {
-            $configSetting = new ConfigSetting();
-            $configSetting->setConfigKey($name);
-            $configSetting->setConfigValue($value);
+            $configSetting = new ConfigSetting($name, $value);
             $this->configSettingRepository->add($configSetting);
         }
+        $this->persistenceManager->persistAll();
     }
 
     /**

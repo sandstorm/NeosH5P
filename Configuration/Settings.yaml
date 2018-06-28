@@ -3,6 +3,11 @@ Sandstorm:
     # URL of the h5p public folder. Can be absolute or relative to the base Uri.
     # Needs to match the baseUri for the custom targets all the way down.
     h5pPublicFolderUrl: &h5pPublicFolderUrl '_Resources/Static/H5P/'
+    # These can be generated as ConfigSettings by the flow command
+    # ./flow h5p:generatedefaultconfigsettings.
+    defaultConfigSettings:
+      send_usage_statistics: 0
+
 
 Neos:
   Neos:
