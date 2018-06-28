@@ -3,13 +3,15 @@
 namespace Sandstorm\NeosH5P\Resource\Storage;
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Exception;
 use Neos\Flow\ResourceManagement\CollectionInterface;
 use Neos\Flow\ResourceManagement\PersistentResource;
 use Neos\Flow\ResourceManagement\ResourceManager;
-use Neos\Flow\ResourceManagement\ResourceRepository;
 use Neos\Flow\ResourceManagement\Storage\StorageInterface;
 use Neos\Flow\ResourceManagement\Storage\StorageObject;
 use Neos\Flow\Utility\Environment;
+use Sandstorm\NeosH5P\Domain\Model\Library;
+use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
 
 /**
  * Read-only shim for all registered H5P Libraries; making the extracted versions exposed in the web root.
@@ -19,9 +21,8 @@ use Neos\Flow\Utility\Environment;
  *
  * @Flow\Scope("singleton")
  */
-class ExtractedH5PFileStorage implements StorageInterface
+class ExtractedH5PLibraryStorage implements StorageInterface
 {
-
     /**
      * Name which identifies this resource storage
      *
@@ -43,9 +44,9 @@ class ExtractedH5PFileStorage implements StorageInterface
 
     /**
      * @Flow\Inject
-     * @var ResourceRepository
+     * @var LibraryRepository
      */
-    protected $resourceRepository;
+    protected $libraryRepository;
 
     /**
      * Constructor
@@ -61,7 +62,7 @@ class ExtractedH5PFileStorage implements StorageInterface
             switch ($key) {
                 default:
                     if ($value !== null) {
-                        throw new \Neos\Flow\Exception(sprintf('An unknown option "%s" was specified in the configuration of a resource FileSystemStorage. Please check your settings.', $key), 1361533187);
+                        throw new Exception(sprintf('An unknown option "%s" was specified in the configuration of a resource FileSystemStorage. Please check your settings.', $key), 1361533187);
                     }
             }
         }
@@ -108,6 +109,7 @@ class ExtractedH5PFileStorage implements StorageInterface
      * Retrieve all Objects stored in this storage.
      *
      * @return \Generator<StorageObject>
+     * @throws \Neos\Flow\ResourceManagement\Exception
      * @api
      */
     public function getObjects()
@@ -122,15 +124,17 @@ class ExtractedH5PFileStorage implements StorageInterface
      *
      * @param CollectionInterface $collection
      * @param callable $callback Function called after each iteration
+     * @throws \Neos\Flow\ResourceManagement\Exception
      * @return \Generator<StorageObject>
      * @api
      */
     public function getObjectsByCollection(CollectionInterface $collection, callable $callback = null)
     {
-        $iterator = $this->resourceRepository->findByCollectionNameIterator($collection->getName());
         $iteration = 0;
-        foreach ($this->resourceRepository->iterate($iterator, $callback) as $resource) {
-            $h5pPathAndFilename = $resource->createTemporaryLocalCopy();
+        $libraries = $this->libraryRepository->findAll();
+        /** @var Library $library */
+        foreach ($libraries as $library) {
+            $h5pPathAndFilename = $library->getZippedLibraryFile()->createTemporaryLocalCopy();
             $zipArchive = new \ZipArchive();
 
             $zipArchive->open($h5pPathAndFilename);
@@ -151,7 +155,7 @@ class ExtractedH5PFileStorage implements StorageInterface
                 $object->setMd5(md5($fileContents));
                 $object->setFileSize(strlen($fileContents));
                 $object->setStream($stream);
-                $object->setRelativePublicationPath('libraries/' . dirname($pathAndFilenameInZip) . '/');
+                $object->setRelativePublicationPath('libraries/' . $library->getNameAndVersionString() . '/' . dirname($pathAndFilenameInZip) . '/');
                 yield $object;
 
                 if (is_callable($callback)) {

@@ -41,12 +41,6 @@ class H5PPackageFileStorage implements StorageInterface
     protected $resourceManager;
 
     /**
-     * @Flow\Inject
-     * @var FakeLibraryRepository
-     */
-    protected $fakeLibraryRepository;
-
-    /**
      * Constructor
      *
      * @param string $name Name of this storage instance, according to the resource settings

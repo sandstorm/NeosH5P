@@ -242,6 +242,17 @@ class Library
     }
 
     /**
+     * Returns the library name in a format such as
+     * H5P.MultiChoice-1.12
+     *
+     * @return string
+     */
+    public function getNameAndVersionString(): string
+    {
+        return $this->getName() . '-' . $this->getMajorVersion() . '.' . $this->getMinorVersion();
+    }
+
+    /**
      * Convert list of file paths to csv
      *
      * @param array $library

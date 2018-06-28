@@ -3,6 +3,7 @@ Sandstorm:
     # URL of the h5p public folder. Can be absolute or relative to the base Uri.
     # Needs to match the baseUri for the custom targets all the way down.
     h5pPublicFolderUrl: &h5pPublicFolderUrl '_Resources/Static/H5P/'
+    h5pPublicFolderPath: &h5pPublicFolderPath '%FLOW_PATH_WEB%_Resources/Static/H5P/'
     # These can be generated as ConfigSettings by the flow command
     # ./flow h5p:generatedefaultconfigsettings.
     defaultConfigSettings:
@@ -58,7 +59,7 @@ Neos:
     resource:
       storages:
         h5pLibraryStorage:
-          storage: 'Sandstorm\NeosH5P\Resource\Storage\ExtractedH5PFileStorage'
+          storage: 'Sandstorm\NeosH5P\Resource\Storage\ExtractedH5PLibraryStorage'
         h5pCoreStorage:
           storage: 'Sandstorm\NeosH5P\Resource\Storage\H5PPackageFileStorage'
           storageOptions:
@@ -95,18 +96,18 @@ Neos:
         h5pLibraryTarget:
           target: 'Neos\Flow\ResourceManagement\Target\FileSystemTarget'
           targetOptions:
-            path: '%FLOW_PATH_WEB%_Resources/Static/H5P/'
+            path: *h5pPublicFolderPath
             baseUri: *h5pPublicFolderUrl
             subdivideHashPathSegment: false
         h5pCoreTarget:
           target: 'Neos\Flow\ResourceManagement\Target\FileSystemTarget'
           targetOptions:
-            path: '%FLOW_PATH_WEB%_Resources/Static/H5P/'
+            path: *h5pPublicFolderPath
             baseUri: *h5pPublicFolderUrl
             subdivideHashPathSegment: false
         h5pEditorTarget:
           target: 'Neos\Flow\ResourceManagement\Target\FileSystemTarget'
           targetOptions:
-            path: '%FLOW_PATH_WEB%_Resources/Static/H5P/'
+            path: *h5pPublicFolderPath
             baseUri: *h5pPublicFolderUrl
             subdivideHashPathSegment: false
