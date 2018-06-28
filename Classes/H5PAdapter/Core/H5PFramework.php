@@ -17,6 +17,7 @@ use Sandstorm\NeosH5P\Domain\Model\ContentTypeCacheEntry;
 use Sandstorm\NeosH5P\Domain\Model\Library;
 use Sandstorm\NeosH5P\Domain\Model\LibraryDependency;
 use Sandstorm\NeosH5P\Domain\Model\LibraryTranslation;
+use Sandstorm\NeosH5P\Domain\Repository\CachedAssetRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ConfigSettingRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ContentTypeCacheEntryRepository;
 use Sandstorm\NeosH5P\Domain\Repository\LibraryDependencyRepository;
@@ -86,6 +87,12 @@ class H5PFramework implements \H5PFrameworkInterface
      * @var ContentTypeCacheEntryRepository
      */
     protected $contentTypeCacheEntryRepository;
+
+    /**
+     * @Flow\Inject
+     * @var CachedAssetRepository
+     */
+    protected $cachedAssetRepository;
 
 
     /**
@@ -830,7 +837,20 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function deleteCachedAssets($library_id)
     {
-        // TODO: Implement deleteCachedAssets() method.
+        $removedKeys = [];
+
+        /** @var Library $library */
+        $library = $this->libraryRepository->findOneByLibraryId($library_id);
+        if($library === null) {
+            return $removedKeys;
+        }
+
+        $cachedAssetsForLibrary = $this->cachedAssetRepository->findByLibrary($library);
+        foreach ($cachedAssetsForLibrary as $cachedAsset) {
+            $removedKeys[] = $this->persistenceManager->getIdentifierByObject($cachedAsset);
+            $this->cachedAssetRepository->remove($cachedAsset);
+        }
+        return $removedKeys;
     }
 
     /**

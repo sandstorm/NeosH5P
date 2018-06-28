@@ -225,7 +225,11 @@ class FileAdapter implements \H5PFileStorage
      */
     public function deleteCachedAssets($keys)
     {
-        // TODO: Implement deleteCachedAssets() method.
+        /**
+         * This is called right after H5PFramework->deleteCachedAssets and is supposed to remove the actual asset files.
+         * Since we have cascade="remove" set on the relation CachedAsset->PersistentResource, the Resource should be
+         * removed automatically by Doctrine. This means we have to do nothing here.
+         */
     }
 
     /**
