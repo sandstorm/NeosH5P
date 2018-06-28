@@ -14,14 +14,24 @@ class H5PCoreFactory
      * @Flow\Inject(lazy=false)
      */
     protected $h5pFrameworkInterface;
+    /**
+     * @var boolean
+     * @Flow\InjectConfiguration(path="aggregateAssets")
+     */
+    protected $aggregateAssets;
 
     public function getCore(string $h5pPublicFolderUrl): \H5PCore
     {
-        return new \H5PCore(
+        $core = new \H5PCore(
             $this->h5pFrameworkInterface,
             new FileAdapter(),
             $h5pPublicFolderUrl,
             'en', // We only support english for now
             false);
+
+        // control asset aggregation
+        $core->aggregateAssets = $this->aggregateAssets;
+
+        return $core;
     }
 }

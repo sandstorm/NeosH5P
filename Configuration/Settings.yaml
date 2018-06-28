@@ -7,6 +7,9 @@ Sandstorm:
     # ./flow h5p:generatedefaultconfigsettings.
     defaultConfigSettings:
       send_usage_statistics: 0
+    # Setting for the H5PCore->aggregateAssets switch. If set to TRUE, H5P triggers the generation of
+    # aggregated assets (CachedAsset) for each content element.
+    aggregateAssets: true
 
 
 Neos:
