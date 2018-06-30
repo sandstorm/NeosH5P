@@ -4,7 +4,10 @@ namespace Sandstorm\NeosH5P\Command;
 
 use Neos\Flow\Cli\CommandController;
 use Neos\Flow\Annotations as Flow;
-use Sandstorm\NeosH5P\Domain\Model\ConfigSetting;
+use Neos\Flow\Cli\Request;
+use Neos\Flow\Cli\Response;
+use Neos\Flow\Exception;
+use Neos\Flow\Mvc\Dispatcher;
 use Sandstorm\NeosH5P\Domain\Repository\ConfigSettingRepository;
 use Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework;
 
@@ -35,6 +38,12 @@ class H5PCommandController extends CommandController
     protected $h5pFramework;
 
     /**
+     * @Flow\Inject
+     * @var Dispatcher
+     */
+    protected $dispatcher;
+
+    /**
      * @var array
      * @Flow\InjectConfiguration(path="defaultConfigSettings")
      */
@@ -52,6 +61,7 @@ class H5PCommandController extends CommandController
      * Installs a library via the H5P Hub.
      *
      * @param string $machineName
+     * @throws Exception
      */
     public function installLibraryCommand(string $machineName)
     {
@@ -60,6 +70,18 @@ class H5PCommandController extends CommandController
 
         // Start the library import
         $this->h5peditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $machineName);
+        $this->outputLine("=======================================");
+        $this->outputLine("Done installing libraries.");
+
+        // Publish the h5p library collection so the library files are made available
+        $cliRequest = new Request();
+        $cliRequest->setControllerObjectName('Neos\Flow\Command\ResourceCommandController');
+        $cliRequest->setControllerCommandName('publish');
+        $cliRequest->setArguments([
+            'collection' => 'h5p-libraries'
+        ]);
+        $cliResponse = new Response();
+        $this->dispatcher->dispatch($cliRequest, $cliResponse);
     }
 
     /**
