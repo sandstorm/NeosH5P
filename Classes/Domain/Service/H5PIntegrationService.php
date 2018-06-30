@@ -22,10 +22,22 @@ class H5PIntegrationService
     protected $baseUri;
 
     /**
-     * @Flow\InjectConfiguration(path="h5pPublicFolderUrl")
+     * @Flow\InjectConfiguration(path="h5pPublicFolder.url")
      * @var string
      */
     protected $h5pPublicFolderUrl;
+
+    /**
+     * @Flow\InjectConfiguration(path="h5pPublicFolder.subfolders.core")
+     * @var string
+     */
+    protected $h5pCorePublicFolderName;
+
+    /**
+     * @Flow\InjectConfiguration(path="h5pPublicFolder.subfolders.editor")
+     * @var string
+     */
+    protected $h5pEditorPublicFolderName;
 
     /**
      * @Flow\Inject
@@ -106,10 +118,11 @@ class H5PIntegrationService
      *
      * @return array
      */
-    public function getRelativeCoreScriptUrls() : array {
+    public function getRelativeCoreScriptUrls(): array
+    {
         $urls = [];
         foreach (\H5PCore::$scripts as $script) {
-            $urls[] = $this->h5pPublicFolderUrl . $script . $this->getCacheBuster();
+            $urls[] = $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName . '/' . $script . $this->getCacheBuster();
         }
         return $urls;
     }
@@ -121,16 +134,18 @@ class H5PIntegrationService
      *
      * @return array
      */
-    public function getRelativeCoreStyleUrls() : array {
+    public function getRelativeCoreStyleUrls(): array
+    {
         $urls = [];
         foreach (\H5PCore::$styles as $style) {
-            $urls[] = $this->h5pPublicFolderUrl . $style . $this->getCacheBuster();
+            $urls[] = $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName . '/' . $style . $this->getCacheBuster();
         }
         return $urls;
     }
 
-    protected function getCacheBuster() : string {
+    protected function getCacheBuster(): string
+    {
         $neosH5PPackage = $this->packageManager->getPackage('Sandstorm.NeosH5P');
-        return "?v=".$neosH5PPackage->getInstalledVersion();
+        return "?v=" . $neosH5PPackage->getInstalledVersion();
     }
 }

@@ -8,8 +8,8 @@ Sandstorm:
       subfolders:
         content: &h5pContentSubfolderName 'content'
         libraries: &h5pLibrarySubfolderName 'libraries'
-        coreAssets: &h5pCoreSubfolderName 'h5p-core'
-        editorAssets: &h5pEditorSubfolderName 'h5p-editor'
+        core: &h5pCoreSubfolderName 'h5p-core'
+        editor: &h5pEditorSubfolderName 'h5p-editor'
     # These can be generated as ConfigSettings by the flow command
     # ./flow h5p:generatedefaultconfigsettings.
     defaultConfigSettings:

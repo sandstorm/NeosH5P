@@ -17,6 +17,6 @@ class ContentController extends AbstractModuleController
     public function newAction()
     {
         $coreSettings = $this->h5pIntegrationService->getCoreSettings();
-        \Neos\Flow\var_dump($coreSettings['core']);
+        \Neos\Flow\var_dump($coreSettings);
     }
 }

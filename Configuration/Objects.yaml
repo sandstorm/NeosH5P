@@ -4,7 +4,7 @@ H5PCore:
   factoryMethodName: getCore
   arguments:
     1:
-      setting: Sandstorm.NeosH5P.h5pPublicFolderUrl
+      setting: Sandstorm.NeosH5P.h5pPublicFolder.url
 
 H5PValidator:
   arguments: &frameworkAndCore
