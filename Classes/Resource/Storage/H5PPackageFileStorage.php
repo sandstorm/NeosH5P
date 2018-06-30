@@ -58,6 +58,7 @@ class H5PPackageFileStorage implements StorageInterface
         foreach ($options as $key => $value) {
             switch ($key) {
                 case 'path':
+                case 'library':
                 case 'subfolders':
                     $this->options[$key] = $value;
                     break;
@@ -133,9 +134,10 @@ class H5PPackageFileStorage implements StorageInterface
         $iteration = 0;
 
         foreach ($this->options['subfolders'] as $subfoldername) {
-            $absolutePath = $this->options['path'] . $subfoldername;
+            $relativeSubfolderPath = $this->options['library'] . DIRECTORY_SEPARATOR . $subfoldername;
+            $absolutePath = $this->options['path'] . DIRECTORY_SEPARATOR . $relativeSubfolderPath;
             foreach (Files::getRecursiveDirectoryGenerator($absolutePath) as $resourcePathAndFilename) {
-                $object = $this->createStorageObject($resourcePathAndFilename, basename($this->options['path']) . '/' . $subfoldername);
+                $object = $this->createStorageObject($resourcePathAndFilename, $relativeSubfolderPath);
                 yield $object;
                 if (is_callable($callback)) {
                     call_user_func($callback, $iteration, $object);

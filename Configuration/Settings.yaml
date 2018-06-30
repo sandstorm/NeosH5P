@@ -2,8 +2,14 @@ Sandstorm:
   NeosH5P:
     # URL of the h5p public folder. Can be absolute or relative to the base Uri.
     # Needs to match the baseUri for the custom targets all the way down.
-    h5pPublicFolderUrl: &h5pPublicFolderUrl '_Resources/Static/H5P/'
-    h5pPublicFolderPath: &h5pPublicFolderPath '%FLOW_PATH_WEB%_Resources/Static/H5P/'
+    h5pPublicFolder:
+      url: &h5pPublicFolderUrl '_Resources/Static/H5P/'
+      path: &h5pPublicFolderPath '%FLOW_PATH_WEB%_Resources/Static/H5P/'
+      subfolders:
+        content: &h5pContentSubfolderName 'content'
+        libraries: &h5pLibrarySubfolderName 'libraries'
+        coreAssets: &h5pCoreSubfolderName 'h5p-core'
+        editorAssets: &h5pEditorSubfolderName 'h5p-editor'
     # These can be generated as ConfigSettings by the flow command
     # ./flow h5p:generatedefaultconfigsettings.
     defaultConfigSettings:
@@ -66,13 +72,14 @@ Neos:
         h5pLibraryStorage:
           storage: 'Sandstorm\NeosH5P\Resource\Storage\ExtractedH5PLibraryStorage'
           storageOptions:
-            publishingSubfolder: 'libraries'
+            publishingSubfolder: *h5pLibrarySubfolderName
             resourceGetterMethod: 'getZippedLibraryFile'
             itemFolderNameMethod: 'getNameAndVersionString'
         h5pCoreStorage:
           storage: 'Sandstorm\NeosH5P\Resource\Storage\H5PPackageFileStorage'
           storageOptions:
-            path: '%FLOW_PATH_PACKAGES%Libraries/h5p/h5p-core/'
+            path: '%FLOW_PATH_PACKAGES%Libraries/h5p/'
+            library: *h5pCoreSubfolderName
             subfolders:
               - 'fonts'
               - 'images'
@@ -81,7 +88,8 @@ Neos:
         h5pEditorStorage:
           storage: 'Sandstorm\NeosH5P\Resource\Storage\H5PPackageFileStorage'
           storageOptions:
-            path: '%FLOW_PATH_PACKAGES%Libraries/h5p/h5p-editor/'
+            path: '%FLOW_PATH_PACKAGES%Libraries/h5p/'
+            library: *h5pEditorSubfolderName
             subfolders:
               - 'ckeditor'
               - 'images'
