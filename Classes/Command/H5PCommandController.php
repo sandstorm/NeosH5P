@@ -52,7 +52,7 @@ class H5PCommandController extends CommandController
     /**
      * Clears all EditorTempfiles from the database and file system.
      */
-    public function cleanEditorTempFilesCommand()
+    public function clearEditorTempFilesCommand()
     {
         $this->outputLine("TODO");
     }
@@ -70,6 +70,7 @@ class H5PCommandController extends CommandController
 
         // Start the library import
         $this->h5peditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $machineName);
+        $this->outputLine("");
         $this->outputLine("=======================================");
         $this->outputLine("Done installing libraries.");
 

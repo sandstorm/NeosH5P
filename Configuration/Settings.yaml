@@ -7,7 +7,12 @@ Sandstorm:
     # These can be generated as ConfigSettings by the flow command
     # ./flow h5p:generatedefaultconfigsettings.
     defaultConfigSettings:
-      send_usage_statistics: 0
+      send_usage_statistics: false
+      track_user: true
+      save_content_state: true
+      save_content_frequency: 10
+      hub_is_enabled: true
+      enable_lrs_content_types: true
     # Setting for the H5PCore->aggregateAssets switch. If set to TRUE, H5P triggers the generation of
     # aggregated assets (CachedAsset) for each content element.
     aggregateAssets: true

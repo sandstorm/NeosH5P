@@ -1,0 +1,41 @@
+{namespace neos=Neos\Neos\ViewHelpers}
+<div class="neos-content neos-indented neos-fluid-container">
+    <h2>Create a new H5P content element</h2>
+    <f:form action="create" controller="Backend\Content" object="{content}" objectName="content">
+        <div class="neos-row-fluid">
+            <f:comment>
+                Later: Move form to partial
+                <f:render partial="Forms\H5PContentElement" arguments="{_all}"/>
+            </f:comment>
+            <fieldset class="neos-span12">
+
+                <f:comment>
+                    <!-- TODO -->
+                    <f:render partial="FormError" arguments="{for:'shortName', sourceObjectName:'centerType'}"/>
+                </f:comment>
+                <div class="neos-control-group">
+                    <label class="neos-control-label" for="title">Title</label>
+                    <div class="neos-controls">
+                        <f:form.textfield required="true" class="neos-span6" id="title" property="title"
+                                          placeholder="Enter a title for your new H5P content"/>
+                    </div>
+                </div>
+                <div class="neos-control-group">
+                    <label class="neos-control-label" for="title">Library</label>
+                    <div class="neos-controls">
+                        <!-- H5P Box renders here -->
+                        <div class="h5p-create">
+                            <div class="h5p-editor">
+                                <p>Waiting for H5P JavaScript to load...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="neos-footer">
+            <a class="neos-button" href="">Cancel (TODO)</a>
+            <f:form.submit name="submit" value="Speichern" class="neos-button neos-button-primary"/>
+        </div>
+    </f:form>
+</div>

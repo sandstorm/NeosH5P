@@ -848,21 +848,25 @@ class H5PFramework implements \H5PFrameworkInterface
      *   Identifier for the setting
      * @param mixed $value Data
      *   Whatever we want to store as the setting
-     * @throws IllegalObjectTypeException
      */
     public function setOption($name, $value)
     {
         /** @var ConfigSetting $configSetting */
         $configSetting = $this->configSettingRepository->findOneByConfigKey($name);
 
-        if ($configSetting != null) {
-            $configSetting->setConfigValue($value);
-            $this->configSettingRepository->update($configSetting);
-        } else {
-            $configSetting = new ConfigSetting($name, $value);
-            $this->configSettingRepository->add($configSetting);
+        try {
+            if ($configSetting != null) {
+                $configSetting->setConfigValue($value);
+                $this->configSettingRepository->update($configSetting);
+            } else {
+                $configSetting = new ConfigSetting($name, $value);
+                $this->configSettingRepository->add($configSetting);
+            }
+            $this->persistenceManager->persistAll();
+        } catch (IllegalObjectTypeException $ex) {
+            // Swallow, will never happen
         }
-        $this->persistenceManager->persistAll();
+
     }
 
     /**
