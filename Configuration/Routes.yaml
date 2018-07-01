@@ -1,0 +1,15 @@
+# backend editor ajax routes
+-
+  name: 'H5P Backend Editor AJAX'
+  uriPattern: 'neosh5p/editor'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Backend\EditorAjax'
+    '@action': 'index'
+-
+  name: 'H5P Backend Editor AJAX'
+  uriPattern: 'neosh5p/editor/content-type-cache'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Backend\EditorAjax'
+    '@action': 'contentTypeCache'

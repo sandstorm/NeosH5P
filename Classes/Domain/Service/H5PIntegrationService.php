@@ -3,6 +3,8 @@
 namespace Sandstorm\NeosH5P\Domain\Service;
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Mvc\Routing\Exception\MissingActionNameException;
+use Neos\Flow\Mvc\Routing\UriBuilder;
 use Neos\Flow\Package\PackageManagerInterface;
 use Neos\Neos\Domain\Service\UserService;
 use Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework;
@@ -16,7 +18,7 @@ use Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework;
 class H5PIntegrationService
 {
     /**
-     * @Flow\InjectConfiguration(package="Neos.Flow", path="http.baseUri")
+     * @Flow\InjectConfiguration(path="http.baseUri", package="Neos.Flow")
      * @var string
      */
     protected $baseUri;
@@ -70,6 +72,12 @@ class H5PIntegrationService
     protected $packageManager;
 
     /**
+     * @Flow\Inject
+     * @var UriBuilder
+     */
+    protected $uriBuilder;
+
+    /**
      * Returns an array with a set of core settings that the H5P JavaScript needs
      * to do its thing.
      *
@@ -78,6 +86,9 @@ class H5PIntegrationService
     public function getCoreSettings(): array
     {
         $currentUser = $this->userService->getCurrentUser();
+
+        // TODO: $this->>baseUri is null here - probably because of the subrequest thing in the Neos BE. how to get it?
+        $this->baseUri = 'http://127.0.0.1:8081/';
 
         $settings = [
             'baseUrl' => $this->baseUri,
@@ -126,25 +137,39 @@ class H5PIntegrationService
      */
     public function getEditorSettings($contentId = null): array
     {
+        // TODO: $this->>baseUri is null here - probably because of the subrequest thing in the Neos BE. how to get it?
+        $this->baseUri = 'http://127.0.0.1:8081/';
+
+        // TODO: issues with plugin uri rewrite by PluginUriAspect
+//        try {
+//            $editorAjaxAction = $this->uriBuilder->reset()->setCreateAbsoluteUri(true)->uriFor(
+//                'index',
+//                [],
+//                'Backend\EditorAjax',
+//                'Sandstorm.NeosH5P'
+//            );
+//        } catch (MissingActionNameException $ex) {
+//            // swallow, never happens
+//        }
+
         $editorSettings = [
-            'filesPath' => $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName,
+            'filesPath' => $this->h5pPublicFolderUrl . 'editor', // TODO - from settings
             'fileIcon' => [
                 'path' => $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName . '/images/binary-file.png',
                 'width' => 50,
                 'height' => 50,
             ],
-            'ajaxPath' => '', // TODO admin_url('admin-ajax.php?token=' . wp_create_nonce('h5p_editor_ajax') . '&action=h5p_'),
-            'libraryUrl' => '', // TODO - huh ? plugin_dir_url('h5p/h5p-editor-php-library/h5peditor.class.php'),
+            'ajaxPath' => 'http://127.0.0.1:8081/neosh5p/editor/',
+            'libraryUrl' => $this->baseUri . $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName,
             'copyrightSemantics' => $this->h5pContentValidator->getCopyrightSemantics(),
             'assets' => [
-                'css' => $this->getRelativeEditorStyleUrls(),
-                'js' => $this->getRelativeEditorScriptUrls()
+                'css' => array_merge($this->getRelativeCoreStyleUrls(), $this->getRelativeEditorStyleUrls()),
+                'js' => array_merge($this->getRelativeCoreScriptUrls(), $this->getRelativeEditorScriptUrls())
             ],
-            'deleteMessage' => 'Are you sure you wish to delete this content?',
             'apiVersion' => \H5PCore::$coreApi
         ];
 
-        if($contentId !== null) {
+        if ($contentId !== null) {
             $editorSettings['nodeVersionId'] = $contentId;
         }
 
@@ -194,16 +219,15 @@ class H5PIntegrationService
     {
         $urls = [];
         foreach (\H5peditor::$scripts as $script) {
-            $urls[] = $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName . '/' . $script . $this->getCacheBuster();
             /**
-             * TODO: The following is in WP, not sure if needed...
+             * We do not want the creator of the iframe inside the iframe.
+             * If we loaded this, the iframe would continually try to load more iframes inside itself.
+             * This is a bug in the H5P integration (or rather a weird way of declaring the libraries)
              */
-            /**
-             * // We do not want the creator of the iframe inside the iframe
-             * if ($script !== 'scripts/h5peditor-editor.js') {
-             * $assets['js'][] = $url . $script . $cache_buster;
-             * }
-             * */
+            if (strpos($script, 'scripts/h5peditor-editor.js') !== false) {
+                continue;
+            }
+            $urls[] = $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName . '/' . $script . $this->getCacheBuster();
         }
 
         // Add language script - english only for now
@@ -223,6 +247,10 @@ class H5PIntegrationService
     {
         $urls = [];
         foreach (\H5peditor::$styles as $style) {
+            // DIRTY FIX!
+            // The H5P Editor default settings are wrong here: the css files are actually in the "styles" dir, not in
+            // a subfolder of that dir called "css".
+            $style = str_replace('styles/css', 'styles', $style);
             $urls[] = $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName . '/' . $style . $this->getCacheBuster();
         }
         return $urls;

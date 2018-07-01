@@ -3,8 +3,8 @@ Sandstorm:
     # URL of the h5p public folder. Can be absolute or relative to the base Uri.
     # Needs to match the baseUri for the custom targets all the way down.
     h5pPublicFolder:
-      url: &h5pPublicFolderUrl '_Resources/Static/H5P/'
-      path: &h5pPublicFolderPath '%FLOW_PATH_WEB%_Resources/Static/H5P/'
+      url: &h5pPublicFolderUrl '/_Resources/Static/H5P/'
+      path: &h5pPublicFolderPath '%FLOW_PATH_WEB%/_Resources/Static/H5P/'
       subfolders:
         content: &h5pContentSubfolderName 'content'
         libraries: &h5pLibrarySubfolderName 'libraries'
@@ -25,6 +25,7 @@ Sandstorm:
 
 
 Neos:
+
   Neos:
     modules:
       'h5p':
@@ -66,6 +67,10 @@ Neos:
       ignoredTags:
         'variable': true
 
+    mvc:
+      routes:
+        'Sandstorm.NeosH5P':
+          position: 'start'
 
     resource:
       storages:
