@@ -151,12 +151,14 @@ class H5PPackageFileStorage implements StorageInterface
      * Create a storage object for the given static resource path.
      *
      * @param string $resourcePathAndFilename
-     * @param string $relativePublicationPath
+     * @param string $relativeSubfolderPath
      * @return StorageObject
      */
-    protected function createStorageObject($resourcePathAndFilename, string $relativePublicationPath)
+    protected function createStorageObject($resourcePathAndFilename, string $relativeSubfolderPath)
     {
         $pathInfo = UnicodeFunctions::pathinfo($resourcePathAndFilename);
+
+        $relativePublicationPath = dirname(explode($relativeSubfolderPath, $resourcePathAndFilename)[1]);
 
         $object = new StorageObject();
         $object->setFilename($pathInfo['basename']);
@@ -164,7 +166,7 @@ class H5PPackageFileStorage implements StorageInterface
         $object->setMd5(md5_file($resourcePathAndFilename));
         $object->setFileSize(filesize($resourcePathAndFilename));
         if (isset($pathInfo['dirname'])) {
-            $object->setRelativePublicationPath($relativePublicationPath . '/');
+            $object->setRelativePublicationPath($relativeSubfolderPath. DIRECTORY_SEPARATOR . $relativePublicationPath . DIRECTORY_SEPARATOR);
         }
         $object->setStream(function () use ($resourcePathAndFilename) {
             return fopen($resourcePathAndFilename, 'r');

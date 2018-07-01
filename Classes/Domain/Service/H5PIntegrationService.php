@@ -247,10 +247,6 @@ class H5PIntegrationService
     {
         $urls = [];
         foreach (\H5peditor::$styles as $style) {
-            // DIRTY FIX!
-            // The H5P Editor default settings are wrong here: the css files are actually in the "styles" dir, not in
-            // a subfolder of that dir called "css".
-            $style = str_replace('styles/css', 'styles', $style);
             $urls[] = $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName . '/' . $style . $this->getCacheBuster();
         }
         return $urls;
