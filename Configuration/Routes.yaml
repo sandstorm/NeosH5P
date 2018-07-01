@@ -7,9 +7,16 @@
     '@controller': 'Backend\EditorAjax'
     '@action': 'index'
 -
-  name: 'H5P Backend Editor AJAX'
+  name: 'H5P Backend Editor AJAX - content type cache'
   uriPattern: 'neosh5p/editor/content-type-cache'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\EditorAjax'
     '@action': 'contentTypeCache'
+-
+  name: 'H5P Backend Editor AJAX - library install'
+  uriPattern: 'neosh5p/editor/library-install{libraryInstallQuery}'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Backend\EditorAjax'
+    '@action': 'installLibrary'

@@ -110,9 +110,13 @@ class EditorFileAdapter implements \H5peditorStorage
             } catch (FilesException $e) {
                 // Swallow - temp dir is regarded as trash anyway and should be deleted regularly (e.g. on deployment)
             }
-        }
-        else {
-            unlink($filePath);
+        } else {
+            try {
+                unlink($filePath);
+            } catch (\Exception $e) {
+                // TODO - probably handle better
+                // File doesnt exist anymore, swallow
+            }
         }
     }
 
