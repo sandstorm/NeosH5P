@@ -311,6 +311,24 @@ class Library
         return $libraryArray;
     }
 
+    /**
+     * Returns this library as a stdClass object in a format that H5P expects
+     * when it calls the method:
+     * @see \H5peditorStorage::getLibraries()
+     * @return \stdClass
+     */
+    public function toStdClass(): \stdClass
+    {
+        return (object)[
+            'name' => $this->getName(),
+            'title' => $this->getTitle(),
+            'majorVersion' => $this->getMajorVersion(),
+            'minorVersion' => $this->getMinorVersion(),
+            'tutorialUrl' => $this->getTutorialUrl(),
+            'restricted' => $this->isRestricted()
+        ];
+    }
+
     public function __construct()
     {
         $this->contents = new ArrayCollection();

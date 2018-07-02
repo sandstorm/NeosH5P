@@ -63,7 +63,7 @@ class EditorAjaxController extends ActionController
      * @param string $queryString
      * @return bool
      */
-    public function librariesAction(string $queryString)
+    public function libraryDetailsAction(string $queryString)
     {
         $queryArguments = $this->resolveQueryString($queryString);
 
@@ -81,6 +81,24 @@ class EditorAjaxController extends ActionController
             '',
             $this->h5pPublicFolderPath
         );
+        // TODO: this probably has to do with output buffering - if we remove the "die", nothing is returned if errors occur.
+        die;
+        return false;
+    }
+
+    /**
+     * @param array $libraries
+     * @return bool
+     */
+    public function librariesAction($libraries = null)
+    {
+        /**
+         * This call is resolved to:
+         * @see \H5peditor::getLibraries()
+         * This method expects $_POST['libraries'] to be set, so we need to fake it.
+         */
+        $_POST['libraries'] = $libraries;
+        $this->h5pEditor->ajax->action(\H5PEditorEndpoints::LIBRARIES);
         // TODO: this probably has to do with output buffering - if we remove the "die", nothing is returned if errors occur.
         die;
         return false;

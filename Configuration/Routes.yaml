@@ -21,9 +21,18 @@
     '@controller': 'Backend\EditorAjax'
     '@action': 'installLibrary'
 -
-  name: 'H5P Backend Editor AJAX - libraries'
+  name: 'H5P Backend Editor AJAX - single library details'
   uriPattern: 'neosh5p/editor/libraries{queryString}'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\EditorAjax'
+    '@action': 'libraryDetails'
+  httpMethods: ['GET']
+-
+  name: 'H5P Backend Editor AJAX - multiple libraries'
+  uriPattern: 'neosh5p/editor/libraries'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Backend\EditorAjax'
     '@action': 'libraries'
+  httpMethods: ['POST']

@@ -4,14 +4,24 @@ namespace Sandstorm\NeosH5P\H5PAdapter\Editor;
 
 use H5peditorFile;
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Persistence\QueryInterface;
 use Neos\Utility\Exception\FilesException;
 use Neos\Utility\Files;
+use Sandstorm\NeosH5P\Domain\Model\Library;
+use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
 
 /**
  * @Flow\Scope("singleton")
  */
 class EditorFileAdapter implements \H5peditorStorage
 {
+
+    /**
+     * @Flow\Inject
+     * @var LibraryRepository
+     */
+    protected $libraryRepository;
+
     /**
      * Load language file(JSON) from database.
      * This is used to translate the editor fields(title, description etc.)
@@ -42,7 +52,70 @@ class EditorFileAdapter implements \H5peditorStorage
      */
     public function getLibraries($libraries = NULL)
     {
-        // TODO: Implement getLibraries() method.
+        $librariesWithDetails = [];
+
+        if ($libraries !== null) {
+            // Get details for the specified libraries only.
+            foreach ($libraries as $libraryData) {
+                /** @var Library $library */
+                $library = $this->libraryRepository->findOneBy([
+                    'name' => $libraryData->name,
+                    'majorVersion' => $libraryData->majorVersion,
+                    'minorVersion' => $libraryData->minorVersion
+                ]);
+                if ($library === null || $library->getSemantics() === null) {
+                    continue;
+                }
+                // Library found, add details to list
+                $libraryData->tutorialUrl = $library->getTutorialUrl();
+                $libraryData->title = $library->getTitle();
+                $libraryData->runnable = $library->isRunnable();
+                $libraryData->restricted = false; // for now
+                // TODO: Implement the below correctly with auth check
+                // $libraryData->restricted = $super_user ? FALSE : $library->isRestricted();
+                $librariesWithDetails[] = $libraryData;
+            }
+            // Done, return list with library details
+            return $librariesWithDetails;
+        }
+
+        // Load all libraries that have semantics and are runnable
+        $libraries = $this->libraryRepository->findBy(
+            ['runnable' => true],
+            ['title' => QueryInterface::ORDER_ASCENDING]
+        );
+        /** @var Library $library */
+        foreach ($libraries as $library) {
+            if ($library->getSemantics() === null) {
+                continue;
+            }
+            $libraryData = $library->toStdClass();
+            // Make sure we only display the newest version of a library.
+            foreach ($librariesWithDetails as $key => $existingLibrary) {
+                if ($libraryData->name === $existingLibrary->name) {
+
+                    // Found library with same name, check versions
+                    if (($libraryData->majorVersion === $existingLibrary->majorVersion &&
+                            $libraryData->minorVersion > $existingLibrary->minorVersion) ||
+                        ($libraryData->majorVersion > $existingLibrary->majorVersion)) {
+                        // This is a newer version
+                        $existingLibrary->isOld = TRUE;
+                    } else {
+                        // This is an older version
+                        $libraryData->isOld = TRUE;
+                    }
+                }
+            }
+
+            // Check to see if content type should be restricted
+            $libraryData->restricted = false; // for now
+            // TODO: Implement the below correctly with auth check
+            // $libraryData->restricted = $super_user ? FALSE : $library->isRestricted();
+
+            // Add new library
+            $librariesWithDetails[] = $libraryData;
+        }
+        return $librariesWithDetails;
     }
 
     /**
