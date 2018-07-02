@@ -2,8 +2,12 @@
 
 namespace Sandstorm\NeosH5P\Controller\Backend;
 
+use Neos\Flow\Mvc\Exception\StopActionException;
 use Neos\Neos\Controller\Module\AbstractModuleController;
 use Neos\Flow\Annotations as Flow;
+use Sandstorm\NeosH5P\Domain\Model\Content;
+use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
+use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
 
 class ContentController extends AbstractModuleController
@@ -13,6 +17,18 @@ class ContentController extends AbstractModuleController
      * @var H5PIntegrationService
      */
     protected $h5pIntegrationService;
+
+    /**
+     * @Flow\Inject
+     * @var LibraryRepository
+     */
+    protected $libraryRepository;
+
+    /**
+     * @Flow\Inject
+     * @var ContentRepository
+     */
+    protected $contentRepository;
 
     public function newAction()
     {
@@ -28,12 +44,31 @@ class ContentController extends AbstractModuleController
      * @param string $title
      * @param string $action
      * @param string $library
+     * @param string $parameters
      */
-    public function createAction(string $title, string $action, string $library, string $parameters)
+    public function createAction(string $action, string $title, string $library, string $parameters)
     {
-        \Neos\Flow\var_dump($title);
-        \Neos\Flow\var_dump($action);
-        \Neos\Flow\var_dump($library);
-        \Neos\Flow\var_dump($parameters);
+        // We only handle $action == 'create' so far
+        if ($action === 'upload') {
+            // TODO
+        }
+
+        $library = $this->libraryRepository->findOneByNameAndVersionString($library);
+        $content = Content::createFromMetadata($title, $library, $parameters);
+        $this->contentRepository->add($content);
+        // TODO flashmessage
+        try {
+            $this->redirect('display', null, null, ['content' => $content]);
+        } catch (StopActionException $ex) {
+            // swallow
+        }
+    }
+
+    /**
+     * @param Content $content
+     */
+    public function displayAction(Content $content)
+    {
+        $this->view->assign('content', $content);
     }
 }
