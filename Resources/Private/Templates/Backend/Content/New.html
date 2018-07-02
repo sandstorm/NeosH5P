@@ -24,10 +24,16 @@
 
                 <!-- needed by h5p, but not shown to the user -->
                 <div class="neos-control-group" style="display: none;">
-                    <label class="neos-control-label" for="h5p-file">Select Action</label>
+                    <label class="neos-control-label">Select Action</label>
                     <div class="neos-controls">
-                        <label><input class="h5p-actions" type="radio" name="action" value="upload"/>Upload</label>
-                        <label><input class="h5p-actions" type="radio" name="action" value="create" checked="checked"/>Create</label>
+                        <label>
+                            <f:form.radio class="h5p-actions" name="action" value="upload"/>
+                            Upload
+                        </label>
+                        <label>
+                            <f:form.radio class="h5p-actions" name="action" value="create" checked="checked"/>
+                            Create
+                        </label>
                     </div>
                 </div>
 
@@ -36,7 +42,7 @@
                     <label class="neos-control-label" for="h5p-file">Upload File</label>
                     <div class="neos-controls">
                         <div id="h5p-upload">
-                            <input type="file" name="h5p_file" id="h5p-file"/>
+                            <f:form.upload name="h5p-file" id="h5p-file" />
                         </div>
                     </div>
                 </div>
@@ -53,8 +59,8 @@
                     </div>
                 </div>
 
-                <input id="h5p-library" type="hidden" name="library" value="0" />
-                <input id="h5p-parameters" type="hidden" name="parameters" value="{}" />
+                <f:form.hidden id="h5p-library" name="library" value="0" />
+                <f:form.hidden id="h5p-parameters" name="parameters" value="{}" />
 
             </fieldset>
         </div>
