@@ -67,7 +67,7 @@ class EditorFileAdapter implements \H5peditorStorage
      */
     public function alterLibraryFiles(&$files, $libraries)
     {
-        // TODO: Implement alterLibraryFiles() method.
+        // Not implemented yet.
     }
 
     /**

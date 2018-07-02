@@ -240,7 +240,13 @@ class FileAdapter implements \H5PFileStorage
      */
     public function getContent($file_path)
     {
-        // TODO: Implement getContent() method.
+        /**
+         * This might cause issues if files are not put locally, because the path is generated inside H5P
+         * and cannot be modified.
+         * @see \H5PCore::getDependenciesFiles()
+         * @see \H5PCore::getDependencyAssets()
+         */
+        return file_get_contents($file_path);
     }
 
     /**

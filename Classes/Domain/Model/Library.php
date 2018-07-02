@@ -7,6 +7,7 @@ use Neos\Flow\Annotations as Flow;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Neos\Flow\ResourceManagement\PersistentResource;
+use Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework;
 
 /**
  * @Flow\Entity
@@ -272,6 +273,42 @@ class Library
             return implode(', ', $paths);
         }
         return '';
+    }
+
+    /**
+     * Returns an associative array containing the library in the form that
+     * H5PFramework->loadLibrary is expected to return.
+     * @see H5PFramework::loadLibrary()
+     */
+    public function toAssocArray(): array
+    {
+        $libraryArray = [
+            'libraryId' => $this->getLibraryId(),
+            'machineName' => $this->getName(),
+            'title' => $this->getTitle(),
+            'majorVersion' => $this->getMajorVersion(),
+            'minorVersion' => $this->getMinorVersion(),
+            'patchVersion' => $this->getPatchVersion(),
+            'embedTypes' => $this->getEmbedTypes(),
+            'preloadedJs' => $this->getPreloadedJs(),
+            'preloadedCss' => $this->getPreloadedCss(),
+            'dropLibraryCss' => $this->getDropLibraryCss(),
+            'fullscreen' => $this->isFullscreen(),
+            'runnable' => $this->isRunnable(),
+            'semantics' => $this->getSemantics(),
+            'hasIcon' => $this->hasIcon()
+        ];
+
+        /** @var LibraryDependency $dependency */
+        foreach ($this->getLibraryDependencies() as $dependency) {
+            $libraryArray[$dependency->getDependencyType() . 'Dependencies'][] = [
+                'machineName' => $dependency->getRequiredLibrary()->getName(),
+                'majorVersion' => $dependency->getRequiredLibrary()->getMajorVersion(),
+                'minorVersion' => $dependency->getRequiredLibrary()->getMinorVersion()
+            ];
+        }
+
+        return $libraryArray;
     }
 
     public function __construct()

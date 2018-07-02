@@ -21,6 +21,12 @@ class EditorAjaxController extends ActionController
     protected $h5pFramework;
 
     /**
+     * @Flow\InjectConfiguration(path="h5pPublicFolder.path")
+     * @var string
+     */
+    protected $h5pPublicFolderPath;
+
+    /**
      * This is never called, only serves as a uri generation base
      */
     public function indexAction()
@@ -34,18 +40,49 @@ class EditorAjaxController extends ActionController
     public function contentTypeCacheAction()
     {
         $this->h5pEditor->ajax->action(\H5PEditorEndpoints::CONTENT_TYPE_CACHE);
+        // TODO: this probably has to do with output buffering - if we remove the "die", nothing is returned if errors occur.
+        die;
         return false;
     }
 
     /**
-     * @param string $libraryInstallQuery
+     * @param string $queryString
      * @return bool
      */
-    public function installLibraryAction(string $libraryInstallQuery)
+    public function installLibraryAction(string $queryString)
     {
-        $queryArguments = $this->resolveQueryString($libraryInstallQuery);
+        $queryArguments = $this->resolveQueryString($queryString);
         $this->h5pEditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $queryArguments['id']);
         // TODO: This doesnt work e.g. for H5P.CoursePresentation. make error msg visible to user!
+        // TODO: this probably has to do with output buffering - if we remove the "die", nothing is returned if errors occur.
+        die;
+        return false;
+    }
+
+    /**
+     * @param string $queryString
+     * @return bool
+     */
+    public function librariesAction(string $queryString)
+    {
+        $queryArguments = $this->resolveQueryString($queryString);
+
+        /**
+         * This call is resolved to:
+         * \H5peditor->getLibraryData($machineName, $majorVersion, $minorVersion, $languageCode, $prefix = '', $fileDir = '')
+         * @see \H5peditor::getLibraryData()
+         */
+        $this->h5pEditor->ajax->action(
+            \H5PEditorEndpoints::SINGLE_LIBRARY,
+            $queryArguments['machineName'],
+            $queryArguments['majorVersion'],
+            $queryArguments['minorVersion'],
+            'en', // TODO make configurable
+            '',
+            $this->h5pPublicFolderPath
+        );
+        // TODO: this probably has to do with output buffering - if we remove the "die", nothing is returned if errors occur.
+        die;
         return false;
     }
 

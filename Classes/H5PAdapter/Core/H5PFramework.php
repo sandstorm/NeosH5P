@@ -701,7 +701,17 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function loadLibrary($machineName, $majorVersion, $minorVersion)
     {
-        // TODO: Implement loadLibrary() method.
+        /** @var Library $library */
+        $library = $this->libraryRepository->findOneBy([
+            'name' => $machineName,
+            'majorVersion' => $majorVersion,
+            'minorVersion' => $minorVersion
+        ]);
+        if ($library === null) {
+            return false;
+        }
+
+        return $library->toAssocArray();
     }
 
     /**
@@ -718,7 +728,16 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function loadLibrarySemantics($machineName, $majorVersion, $minorVersion)
     {
-        // TODO: Implement loadLibrarySemantics() method.
+        /** @var Library $library */
+        $library = $this->libraryRepository->findOneBy([
+            'name' => $machineName,
+            'majorVersion' => $majorVersion,
+            'minorVersion' => $minorVersion
+        ]);
+        if($library === null) {
+            return null;
+        }
+        return $library->getSemantics();
     }
 
     /**
@@ -735,7 +754,7 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function alterLibrarySemantics(&$semantics, $machineName, $majorVersion, $minorVersion)
     {
-        // TODO: Implement alterLibrarySemantics() method.
+        // Not implemented yet
     }
 
     /**
