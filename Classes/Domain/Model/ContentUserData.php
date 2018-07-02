@@ -63,4 +63,131 @@ class ContentUserData {
      */
     protected $updatedAt;
 
+    /**
+     * @return Content
+     */
+    public function getContent(): Content
+    {
+        return $this->content;
+    }
+
+    /**
+     * @param Content $content
+     */
+    public function setContent(Content $content): void
+    {
+        $this->content = $content;
+    }
+
+    /**
+     * @return Account
+     */
+    public function getAccount(): Account
+    {
+        return $this->account;
+    }
+
+    /**
+     * @param Account $account
+     */
+    public function setAccount(Account $account): void
+    {
+        $this->account = $account;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDataId(): string
+    {
+        return $this->dataId;
+    }
+
+    /**
+     * @param string $dataId
+     */
+    public function setDataId(string $dataId): void
+    {
+        $this->dataId = $dataId;
+    }
+
+    /**
+     * @return Content
+     */
+    public function getSubContent(): Content
+    {
+        return $this->subContent;
+    }
+
+    /**
+     * @param Content $subContent
+     */
+    public function setSubContent(Content $subContent): void
+    {
+        $this->subContent = $subContent;
+    }
+
+    /**
+     * @return string
+     */
+    public function getData(): string
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param string $data
+     */
+    public function setData(string $data): void
+    {
+        $this->data = $data;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPreload(): bool
+    {
+        return $this->preload;
+    }
+
+    /**
+     * @param bool $preload
+     */
+    public function setPreload(bool $preload): void
+    {
+        $this->preload = $preload;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInvalidate(): bool
+    {
+        return $this->invalidate;
+    }
+
+    /**
+     * @param bool $invalidate
+     */
+    public function setInvalidate(bool $invalidate): void
+    {
+        $this->invalidate = $invalidate;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getUpdatedAt(): \DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param \DateTime $updatedAt
+     */
+    public function setUpdatedAt(\DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
 }

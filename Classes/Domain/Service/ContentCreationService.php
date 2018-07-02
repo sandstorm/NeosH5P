@@ -96,6 +96,6 @@ class ContentCreationService
 
         // Move images and find all content dependencies
         $this->h5pEditor->processParameters($content['id'], $content['library'], $params);
-        return $this->contentRepository->findByIdentifier($content['id']);
+        return $this->contentRepository->findOneByContentId($content['id']);
     }
 }

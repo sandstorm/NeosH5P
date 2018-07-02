@@ -1,4 +1,5 @@
 <?php
+
 namespace Sandstorm\NeosH5P\Domain\Model;
 
 use Neos\Flow\Annotations as Flow;
@@ -9,7 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  * @package Sandstorm\NeosH5P\Domain\Model
  * @Flow\Entity
  */
-class ContentDependency {
+class ContentDependency
+{
 
     /**
      * @var Content
@@ -43,6 +45,22 @@ class ContentDependency {
      * @ORM\Column(nullable=false)
      */
     protected $dropCss;
+
+    /**
+     * Returns an assoc array as expected by
+     * @see \H5PCore::getDependenciesFiles
+     *
+     * @return array
+     */
+    public function toAssocArray(): array
+    {
+        // Not all fields from library are expected in this array, but we dont expect conflicts here.
+        $libraryData = $this->getLibrary()->toAssocArray();
+        return array_merge($libraryData, [
+            'dropCss' => $this->isDropCss(),
+            'dependencyType' => $this->getDependencyType()
+        ]);
+    }
 
     /**
      * @return Content

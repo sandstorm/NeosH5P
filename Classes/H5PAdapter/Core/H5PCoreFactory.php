@@ -19,6 +19,11 @@ class H5PCoreFactory
      * @Flow\InjectConfiguration(path="aggregateAssets")
      */
     protected $aggregateAssets;
+    /**
+     * @var boolean
+     * @Flow\InjectConfiguration(path="enableExport")
+     */
+    protected $enableExport;
 
     public function getCore(string $h5pPublicFolderUrl): \H5PCore
     {
@@ -27,7 +32,7 @@ class H5PCoreFactory
             new FileAdapter(),
             $h5pPublicFolderUrl,
             'en', // We only support english for now
-            false);
+            $this->enableExport);
 
         // control asset aggregation
         $core->aggregateAssets = $this->aggregateAssets;

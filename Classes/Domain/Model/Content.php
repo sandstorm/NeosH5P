@@ -14,6 +14,15 @@ use Neos\Flow\Security\Account;
 class Content
 {
     /**
+     * This is the "Content ID" we pass to H5P. H5P expects an int here, but we cannot use this as a technical primary
+     * key because doctrine doesnt handle it correctly. So this is a unique key.
+     *
+     * @var int
+     * @ORM\Column(nullable=false, columnDefinition="INT AUTO_INCREMENT UNIQUE")
+     */
+    protected $contentId;
+
+    /**
      * @var Library
      * @ORM\ManyToOne(inversedBy="contents")
      * @ORM\Column(nullable=false)
@@ -146,6 +155,27 @@ class Content
         $content->setFiltered('');
 
         return $content;
+    }
+
+    /**
+     * Returns an associative array containing the content in the form that
+     * \H5PCore->filterParameters() expects.
+     * @see H5PCore::filterParameters()
+     */
+    public function toAssocArray(): array
+    {
+        $contentArray = [
+            'id' => $this->getContentId(),
+            'title' => $this->getTitle(),
+            'library' => $this->getLibrary()->toAssocArray(),
+            'slug' => $this->getSlug(),
+            'disable' => $this->getDisable(),
+            'embedType' => $this->getEmbedType(),
+            'params' => $this->getParameters(),
+            'filtered' => $this->getFiltered()
+        ];
+
+        return $contentArray;
     }
 
     public function __construct()
@@ -424,5 +454,21 @@ class Content
     public function setContentUserDatas(Collection $contentUserDatas): void
     {
         $this->contentUserDatas = $contentUserDatas;
+    }
+
+    /**
+     * @return int
+     */
+    public function getContentId(): int
+    {
+        return $this->contentId;
+    }
+
+    /**
+     * @param int $contentId
+     */
+    public function setContentId(int $contentId): void
+    {
+        $this->contentId = $contentId;
     }
 }

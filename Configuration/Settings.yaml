@@ -1,14 +1,18 @@
 Sandstorm:
   NeosH5P:
-    # URL of the h5p public folder. Can be absolute or relative to the base Uri.
-    # Needs to match the baseUri for the custom targets all the way down.
     h5pPublicFolder:
+      # URL of the h5p public folder. Can be absolute or relative to the base Uri.
       url: &h5pPublicFolderUrl '/_Resources/Static/H5P/'
+      # File path of the h5p public folder.
       path: &h5pPublicFolderPath '%FLOW_PATH_WEB%/_Resources/Static/H5P/'
       subfolders:
+        # subfolder for content. Must be named "content" for now, because H5P expects this.
         content: &h5pContentSubfolderName 'content'
+        # subfolder for libraries. Must be named "libraries" for now, because H5P expects this.
         libraries: &h5pLibrarySubfolderName 'libraries'
+        # Directory where the H5P core assets (from 3rd party package) are published to.
         core: &h5pCoreSubfolderName 'h5p-core'
+        # Directory where the H5P editor assets (from 3rd party package) are published to.
         editor: &h5pEditorSubfolderName 'h5p-editor'
     # These can be generated as ConfigSettings by the flow command
     # ./flow h5p:generatedefaultconfigsettings.
@@ -19,10 +23,19 @@ Sandstorm:
       save_content_frequency: 10
       hub_is_enabled: true
       enable_lrs_content_types: true
+      # content display options
+      frame: false
+      export: false
+      embed: false
+      copyright: false
+      icon: false
+
     # Setting for the H5PCore->aggregateAssets switch. If set to TRUE, H5P triggers the generation of
     # aggregated assets (CachedAsset) for each content element.
     aggregateAssets: true
-
+    # Set to true to enable the export functionality.
+    # !!! Not implemented yet !!!
+    enableExport: false
 
 Neos:
 

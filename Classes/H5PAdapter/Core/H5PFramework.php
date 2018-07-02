@@ -26,6 +26,7 @@ use Sandstorm\NeosH5P\Domain\Repository\ConfigSettingRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ContentDependencyRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ContentTypeCacheEntryRepository;
+use Sandstorm\NeosH5P\Domain\Repository\ContentUserDataRepository;
 use Sandstorm\NeosH5P\Domain\Repository\LibraryDependencyRepository;
 use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
 use Sandstorm\NeosH5P\Domain\Repository\LibraryTranslationRepository;
@@ -75,6 +76,12 @@ class H5PFramework implements \H5PFrameworkInterface
      * @var ContentDependencyRepository
      */
     protected $contentDependencyRepository;
+
+    /**
+     * @Flow\Inject
+     * @var ContentUserDataRepository
+     */
+    protected $contentUserDataRepository;
 
     /**
      * @Flow\Inject
@@ -232,9 +239,15 @@ class H5PFramework implements \H5PFrameworkInterface
         $library = $this->libraryRepository->findOneByLibraryId($content['library']['libraryId']);
         $account = $this->userService->getCurrentUser()->getAccounts()->first();
         $content = Content::createFromMetadata($content, $library, $account);
-        $this->contentRepository->add($content);
 
-        return $this->persistenceManager->getIdentifierByObject($content);
+        // Persist and re-read the entity to generate the content ID in the DB and fill the field
+        $this->contentRepository->add($content);
+        $this->persistenceManager->persistAll();
+        $this->persistenceManager->clearState();
+        /** @var Content $content */
+        $content = $this->contentRepository->findByIdentifier($this->persistenceManager->getIdentifierByObject($content));
+
+        return $content->getContentId();
     }
 
     /**
@@ -261,7 +274,14 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function resetContentUserData($contentId)
     {
-        // TODO: Implement resetContentUserData() method.
+        /** @var Content $content */
+        $content = $this->contentRepository->findOneByContentId($contentId);
+        if ($content === null) {
+            return;
+        }
+        foreach ($content->getContentUserDatas() as $contentUserData) {
+            $this->contentUserDataRepository->remove($contentUserData);
+        }
     }
 
     /**
@@ -284,7 +304,10 @@ class H5PFramework implements \H5PFrameworkInterface
     public function deleteLibraryUsage($contentId)
     {
         /** @var Content $content */
-        $content = $this->contentRepository->findByIdentifier($contentId);
+        $content = $this->contentRepository->findOneByContentId($contentId);
+        if ($content === null) {
+            return;
+        }
         foreach ($content->getContentDependencies() as $contentDependency) {
             $this->contentDependencyRepository->remove($contentDependency);
         }
@@ -311,8 +334,8 @@ class H5PFramework implements \H5PFrameworkInterface
     public function saveLibraryUsage($contentId, $librariesInUse)
     {
         /** @var Content $content */
-        $content = $this->contentRepository->findByIdentifier($contentId);
-        if($content === null) {
+        $content = $this->contentRepository->findOneByContentId($contentId);
+        if ($content === null) {
             return;
         }
 
@@ -332,6 +355,7 @@ class H5PFramework implements \H5PFrameworkInterface
             $contentDependency->setWeight($dependencyData['weight']);
             $this->contentDependencyRepository->add($contentDependency);
         }
+        $this->persistenceManager->persistAll();
     }
 
     /**
@@ -381,7 +405,27 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function loadContentDependencies($id, $type = NULL)
     {
-        // TODO: Implement loadContentDependencies() method.
+        $dependencyArray = [];
+        /** @var Content $content */
+        $content = $this->contentRepository->findOneByContentId($id);
+        if ($content === null) {
+            return $dependencyArray;
+        }
+
+        $criteria = [
+            'content' => $content
+        ];
+        if ($type !== null) {
+            $criteria['dependencyType'] = $type;
+        }
+
+        $dependencies = $this->contentDependencyRepository->findBy($criteria);
+        /** @var ContentDependency $dependency */
+        foreach ($dependencies as $dependency) {
+            $dependencyArray[] = $dependency->toAssocArray();
+        }
+
+        return $dependencyArray;
     }
 
     /**
@@ -393,8 +437,8 @@ class H5PFramework implements \H5PFrameworkInterface
     public function updateContentFields($id, $fields)
     {
         /** @var Content $content */
-        $content = $this->contentRepository->findByIdentifier($id);
-        if($content === null) {
+        $content = $this->contentRepository->findOneByContentId($id);
+        if ($content === null) {
             return;
         }
 
@@ -615,8 +659,6 @@ class H5PFramework implements \H5PFrameworkInterface
             $this->libraryRepository->update($library);
             $this->deleteLibraryDependencies($libraryData['libraryId']);
         }
-
-        // TODO: Log an H5P Event here, once we implement this.
 
         // Update languages
         $translations = $this->libraryTranslationRepository->findByLibrary($library);

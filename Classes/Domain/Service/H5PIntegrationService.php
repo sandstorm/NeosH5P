@@ -6,7 +6,11 @@ use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\Routing\Exception\MissingActionNameException;
 use Neos\Flow\Mvc\Routing\UriBuilder;
 use Neos\Flow\Package\PackageManagerInterface;
+use Neos\Flow\Security\Account;
 use Neos\Neos\Domain\Service\UserService;
+use Sandstorm\NeosH5P\Domain\Model\Content;
+use Sandstorm\NeosH5P\Domain\Model\ContentUserData;
+use Sandstorm\NeosH5P\Domain\Repository\ContentUserDataRepository;
 use Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework;
 
 /**
@@ -76,6 +80,12 @@ class H5PIntegrationService
      * @var UriBuilder
      */
     protected $uriBuilder;
+
+    /**
+     * @Flow\Inject
+     * @var ContentUserDataRepository
+     */
+    protected $contentUserDataRepository;
 
     /**
      * Returns an array with a set of core settings that the H5P JavaScript needs
@@ -257,4 +267,73 @@ class H5PIntegrationService
         $neosH5PPackage = $this->packageManager->getPackage('Sandstorm.NeosH5P');
         return "?v=" . $neosH5PPackage->getInstalledVersion();
     }
+
+    /**
+     * Get settings for given content
+     *
+     * @param Content $content
+     * @return array
+     */
+    public function getContentSettings(Content $content)
+    {
+        $contentArray = $content->toAssocArray();
+
+        // TODO: $this->>baseUri is null here - probably because of the subrequest thing in the Neos BE. how to get it?
+        $this->baseUri = 'http://127.0.0.1:8081/';
+
+        $h5pCorePublicUrl = $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName;
+
+        // Add JavaScript settings for this content
+        $contentSettings = [
+            'library' => \H5PCore::libraryToString($contentArray['library']),
+            'jsonContent' => $content->getFiltered(), //$this->h5pCore->filterParameters($contentArray),
+            'fullScreen' => $contentArray['library']['fullscreen'],
+            // TODO: implement once export is enabled
+            'exportUrl' => 'foo',
+            // TODO: implement once iframe embedding is enabled
+            'embedCode' => '<iframe src="embed-url-for-content-here-once-implemented" width=":w" height=":h" frameborder="0" allowfullscreen="allowfullscreen"></iframe>',
+            'resizeCode' => '<script src="' . $h5pCorePublicUrl . '/js/h5p-resizer.js' . '" charset="UTF-8"></script>',
+            'url' => $this->baseUri, // TODO needed? admin_url('admin-ajax.php?action=h5p_embed&id=' . $contentArray['id']),
+            'title' => $contentArray['title'],
+            // TODO: use actual account identifier instead of 0 - this is needed only for an auth check, which we default to true currently.
+            'displayOptions' => $this->h5pCore->getDisplayOptionsForView($contentArray['disable'], 0),
+            'contentUserData' => [
+                0 => ['state' => '{}']
+            ]
+        ];
+
+        // Get preloaded user data for the current user, if we have one.
+        // TODO - we will have to expose this to packages integrating us, as they might be using a
+        // frontend user model which doesnt get picked up by the Neos UserService.
+        $currentUser = $this->userService->getCurrentUser();
+        if ($this->h5pFramework->getOption('save_content_state', false) && $currentUser !== null) {
+            $contentSettings['contentUserData'] = $this->getContentUserData($content, $currentUser->getAccounts()->first());
+        }
+
+        return $contentSettings;
+    }
+
+    /**
+     * @param Content $content
+     * @param Account $account
+     * @return array
+     */
+    protected function getContentUserData(Content $content, Account $account): array
+    {
+        $contentUserDatas = $this->contentUserDataRepository->findBy([
+            'content' => $content,
+            'account' => $account
+        ]);
+
+        $userDataArray = [
+            0 => ['state' => '{}']
+        ];
+
+        /** @var ContentUserData $contentUserData */
+        foreach ($contentUserDatas as $contentUserData) {
+            $settings['contentUserData'][$contentUserData->getSubContent()->getContentId()][$contentUserData->getDataId()] = $contentUserData->getData();
+        }
+        return $userDataArray;
+    }
+
 }
