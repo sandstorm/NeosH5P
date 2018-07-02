@@ -141,7 +141,7 @@ class FileAdapter implements \H5PFileStorage
      */
     public function exportContent($id, $target)
     {
-        // TODO: Implement exportContent() method.
+        // TODO: Implement once export is enabled as a feature
     }
 
     /**
@@ -154,7 +154,7 @@ class FileAdapter implements \H5PFileStorage
      */
     public function exportLibrary($library, $target)
     {
-        // TODO: Implement exportLibrary() method.
+        // TODO: Implement once export is enabled as a feature
     }
 
     /**
@@ -167,7 +167,7 @@ class FileAdapter implements \H5PFileStorage
      */
     public function saveExport($source, $filename)
     {
-        // TODO: Implement saveExport() method.
+        // TODO: Implement once export is enabled as a feature
     }
 
     /**
@@ -177,7 +177,7 @@ class FileAdapter implements \H5PFileStorage
      */
     public function deleteExport($filename)
     {
-        // TODO: Implement deleteExport() method.
+        // TODO: Implement once export is enabled as a feature
     }
 
     /**
@@ -188,7 +188,8 @@ class FileAdapter implements \H5PFileStorage
      */
     public function hasExport($filename)
     {
-        // TODO: Implement hasExport() method.
+        // TODO: Implement once export is enabled as a feature
+        return false;
     }
 
     /**

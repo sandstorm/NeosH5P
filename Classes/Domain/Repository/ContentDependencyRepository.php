@@ -7,6 +7,6 @@ use Neos\Flow\Annotations as Flow;
 /**
  * @Flow\Scope("singleton")
  */
-class ContentDependecyRepository extends Repository {
+class ContentDependencyRepository extends Repository {
 
 }

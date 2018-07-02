@@ -6,8 +6,7 @@ use Neos\Flow\Mvc\Exception\StopActionException;
 use Neos\Neos\Controller\Module\AbstractModuleController;
 use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Model\Content;
-use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
-use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
+use Sandstorm\NeosH5P\Domain\Service\ContentCreationService;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
 
 class ContentController extends AbstractModuleController
@@ -20,15 +19,9 @@ class ContentController extends AbstractModuleController
 
     /**
      * @Flow\Inject
-     * @var LibraryRepository
+     * @var ContentCreationService
      */
-    protected $libraryRepository;
-
-    /**
-     * @Flow\Inject
-     * @var ContentRepository
-     */
-    protected $contentRepository;
+    protected $contentCreationService;
 
     public function newAction()
     {
@@ -45,6 +38,8 @@ class ContentController extends AbstractModuleController
      * @param string $action
      * @param string $library
      * @param string $parameters
+     * @throws StopActionException
+     * @return bool
      */
     public function createAction(string $action, string $title, string $library, string $parameters)
     {
@@ -53,15 +48,12 @@ class ContentController extends AbstractModuleController
             // TODO
         }
 
-        $library = $this->libraryRepository->findOneByNameAndVersionString($library);
-        $content = Content::createFromMetadata($title, $library, $parameters);
-        $this->contentRepository->add($content);
-        // TODO flashmessage
-        try {
-            $this->redirect('display', null, null, ['content' => $content]);
-        } catch (StopActionException $ex) {
-            // swallow
+        $content = $this->contentCreationService->handleContentCreation($title, $library, $parameters);
+        if ($content === null) {
+            return false;
         }
+        // TODO flashmessage
+        $this->redirect('display', null, null, ['content' => $content]);
     }
 
     /**

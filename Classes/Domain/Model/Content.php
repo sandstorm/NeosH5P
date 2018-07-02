@@ -13,7 +13,6 @@ use Neos\Flow\Security\Account;
  */
 class Content
 {
-
     /**
      * @var Library
      * @ORM\ManyToOne(inversedBy="contents")
@@ -24,7 +23,7 @@ class Content
 
     /**
      * @var Account
-     * @ORM\OneToOne
+     * @ORM\ManyToOne
      * @ORM\Column(nullable=true)
      * @ORM\JoinColumn(onDelete="SET NULL")
      */
@@ -124,70 +123,29 @@ class Content
     protected $contentUserDatas;
 
     /**
-     * @param string $title
+     * Creates a Content from a metadata array.
+     *
+     * @param array $contentData
      * @param Library $library
-     * @param string $parameters
+     * @param Account $account
      * @return Content
      */
-    public static function createFromMetadata(string $title, Library $library, string $parameters): Content
+    public static function createFromMetadata(array $contentData, Library $library, Account $account): Content
     {
-        // Keep track of the old library and params
-        $oldLibrary = NULL;
-        $oldParams = NULL;
-        if ($content !== NULL) {
-            $oldLibrary = $content['library'];
-            $oldParams = json_decode($content['params']);
-        } else {
-            $content = array(
-                'disable' => \H5PCore::DISABLE_NONE
-            );
-        }
-
         $content = new Content();
-        $content->setDisable(false);
+        $content->setLibrary($library);
+        $content->setAccount($account);
+        $content->setCreatedAt(new \DateTime());
+        $content->setUpdatedAt(new \DateTime());
+        $content->setTitle($contentData['title']);
+        $content->setParameters($contentData['params']);
+        $content->setDisable($contentData['disable']);
+        $content->setSlug(''); // Set by h5p later, but must not be null
+        // WordPress always sets "div" here, but has a "TODO: Determine from library?" comment
+        $content->setEmbedType('div');
+        $content->setFiltered('');
 
-        // Get library
-        $content['library'] = $core->libraryFromString($this->get_input('library'));
-        if (!$content['library']) {
-            $core->h5pF->setErrorMessage(__('Invalid library.', $this->plugin_slug));
-            return FALSE;
-        }
-
-        // Check if library exists.
-        $content['library']['libraryId'] = $core->h5pF->getLibraryId($content['library']['machineName'], $content['library']['majorVersion'], $content['library']['minorVersion']);
-        if (!$content['library']['libraryId']) {
-            $core->h5pF->setErrorMessage(__('No such library.', $this->plugin_slug));
-            return FALSE;
-        }
-
-        // Get title
-        $content['title'] = $this->get_input_title();
-        if ($content['title'] === NULL) {
-            return FALSE;
-        }
-
-        // Check parameters
-        $content['params'] = $this->get_input('parameters');
-        if ($content['params'] === NULL) {
-            return FALSE;
-        }
-        $params = json_decode($content['params']);
-        if ($params === NULL) {
-            $core->h5pF->setErrorMessage(__('Invalid parameters.', $this->plugin_slug));
-            return FALSE;
-        }
-
-        // Set disabled features
-        $this->get_disabled_content_features($core, $content);
-
-        // Save new content
-        $content['id'] = $core->saveContent($content);
-
-        // Move images and find all content dependencies
-        $editor = $this->get_h5peditor_instance();
-        $editor->processParameters($content['id'], $content['library'], $params, $oldLibrary, $oldParams);
-        //$content['params'] = json_encode($params);
-        return $content['id'];
+        return $content;
     }
 
     public function __construct()

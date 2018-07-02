@@ -11,15 +11,19 @@ use Neos\Flow\Package\PackageManagerInterface;
 use Neos\Flow\Persistence\Exception\IllegalObjectTypeException;
 use Neos\Flow\Persistence\PersistenceManagerInterface;
 use Neos\Flow\Persistence\QueryInterface;
+use Neos\Neos\Domain\Service\UserService;
+use Neos\Utility\ObjectAccess;
 use Sandstorm\NeosH5P\Domain\Model\ConfigSetting;
 use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Model\Content;
+use Sandstorm\NeosH5P\Domain\Model\ContentDependency;
 use Sandstorm\NeosH5P\Domain\Model\ContentTypeCacheEntry;
 use Sandstorm\NeosH5P\Domain\Model\Library;
 use Sandstorm\NeosH5P\Domain\Model\LibraryDependency;
 use Sandstorm\NeosH5P\Domain\Model\LibraryTranslation;
 use Sandstorm\NeosH5P\Domain\Repository\CachedAssetRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ConfigSettingRepository;
+use Sandstorm\NeosH5P\Domain\Repository\ContentDependencyRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ContentTypeCacheEntryRepository;
 use Sandstorm\NeosH5P\Domain\Repository\LibraryDependencyRepository;
@@ -68,6 +72,12 @@ class H5PFramework implements \H5PFrameworkInterface
 
     /**
      * @Flow\Inject
+     * @var ContentDependencyRepository
+     */
+    protected $contentDependencyRepository;
+
+    /**
+     * @Flow\Inject
      * @var LibraryRepository
      */
     protected $libraryRepository;
@@ -102,6 +112,11 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     protected $cachedAssetRepository;
 
+    /**
+     * @Flow\Inject
+     * @var UserService
+     */
+    protected $userService;
 
     /**
      * ================================================================================================================
@@ -209,10 +224,17 @@ class H5PFramework implements \H5PFrameworkInterface
      *     - libraryId: The id of the main library for this content
      * @param int $contentMainId
      *   Main id for the content if this is a system that supports versions
+     * @return string
      */
     public function insertContent($content, $contentMainId = NULL)
     {
-        // TODO: Implement insertContent() method.
+        /** @var Library $library */
+        $library = $this->libraryRepository->findOneByLibraryId($content['library']['libraryId']);
+        $account = $this->userService->getCurrentUser()->getAccounts()->first();
+        $content = Content::createFromMetadata($content, $library, $account);
+        $this->contentRepository->add($content);
+
+        return $this->persistenceManager->getIdentifierByObject($content);
     }
 
     /**
@@ -261,7 +283,13 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function deleteLibraryUsage($contentId)
     {
-        // TODO: Implement deleteLibraryUsage() method.
+        /** @var Content $content */
+        $content = $this->contentRepository->findByIdentifier($contentId);
+        foreach ($content->getContentDependencies() as $contentDependency) {
+            $this->contentDependencyRepository->remove($contentDependency);
+        }
+        // Persist, because directly afterwards saveLibraryUsage() might be called
+        $this->persistenceManager->persistAll();
     }
 
     /**
@@ -282,7 +310,28 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function saveLibraryUsage($contentId, $librariesInUse)
     {
-        // TODO: Implement saveLibraryUsage() method.
+        /** @var Content $content */
+        $content = $this->contentRepository->findByIdentifier($contentId);
+        if($content === null) {
+            return;
+        }
+
+        $dropLibraryCssList = [];
+        foreach ($librariesInUse as $dependencyData) {
+            if (!empty($dependencyData['library']['dropLibraryCss'])) {
+                $dropLibraryCssList = array_merge($dropLibraryCssList, explode(', ', $dependencyData['library']['dropLibraryCss']));
+            }
+        }
+
+        foreach ($librariesInUse as $dependencyData) {
+            $contentDependency = new ContentDependency();
+            $contentDependency->setContent($content);
+            $contentDependency->setLibrary($this->libraryRepository->findOneByLibraryId($dependencyData['library']['libraryId']));
+            $contentDependency->setDependencyType($dependencyData['type']);
+            $contentDependency->setDropCss(in_array($dependencyData['library']['machineName'], $dropLibraryCssList));
+            $contentDependency->setWeight($dependencyData['weight']);
+            $this->contentDependencyRepository->add($contentDependency);
+        }
     }
 
     /**
@@ -343,7 +392,21 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function updateContentFields($id, $fields)
     {
-        // TODO: Implement updateContentFields() method.
+        /** @var Content $content */
+        $content = $this->contentRepository->findByIdentifier($id);
+        if($content === null) {
+            return;
+        }
+
+        foreach ($fields as $propertyName => $value) {
+            ObjectAccess::setProperty($content, $propertyName, $value);
+        }
+
+        try {
+            $this->contentRepository->update($content);
+        } catch (IllegalObjectTypeException $ex) {
+            // will never happen
+        }
     }
 
     /**
@@ -399,7 +462,7 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function isContentSlugAvailable($slug)
     {
-        // TODO: Implement isContentSlugAvailable() method.
+        return $this->contentRepository->findOneBySlug($slug) === null;
     }
 
 
@@ -734,7 +797,7 @@ class H5PFramework implements \H5PFrameworkInterface
             'majorVersion' => $majorVersion,
             'minorVersion' => $minorVersion
         ]);
-        if($library === null) {
+        if ($library === null) {
             return null;
         }
         return $library->getSemantics();
