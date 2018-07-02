@@ -6,6 +6,7 @@ use Neos\Flow\Mvc\Exception\StopActionException;
 use Neos\Neos\Controller\Module\AbstractModuleController;
 use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Model\Content;
+use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
 use Sandstorm\NeosH5P\Domain\Service\ContentCreationService;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
 
@@ -22,6 +23,18 @@ class ContentController extends AbstractModuleController
      * @var ContentCreationService
      */
     protected $contentCreationService;
+
+    /**
+     * @Flow\Inject
+     * @var ContentRepository
+     */
+    protected $contentRepository;
+
+    public function indexAction()
+    {
+        $contents = $this->contentRepository->findAll();
+        $this->view->assign('contents', $contents);
+    }
 
     public function newAction()
     {

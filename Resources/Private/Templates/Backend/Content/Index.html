@@ -1,4 +1,52 @@
 {namespace neos=Neos\Neos\ViewHelpers}
 <div class="neos-content neos-indented neos-fluid-container">
-    tbd
+    <div class="neos-row-fluid">
+        <neos:link.module
+            title="New H5P Content"
+            class="neos-button neos-button-primary"
+            path="h5p/content"
+            action="new">
+            New H5P Content
+        </neos:link.module>
+    </div>
+    <div class="neos-row-fluid">
+        <legend>Existing H5P Contents</legend>
+        <table class="neos-table">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Library</th>
+                <th>Created</th>
+                <th>Author</th>
+                <!--<th class="neos-aCenter neos-span1">Active</th>-->
+            </tr>
+            </thead>
+            <tbody>
+
+            <f:for each="{contents}" as="content">
+                <tr>
+                    <td>
+                        <neos:link.module
+                            title="New H5P Content"
+                            path="h5p/content"
+                            action="display"
+                            arguments="{content:content}">
+                            {content.title}
+                        </neos:link.module>
+                    </td>
+                    <td>
+                        {content.library.name}
+                    </td>
+                    <td>
+                        {content.createdAt -> f:format.date(format:'d.m.Y H:i')}
+                    </td>
+                    <td>
+                        {content.account.accountIdentifier}
+                    </td>
+                </tr>
+            </f:for>
+
+            </tbody>
+        </table>
+    </div>
 </div>
