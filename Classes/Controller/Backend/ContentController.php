@@ -50,8 +50,8 @@ class ContentController extends AbstractModuleController
 
     public function newAction()
     {
-        $coreSettings = $this->h5pIntegrationService->getCoreSettings();
-        $coreSettings['editor'] = $this->h5pIntegrationService->getEditorSettings();
+        $coreSettings = $this->h5pIntegrationService->getCoreSettings($this->controllerContext);
+        $coreSettings['editor'] = $this->h5pIntegrationService->getEditorSettings($this->controllerContext);
 
         $this->view->assign('settings', json_encode($coreSettings));
         $this->view->assign('scripts', $coreSettings['core']['scripts']);
@@ -90,7 +90,7 @@ class ContentController extends AbstractModuleController
         // TODO: refactor
         $this->persistenceManager->whitelistObject($content);
 
-        $coreSettings = $this->h5pIntegrationService->getCoreSettings();
+        $coreSettings = $this->h5pIntegrationService->getCoreSettings($this->controllerContext);
 
         /*
         // currently, embed type is hard-set to "div" during content creation. therefore we do not need to reflect the following
@@ -109,7 +109,7 @@ class ContentController extends AbstractModuleController
         // elements on pne page (in fusion)
         $contentId = 'cid-' . $content->getContentId();
         if (!isset($coreSettings['contents'][$contentId])) {
-            $coreSettings['contents'][$contentId] = $this->h5pIntegrationService->getContentSettings($content);
+            $coreSettings['contents'][$contentId] = $this->h5pIntegrationService->getContentSettings($this->controllerContext, $content);
 
             // Get assets for this content
             $preloadedDependencies = $this->h5pCore->loadContentDependencies($content->getContentId(), 'preloaded');

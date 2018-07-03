@@ -4,6 +4,7 @@ namespace Sandstorm\NeosH5P\Controller\Backend;
 
 use Neos\Flow\Mvc\Controller\ActionController;
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\ResourceManagement\ResourceManager;
 use Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework;
 
 class EditorAjaxController extends ActionController
@@ -27,6 +28,12 @@ class EditorAjaxController extends ActionController
     protected $h5pPublicFolderPath;
 
     /**
+     * @Flow\Inject
+     * @var ResourceManager
+     */
+    protected $resourceManager;
+
+    /**
      * This is never called, only serves as a uri generation base
      */
     public function indexAction()
@@ -47,12 +54,16 @@ class EditorAjaxController extends ActionController
 
     /**
      * @param string $queryString
+     * @Flow\SkipCsrfProtection
      * @return bool
      */
     public function installLibraryAction(string $queryString)
     {
         $queryArguments = $this->resolveQueryString($queryString);
         $this->h5pEditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $queryArguments['id']);
+        // Publish the "libraries" collection so we get the unzipped file
+        $libraryCollection = $this->resourceManager->getCollection('h5p-libraries');
+        $libraryCollection->getTarget()->publishCollection($libraryCollection);
         // TODO: This doesnt work e.g. for H5P.CoursePresentation. make error msg visible to user!
         // TODO: this probably has to do with output buffering - if we remove the "die", nothing is returned if errors occur.
         die;
@@ -88,6 +99,7 @@ class EditorAjaxController extends ActionController
 
     /**
      * @param array $libraries
+     * @Flow\SkipCsrfProtection
      * @return bool
      */
     public function librariesAction($libraries = null)

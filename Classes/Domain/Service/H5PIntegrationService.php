@@ -3,6 +3,7 @@
 namespace Sandstorm\NeosH5P\Domain\Service;
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Mvc\Controller\ControllerContext;
 use Neos\Flow\Mvc\Routing\Exception\MissingActionNameException;
 use Neos\Flow\Mvc\Routing\UriBuilder;
 use Neos\Flow\Package\PackageManagerInterface;
@@ -21,12 +22,6 @@ use Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework;
  */
 class H5PIntegrationService
 {
-    /**
-     * @Flow\InjectConfiguration(path="http.baseUri", package="Neos.Flow")
-     * @var string
-     */
-    protected $baseUri;
-
     /**
      * @Flow\InjectConfiguration(path="h5pPublicFolder.url")
      * @var string
@@ -77,12 +72,6 @@ class H5PIntegrationService
 
     /**
      * @Flow\Inject
-     * @var UriBuilder
-     */
-    protected $uriBuilder;
-
-    /**
-     * @Flow\Inject
      * @var ContentUserDataRepository
      */
     protected $contentUserDataRepository;
@@ -91,29 +80,28 @@ class H5PIntegrationService
      * Returns an array with a set of core settings that the H5P JavaScript needs
      * to do its thing.
      *
+     * @param ControllerContext $controllerContext
      * @return array
      */
-    public function getCoreSettings(): array
+    public function getCoreSettings(ControllerContext $controllerContext): array
     {
         $currentUser = $this->userService->getCurrentUser();
-
-        // TODO: $this->>baseUri is null here - probably because of the subrequest thing in the Neos BE. how to get it?
-        $this->baseUri = 'http://127.0.0.1:8081/';
+        $baseUri = $controllerContext->getRequest()->getMainRequest()->getHttpRequest()->getBaseUri()->__toString();
 
         $settings = [
-            'baseUrl' => $this->baseUri,
+            'baseUrl' => $baseUri,
             'url' => $this->h5pPublicFolderUrl,
             'postUserStatistics' => $this->h5pFramework->getOption('track_user') && $currentUser !== null,
             'ajax' => [
                 // TODO: set this to the correct routes for the Frontend\ContentAjaxController
                 // in wp looks like: http://127.0.0.1:8081/wp-admin/admin-ajax.php?token=bc3d523a30&action=h5p_setFinished
-                'setFinished' => $this->baseUri,
+                'setFinished' => $baseUri,
                 // in wp looks like: http://127.0.0.1:8081/wp-admin/admin-ajax.php?token=19c5088239&action=h5p_contents_user_data&content_id=:contentId&data_type=:dataType&sub_content_id=:subContentId"
                 // !!!! mind the placeholders !!!
-                'contentUserData' => $this->baseUri
+                'contentUserData' => $baseUri
             ],
             'saveFreq' => $this->h5pFramework->getOption('save_content_state') ? $this->h5pFramework->getOption('save_content_frequency') : false,
-            'siteUrl' => $this->baseUri,
+            'siteUrl' => $baseUri,
             'l10n' => [
                 'H5P' => $this->h5pCore->getLocalization(),
             ],
@@ -142,25 +130,26 @@ class H5PIntegrationService
      * Returns an array with a set of editor settings that the H5P JavaScript needs
      * to do its thing.
      *
+     * @param ControllerContext $controllerContext
      * @param null $contentId provide this to set the "nodeVersionId" - needed to edit contents.
      * @return array
      */
-    public function getEditorSettings($contentId = null): array
+    public function getEditorSettings(ControllerContext $controllerContext, $contentId = null): array
     {
-        // TODO: $this->>baseUri is null here - probably because of the subrequest thing in the Neos BE. how to get it?
-        $this->baseUri = 'http://127.0.0.1:8081/';
-
-        // TODO: issues with plugin uri rewrite by PluginUriAspect
-//        try {
-//            $editorAjaxAction = $this->uriBuilder->reset()->setCreateAbsoluteUri(true)->uriFor(
-//                'index',
-//                [],
-//                'Backend\EditorAjax',
-//                'Sandstorm.NeosH5P'
-//            );
-//        } catch (MissingActionNameException $ex) {
-//            // swallow, never happens
-//        }
+        // Get the main request for URI building
+        $mainRequest = $controllerContext->getRequest()->getMainRequest();
+        $baseUri = $mainRequest->getHttpRequest()->getBaseUri()->__toString();
+        $uriBuilder = $controllerContext->getUriBuilder();
+        // Temporarily set the request to the main request so we get the correct URI
+        $uriBuilder->setRequest($mainRequest);
+        $editorAjaxAction = $uriBuilder->reset()->setCreateAbsoluteUri(true)->uriFor(
+            'index',
+            [],
+            'Backend\EditorAjax',
+            'Sandstorm.NeosH5P'
+        );
+        // Reset the URIBuilder to the subrequest to not mess with the backend module routing
+        $uriBuilder->setRequest($controllerContext->getRequest());
 
         $editorSettings = [
             'filesPath' => $this->h5pPublicFolderUrl . 'editor', // TODO - from settings
@@ -169,9 +158,8 @@ class H5PIntegrationService
                 'width' => 50,
                 'height' => 50,
             ],
-            // TODO - via uriBuilder
-            'ajaxPath' => 'http://127.0.0.1:8081/neosh5p/editor/',
-            'libraryUrl' => $this->baseUri . $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName,
+            'ajaxPath' => $editorAjaxAction . '/',
+            'libraryUrl' => $baseUri . $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName,
             'copyrightSemantics' => $this->h5pContentValidator->getCopyrightSemantics(),
             'assets' => [
                 'css' => array_merge($this->getRelativeCoreStyleUrls(), $this->getRelativeEditorStyleUrls()),
@@ -272,15 +260,15 @@ class H5PIntegrationService
     /**
      * Get settings for given content
      *
+     * @param ControllerContext $controllerContext
      * @param Content $content
      * @return array
      */
-    public function getContentSettings(Content $content)
+    public function getContentSettings(ControllerContext $controllerContext, Content $content)
     {
         $contentArray = $content->toAssocArray();
 
-        // TODO: $this->>baseUri is null here - probably because of the subrequest thing in the Neos BE. how to get it?
-        $this->baseUri = 'http://127.0.0.1:8081/';
+        $baseUri = $controllerContext->getRequest()->getMainRequest()->getHttpRequest()->getBaseUri()->__toString();
 
         $h5pCorePublicUrl = $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName;
 
@@ -295,7 +283,7 @@ class H5PIntegrationService
             // TODO: implement once iframe embedding is enabled
             'embedCode' => '<iframe src="embed-url-for-content-here-once-implemented" width=":w" height=":h" frameborder="0" allowfullscreen="allowfullscreen"></iframe>',
             'resizeCode' => '<script src="' . $h5pCorePublicUrl . '/js/h5p-resizer.js' . '" charset="UTF-8"></script>',
-            'url' => $this->baseUri, // TODO needed? admin_url('admin-ajax.php?action=h5p_embed&id=' . $contentArray['id']),
+            'url' => $baseUri, // TODO needed? admin_url('admin-ajax.php?action=h5p_embed&id=' . $contentArray['id']),
             'title' => $contentArray['title'],
             // TODO: use actual account identifier instead of 0 - this is needed only for an auth check, which we default to true currently.
             'displayOptions' => $this->h5pCore->getDisplayOptionsForView($contentArray['disable'], 0),
