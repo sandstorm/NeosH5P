@@ -169,6 +169,7 @@ class H5PIntegrationService
                 'width' => 50,
                 'height' => 50,
             ],
+            // TODO - via uriBuilder
             'ajaxPath' => 'http://127.0.0.1:8081/neosh5p/editor/',
             'libraryUrl' => $this->baseUri . $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName,
             'copyrightSemantics' => $this->h5pContentValidator->getCopyrightSemantics(),

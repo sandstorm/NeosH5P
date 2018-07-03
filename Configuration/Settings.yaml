@@ -146,3 +146,16 @@ Neos:
             path: *h5pPublicFolderPath
             baseUri: *h5pPublicFolderUrl
             subdivideHashPathSegment: false
+
+    # We add a request pattern for our controllers to the Neos Backend provider,
+    # so that XHR requests that go directly to these controllers (and not through
+    # a ModuleController subrequest) can be authenticated as well
+    security:
+      authentication:
+        providers:
+          'Neos.Neos:Backend':
+            requestPatterns:
+              'Sandstorm.NeosH5P:BackendControllers':
+                pattern: 'ControllerObjectName'
+                patternOptions:
+                  controllerObjectNamePattern: 'Sandstorm\NeosH5P\Controller\Backend\.*'
