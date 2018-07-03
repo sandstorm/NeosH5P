@@ -8,6 +8,7 @@ use Neos\Flow\Cli\Request;
 use Neos\Flow\Cli\Response;
 use Neos\Flow\Exception;
 use Neos\Flow\Mvc\Dispatcher;
+use Sandstorm\NeosH5P\Domain\Repository\CachedAssetRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ConfigSettingRepository;
 use Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework;
 
@@ -42,6 +43,12 @@ class H5PCommandController extends CommandController
      * @var Dispatcher
      */
     protected $dispatcher;
+
+    /**
+     * @Flow\Inject
+     * @var CachedAssetRepository
+     */
+    protected $cachedAssetRepository;
 
     /**
      * @var array
@@ -104,6 +111,15 @@ class H5PCommandController extends CommandController
             $this->h5pFramework->setOption($key, $value);
             $this->outputLine("<b>$key:</b> $value");
         }
+    }
+
+    /**
+     * Removes all CachedAssets
+     */
+    public function clearCachedAssetsCommand()
+    {
+        $this->cachedAssetRepository->removeAll();
+        $this->outputLine('Removed all cached assets.');
     }
 
 }

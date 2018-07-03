@@ -52,7 +52,7 @@ class H5PIntegrationService
     protected $h5pFramework;
 
     /**
-     * @Flow\Inject
+     * @Flow\Inject(lazy=false)
      * @var \H5PCore
      */
     protected $h5pCore;
@@ -286,6 +286,7 @@ class H5PIntegrationService
         // Add JavaScript settings for this content
         $contentSettings = [
             'library' => \H5PCore::libraryToString($contentArray['library']),
+            // TODO: filterParameters if filtered is empty
             'jsonContent' => $content->getFiltered(), //$this->h5pCore->filterParameters($contentArray),
             'fullScreen' => $contentArray['library']['fullscreen'],
             // TODO: implement once export is enabled

@@ -691,6 +691,14 @@ class Library
     }
 
     /**
+     * @param CachedAsset $cachedAsset
+     */
+    public function addCachedAsset(CachedAsset $cachedAsset): void
+    {
+        $this->cachedAssets->add($cachedAsset);
+    }
+
+    /**
      * @return PersistentResource|null
      */
     public function getZippedLibraryFile()

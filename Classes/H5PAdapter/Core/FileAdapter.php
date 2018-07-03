@@ -4,10 +4,13 @@ namespace Sandstorm\NeosH5P\H5PAdapter\Core;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Exception;
+use Neos\Flow\Persistence\PersistenceManagerInterface;
 use Neos\Flow\ResourceManagement\ResourceManager;
 use Neos\Utility\Exception\FilesException;
 use Neos\Utility\Files;
+use Sandstorm\NeosH5P\Domain\Model\CachedAsset;
 use Sandstorm\NeosH5P\Domain\Model\Library;
+use Sandstorm\NeosH5P\Domain\Repository\CachedAssetRepository;
 use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
 
 /**
@@ -26,6 +29,18 @@ class FileAdapter implements \H5PFileStorage
      * @var LibraryRepository
      */
     protected $libraryRepository;
+
+    /**
+     * @Flow\Inject
+     * @var CachedAssetRepository
+     */
+    protected $cachedAssetRepository;
+
+    /**
+     * @Flow\Inject
+     * @var PersistenceManagerInterface
+     */
+    protected $persistenceManager;
 
     /**
      * Store the library folder.
@@ -203,7 +218,61 @@ class FileAdapter implements \H5PFileStorage
      */
     public function cacheAssets(&$files, $key)
     {
-        // TODO: Implement cacheAssets() method.
+        /**
+         * The files we get here are published H5P library CSS and JS files.
+         * We create and publish the PersistentResource objects and CachedAsset objects
+         * here and make the assignment to libraries later when we have that information
+         * in H5PFramework->saveCachedAssets().
+         * @see H5PFramework::saveCachedAssets()
+         * @see \H5PCore::getDependenciesFiles
+         */
+        foreach ($files as $type => $assets) {
+            if (empty($assets)) {
+                continue;
+            }
+
+            $content = '';
+            foreach ($assets as $asset) {
+                // Get content from asset file
+                $assetContent = file_get_contents(FLOW_PATH_WEB . $asset->path);
+                $cssRelPath = preg_replace('/[^\/]+$/', '', $asset->path);
+
+                // Get file content and concatenate
+                if ($type === 'scripts') {
+                    $content .= $assetContent . ";\n";
+                } else {
+                    // Rewrite relative URLs used inside stylesheets
+                    // TODO: This doesn't work correctly yet
+                    $content .= preg_replace_callback(
+                            '/url\([\'"]?([^"\')]+)[\'"]?\)/i',
+                            function ($matches) use ($cssRelPath) {
+                                if (preg_match("/^(data:|([a-z0-9]+:)?\/)/i", $matches[1]) === 1) {
+                                    return $matches[0]; // Not relative, skip
+                                }
+                                return 'url("../' . $cssRelPath . $matches[1] . '")';
+                            },
+                            $assetContent) . "\n";
+                }
+            }
+
+            $ext = ($type === 'scripts' ? 'js' : 'css');
+            $persistentResource = $this->resourceManager->importResourceFromContent($content, $key . '.' . $ext);
+            // Create the CachedAsset object here
+            $cachedAsset = new CachedAsset();
+            $cachedAsset->setHashKey($key);
+            $cachedAsset->setType($type);
+            $cachedAsset->setResource($persistentResource);
+            $this->cachedAssetRepository->add($cachedAsset);
+            // whitelist, as this can be called on GET requests
+            $this->persistenceManager->whitelistObject($cachedAsset);
+
+            $files[$type] = array((object)array(
+                'path' => $this->resourceManager->getPublicPersistentResourceUri($persistentResource),
+                'version' => ''
+            ));
+        }
+        // Persist, so the cachedasset objects can be found in H5PFramework->saveCachedAssets
+        $this->persistenceManager->persistAll();
     }
 
     /**
@@ -211,11 +280,31 @@ class FileAdapter implements \H5PFileStorage
      *
      * @param string $key
      *  Hashed key for cached asset
-     * @return array
+     * @return array|null
      */
     public function getCachedAssets($key)
     {
-        // TODO: Implement getCachedAssets() method.
+        $files = [];
+
+        $cachedAssets = $this->cachedAssetRepository->findByHashKey($key);
+
+        /** @var CachedAsset $cachedAsset */
+        foreach ($cachedAssets as $cachedAsset) {
+            if ($cachedAsset->getType() == 'scripts') {
+                $files['scripts'] = [(object)[
+                    'path' => $this->resourceManager->getPublicPersistentResourceUri($cachedAsset->getResource()),
+                    'version' => ''
+                ]];
+            }
+            if ($cachedAsset->getType() == 'styles') {
+                $files['styles'] = [(object)[
+                    'path' => $this->resourceManager->getPublicPersistentResourceUri($cachedAsset->getResource()),
+                    'version' => ''
+                ]];
+            }
+        }
+
+        return empty($files) ? null : $files;
     }
 
     /**

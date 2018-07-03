@@ -13,6 +13,7 @@ use Neos\Flow\Persistence\PersistenceManagerInterface;
 use Neos\Flow\Persistence\QueryInterface;
 use Neos\Neos\Domain\Service\UserService;
 use Neos\Utility\ObjectAccess;
+use Sandstorm\NeosH5P\Domain\Model\CachedAsset;
 use Sandstorm\NeosH5P\Domain\Model\ConfigSetting;
 use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Model\Content;
@@ -47,11 +48,19 @@ class H5PFramework implements \H5PFrameworkInterface
      * Use $this->>getInjectedH5PCore instead. Reason: This object exposes public properties (such as "fs" for the file
      * storage adapter) which, when accessed, do not trigger the activation of the dependency proxy (only method calls
      * do that). So we need to make sure the dependency proxy is resolved before accessing the H5PCore object.
+     * Because this object is itself a construction parameter of H5PCore, we cannot use lazy=false as that would lead
+     * to a circular DI graph.
      *
      * @Flow\Inject
      * @var \H5PCore
      */
     protected $h5pCore;
+
+    /**
+     * @Flow\Inject(lazy=false)
+     * @var FileAdapter
+     */
+    protected $fileAdapter;
 
     /**
      * @Flow\Inject
@@ -309,6 +318,7 @@ class H5PFramework implements \H5PFrameworkInterface
             return;
         }
         foreach ($content->getContentDependencies() as $contentDependency) {
+            $this->persistenceManager->whitelistObject($contentDependency);
             $this->contentDependencyRepository->remove($contentDependency);
         }
         // Persist, because directly afterwards saveLibraryUsage() might be called
@@ -354,6 +364,7 @@ class H5PFramework implements \H5PFrameworkInterface
             $contentDependency->setDropCss(in_array($dependencyData['library']['machineName'], $dropLibraryCssList));
             $contentDependency->setWeight($dependencyData['weight']);
             $this->contentDependencyRepository->add($contentDependency);
+            $this->persistenceManager->whitelistObject($contentDependency);
         }
         $this->persistenceManager->persistAll();
     }
@@ -419,7 +430,7 @@ class H5PFramework implements \H5PFrameworkInterface
             $criteria['dependencyType'] = $type;
         }
 
-        $dependencies = $this->contentDependencyRepository->findBy($criteria);
+        $dependencies = $this->contentDependencyRepository->findBy($criteria, ['weight' => QueryInterface::ORDER_ASCENDING]);
         /** @var ContentDependency $dependency */
         foreach ($dependencies as $dependency) {
             $dependencyArray[] = $dependency->toAssocArray();
@@ -1005,7 +1016,36 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function saveCachedAssets($key, $libraries)
     {
-        // TODO: Implement saveCachedAssets() method.
+        /**
+         * This is called after FileAdapter->cacheAssets and makes the assignment of
+         * CachedAsset and Library.
+         * @see FileAdapter::cacheAssets()
+         * @see \H5PCore::getDependenciesFiles()
+         */
+
+        $cachedAssets = $this->cachedAssetRepository->findByHashKey($key);
+
+        /** @var CachedAsset $cachedAsset */
+        foreach ($cachedAssets as $cachedAsset) {
+            foreach ($libraries as $libraryData) {
+                /** @var Library $library */
+                $library = $this->libraryRepository->findOneByLibraryId($libraryData['libraryId']);
+                if ($library === null) {
+                    continue;
+                }
+                $library->addCachedAsset($cachedAsset);
+                $cachedAsset->addLibrary($library);
+                // Whitelist, as this can be called on GETs
+                $this->persistenceManager->whitelistObject($library);
+                $this->persistenceManager->whitelistObject($cachedAsset);
+                try {
+                    $this->libraryRepository->update($library);
+                    $this->cachedAssetRepository->update($cachedAsset);
+                } catch (IllegalObjectTypeException $ex) {
+                    // Swallow, will never happen
+                }
+            }
+        }
     }
 
     /**

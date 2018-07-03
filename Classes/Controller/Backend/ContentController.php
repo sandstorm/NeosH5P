@@ -25,7 +25,7 @@ class ContentController extends AbstractModuleController
     protected $h5pIntegrationService;
 
     /**
-     * @Flow\Inject
+     * @Flow\Inject(lazy=false)
      * @var \H5PCore
      */
     protected $h5pCore;

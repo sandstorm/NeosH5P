@@ -21,7 +21,7 @@ class ContentCreationService
     protected $h5pCore;
 
     /**
-     * @Flow\Inject
+     * @Flow\Inject(lazy=false)
      * @var \H5peditor
      */
     protected $h5pEditor;
