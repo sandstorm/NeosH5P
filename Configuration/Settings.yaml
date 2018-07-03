@@ -17,11 +17,19 @@ Sandstorm:
     # These can be generated as ConfigSettings by the flow command
     # ./flow h5p:generatedefaultconfigsettings.
     defaultConfigSettings:
+      # if TRUE, sends usage statistics (#contents, #authors, #librs, etc) to H5P Hub
+      # with every content type cache refresh
       send_usage_statistics: false
+      # if TRUE, saves ContentResults for logged-in users
       track_user: true
+      # if TRUE, saves ContentUserData for logged-in users. This saves data that a frontend user
+      # enters during his work with a content, and will restore content state on page reloads.
       save_content_state: true
+      # interval in seconds fpr whcih the ContentUserData is saved
       save_content_frequency: 10
+      # whether or not the H5P hub is enabled.
       hub_is_enabled: true
+      # Enables LRS content types.
       enable_lrs_content_types: true
       # content display options
       frame: false

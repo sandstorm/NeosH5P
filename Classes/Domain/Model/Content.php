@@ -150,7 +150,6 @@ class Content
         $content->setParameters($contentData['params']);
         $content->setDisable($contentData['disable']);
         $content->setSlug(''); // Set by h5p later, but must not be null
-        // WordPress always sets "div" here, but has a "TODO: Determine from library?" comment
         $content->setEmbedType('div');
         $content->setFiltered('');
 
