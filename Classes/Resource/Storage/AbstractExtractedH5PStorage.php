@@ -21,7 +21,7 @@ use Neos\Flow\Utility\Environment;
  * - Name of the method that yields the zipped PersistentResource which should be extracted. Example:
  *   resourceGetterMethod: 'getZippedLibraryFile'
  * - Method that returns the name of the directory for each individual extracted item. Example:
- *   itemFolderNameMethod: 'getNameAndVersionString'
+ *   itemFolderNameMethod: 'getFolderName'
  */
 abstract class AbstractExtractedH5PStorage implements StorageInterface
 {

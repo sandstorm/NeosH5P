@@ -93,7 +93,7 @@ Neos:
           storageOptions:
             publishingSubfolder: *h5pLibrarySubfolderName
             resourceGetterMethod: 'getZippedLibraryFile'
-            itemFolderNameMethod: 'getNameAndVersionString'
+            itemFolderNameMethod: 'getFolderName'
         h5pCoreStorage:
           storage: 'Sandstorm\NeosH5P\Resource\Storage\H5PPackageFileStorage'
           storageOptions:

@@ -232,7 +232,7 @@ class H5PFramework implements \H5PFrameworkInterface
     /**
      * Insert new content.
      *
-     * @param array $content
+     * @param array $contentData
      *   An associative array containing:
      *   - id: The content id
      *   - params: The content in json format
@@ -242,12 +242,12 @@ class H5PFramework implements \H5PFrameworkInterface
      *   Main id for the content if this is a system that supports versions
      * @return string
      */
-    public function insertContent($content, $contentMainId = NULL)
+    public function insertContent($contentData, $contentMainId = NULL)
     {
         /** @var Library $library */
-        $library = $this->libraryRepository->findOneByLibraryId($content['library']['libraryId']);
+        $library = $this->libraryRepository->findOneByLibraryId($contentData['library']['libraryId']);
         $account = $this->userService->getCurrentUser()->getAccounts()->first();
-        $content = Content::createFromMetadata($content, $library, $account);
+        $content = Content::createFromMetadata($contentData, $library, $account);
 
         // Persist and re-read the entity to generate the content ID in the DB and fill the field
         $this->contentRepository->add($content);
@@ -262,7 +262,7 @@ class H5PFramework implements \H5PFrameworkInterface
     /**
      * Update old content.
      *
-     * @param array $content
+     * @param array $contentData
      *   An associative array containing:
      *   - id: The content id
      *   - params: The content in json format
@@ -271,9 +271,23 @@ class H5PFramework implements \H5PFrameworkInterface
      * @param int $contentMainId
      *   Main id for the content if this is a system that supports versions
      */
-    public function updateContent($content, $contentMainId = NULL)
+    public function updateContent($contentData, $contentMainId = NULL)
     {
-        // TODO: Implement updateContent() method.
+        /** @var Content $content */
+        $content = $this->contentRepository->findOneByContentId($contentData['id']);
+        if ($content === null) {
+            return;
+        }
+
+        /** @var Library $library */
+        $library = $this->libraryRepository->findOneByLibraryId($contentData['library']['libraryId']);
+        if ($library === null) {
+            return;
+        }
+
+        $content->updateFromMetadata($contentData, $library);
+
+        $this->contentRepository->update($content);
     }
 
     /**
@@ -666,7 +680,7 @@ class H5PFramework implements \H5PFrameworkInterface
             if ($library === null) {
                 throw new Exception("Library with ID " . $libraryData['libraryId'] . " could not be found!");
             }
-            Library::updateFromMetadata($libraryData, $library);
+            $library->updateFromMetadata($libraryData);
             $this->libraryRepository->update($library);
             $this->deleteLibraryDependencies($libraryData['libraryId']);
         }

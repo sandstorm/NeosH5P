@@ -78,12 +78,30 @@ class H5PIntegrationService
 
     /**
      * Returns an array with a set of core settings that the H5P JavaScript needs
+     * to do its thing. Can also include editor settings.
+     *
+     * @param ControllerContext $controllerContext
+     * @param bool $includeEditorSettings
+     * @param int $contentId
+     * @return array
+     */
+    public function getSettings(ControllerContext $controllerContext, bool $includeEditorSettings = false, int $contentId = -1): array
+    {
+        $coreSettings = $this->getCoreSettings($controllerContext);
+        if ($includeEditorSettings) {
+            $coreSettings['editor'] = $this->getEditorSettings($controllerContext, $contentId);
+        }
+        return $coreSettings;
+    }
+
+    /**
+     * Returns an array with a set of core settings that the H5P JavaScript needs
      * to do its thing.
      *
      * @param ControllerContext $controllerContext
      * @return array
      */
-    public function getCoreSettings(ControllerContext $controllerContext): array
+    private function getCoreSettings(ControllerContext $controllerContext): array
     {
         $currentUser = $this->userService->getCurrentUser();
         $baseUri = $controllerContext->getRequest()->getMainRequest()->getHttpRequest()->getBaseUri()->__toString();
@@ -131,10 +149,10 @@ class H5PIntegrationService
      * to do its thing.
      *
      * @param ControllerContext $controllerContext
-     * @param null $contentId provide this to set the "nodeVersionId" - needed to edit contents.
+     * @param int $contentId provide this to set the "nodeVersionId" - needed to edit contents.
      * @return array
      */
-    public function getEditorSettings(ControllerContext $controllerContext, $contentId = null): array
+    private function getEditorSettings(ControllerContext $controllerContext, int $contentId = -1): array
     {
         // Get the main request for URI building
         $mainRequest = $controllerContext->getRequest()->getMainRequest();
@@ -168,7 +186,7 @@ class H5PIntegrationService
             'apiVersion' => \H5PCore::$coreApi
         ];
 
-        if ($contentId !== null) {
+        if ($contentId !== -1) {
             $editorSettings['nodeVersionId'] = $contentId;
         }
 

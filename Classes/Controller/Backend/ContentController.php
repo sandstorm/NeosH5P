@@ -8,6 +8,7 @@ use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Model\Content;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
 use Sandstorm\NeosH5P\Domain\Service\ContentCreationService;
+use Sandstorm\NeosH5P\Domain\Service\ContentUpdateService;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
 
 class ContentController extends AbstractModuleController
@@ -38,6 +39,12 @@ class ContentController extends AbstractModuleController
 
     /**
      * @Flow\Inject
+     * @var ContentUpdateService
+     */
+    protected $contentUpdateService;
+
+    /**
+     * @Flow\Inject
      * @var ContentRepository
      */
     protected $contentRepository;
@@ -50,12 +57,11 @@ class ContentController extends AbstractModuleController
 
     public function newAction()
     {
-        $coreSettings = $this->h5pIntegrationService->getCoreSettings($this->controllerContext);
-        $coreSettings['editor'] = $this->h5pIntegrationService->getEditorSettings($this->controllerContext);
+        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext, true);
 
-        $this->view->assign('settings', json_encode($coreSettings));
-        $this->view->assign('scripts', $coreSettings['core']['scripts']);
-        $this->view->assign('styles', $coreSettings['core']['styles']);
+        $this->view->assign('settings', json_encode($h5pIntegrationSettings));
+        $this->view->assign('scripts', $h5pIntegrationSettings['core']['scripts']);
+        $this->view->assign('styles', $h5pIntegrationSettings['core']['styles']);
     }
 
     /**
@@ -82,6 +88,19 @@ class ContentController extends AbstractModuleController
     }
 
     /**
+     * @param int $contentId
+     * @param string $title
+     * @param string $library
+     * @param string $parameters
+     * @return bool
+     */
+    public function updateAction(int $contentId, string $title, string $library, string $parameters)
+    {
+        $this->contentUpdateService->handleContentUpdate($contentId, $title, $library, $parameters);
+        return false;
+    }
+
+    /**
      * @param Content $content
      */
     public function displayAction(Content $content)
@@ -90,7 +109,7 @@ class ContentController extends AbstractModuleController
         // TODO: refactor
         $this->persistenceManager->whitelistObject($content);
 
-        $coreSettings = $this->h5pIntegrationService->getCoreSettings($this->controllerContext);
+        $coreSettings = $this->h5pIntegrationService->getSettings($this->controllerContext);
 
         /*
         // currently, embed type is hard-set to "div" during content creation. therefore we do not need to reflect the following
@@ -122,5 +141,27 @@ class ContentController extends AbstractModuleController
         $this->view->assign('settings', json_encode($coreSettings));
         $this->view->assign('scripts', $coreSettings['core']['scripts']);
         $this->view->assign('styles', $coreSettings['core']['styles']);
+    }
+
+    /**
+     * @param Content $content
+     */
+    public function editAction(Content $content)
+    {
+        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext, true, $content->getContentId());
+
+        $this->view->assign('settings', json_encode($h5pIntegrationSettings));
+        $this->view->assign('scripts', $h5pIntegrationSettings['core']['scripts']);
+        $this->view->assign('styles', $h5pIntegrationSettings['core']['styles']);
+        $this->view->assign('content', $content);
+    }
+
+    /**
+     * @param Content $content
+     */
+    public function deleteAction(Content $content)
+    {
+        // TODO: implement
+        return false;
     }
 }

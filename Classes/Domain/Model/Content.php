@@ -185,6 +185,25 @@ class Content
     }
 
     /**
+     * @param array $contentData
+     * @param Library $library
+     */
+    public function updateFromMetadata(array $contentData, Library $library)
+    {
+        $this->setUpdatedAt(new \DateTime());
+        $this->setTitle($contentData['title']);
+        $this->setFiltered("");
+        $this->setLibrary($library);
+
+        if (isset($contentData['params'])) {
+            $this->setParameters($contentData['params']);
+        }
+        if (isset($contentData['disable'])) {
+            $this->setDisable($contentData['disable']);
+        }
+    }
+
+    /**
      * @return Library
      */
     public function getLibrary(): Library

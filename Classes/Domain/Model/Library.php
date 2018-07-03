@@ -200,7 +200,7 @@ class Library
         }
 
         $library = new Library();
-        self::updateFromMetadata($libraryData, $library);
+        $library->updateFromMetadata($libraryData);
         $library->setCreatedAt(new \DateTime());
         $library->setUpdatedAt(new \DateTime());
         $library->setRestricted(false);
@@ -210,35 +210,34 @@ class Library
 
     /**
      * @param array $libraryData
-     * @param Library $library
      */
-    public static function updateFromMetadata(array $libraryData, Library $library)
+    public function updateFromMetadata(array $libraryData)
     {
-        $library->setUpdatedAt(new \DateTime());
-        $library->setName($libraryData['machineName']);
-        $library->setTitle($libraryData['title']);
-        $library->setMajorVersion($libraryData['majorVersion']);
-        $library->setMinorVersion($libraryData['minorVersion']);
-        $library->setPatchVersion($libraryData['patchVersion']);
-        $library->setRunnable($libraryData['runnable']);
-        $library->setHasIcon($libraryData['hasIcon'] ? true : false);
+        $this->setUpdatedAt(new \DateTime());
+        $this->setName($libraryData['machineName']);
+        $this->setTitle($libraryData['title']);
+        $this->setMajorVersion($libraryData['majorVersion']);
+        $this->setMinorVersion($libraryData['minorVersion']);
+        $this->setPatchVersion($libraryData['patchVersion']);
+        $this->setRunnable($libraryData['runnable']);
+        $this->setHasIcon($libraryData['hasIcon'] ? true : false);
         if (isset($libraryData['semantics'])) {
-            $library->setSemantics($libraryData['semantics']);
+            $this->setSemantics($libraryData['semantics']);
         }
         if (isset($libraryData['fullscreen'])) {
-            $library->setFullscreen($libraryData['fullscreen']);
+            $this->setFullscreen($libraryData['fullscreen']);
         }
         if (isset($libraryData['__embedTypes'])) {
-            $library->setEmbedTypes($libraryData['__embedTypes']);
+            $this->setEmbedTypes($libraryData['__embedTypes']);
         }
         if (isset($libraryData['__preloadedJs'])) {
-            $library->setPreloadedJs($libraryData['__preloadedJs']);
+            $this->setPreloadedJs($libraryData['__preloadedJs']);
         }
         if (isset($libraryData['__preloadedCss'])) {
-            $library->setPreloadedCss($libraryData['__preloadedCss']);
+            $this->setPreloadedCss($libraryData['__preloadedCss']);
         }
         if (isset($libraryData['__dropLibraryCss'])) {
-            $library->setDropLibraryCss($libraryData['__dropLibraryCss']);
+            $this->setDropLibraryCss($libraryData['__dropLibraryCss']);
         }
     }
 
@@ -248,9 +247,20 @@ class Library
      *
      * @return string
      */
-    public function getNameAndVersionString(): string
+    public function getFolderName(): string
     {
-        return $this->getName() . '-' . $this->getMajorVersion() . '.' . $this->getMinorVersion();
+        return \H5PCore::libraryToString($this->toAssocArray(), true);
+    }
+
+    /**
+     * Returns the library name in a format such as
+     * H5P.MultiChoice 1.12
+     *
+     * @return string
+     */
+    public function getString(): string
+    {
+        return \H5PCore::libraryToString($this->toAssocArray(), false);
     }
 
     /**
@@ -284,6 +294,7 @@ class Library
     {
         $libraryArray = [
             'libraryId' => $this->getLibraryId(),
+            'name' => $this->getName(),
             'machineName' => $this->getName(),
             'title' => $this->getTitle(),
             'majorVersion' => $this->getMajorVersion(),
@@ -319,14 +330,7 @@ class Library
      */
     public function toStdClass(): \stdClass
     {
-        return (object)[
-            'name' => $this->getName(),
-            'title' => $this->getTitle(),
-            'majorVersion' => $this->getMajorVersion(),
-            'minorVersion' => $this->getMinorVersion(),
-            'tutorialUrl' => $this->getTutorialUrl(),
-            'restricted' => $this->isRestricted()
-        ];
+        return (object)$this->toAssocArray();
     }
 
     public function __construct()
