@@ -185,7 +185,7 @@ class ContentController extends AbstractModuleController
     {
         $this->contentCRUDService->handleContentDeletion($content);
 
-        $this->addFlashMessage('The content "%s" has been deleted.', 'Content updated', Message::SEVERITY_OK, [$content->getTitle()]);
+        $this->addFlashMessage('The content "%s" has been deleted.', 'Content deleted', Message::SEVERITY_OK, [$content->getTitle()]);
         $this->redirect('index', null, null);
         return false;
     }
