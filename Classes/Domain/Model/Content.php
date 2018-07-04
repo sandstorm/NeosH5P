@@ -187,6 +187,7 @@ class Content
     {
         $this->contentDependencies = new ArrayCollection();
         $this->contentUserDatas = new ArrayCollection();
+        $this->contentResults = new ArrayCollection();
     }
 
     /**
