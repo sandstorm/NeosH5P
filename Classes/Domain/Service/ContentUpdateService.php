@@ -90,7 +90,7 @@ class ContentUpdateService
         // We do it here to save performance and avoid writes in GET requests. It expects $content['slug'] to exist.
         $content['slug'] = null;
         //TODO: reenable filterParameters, was commented out because it inserts contentdependencies during update which we haven't understood yet
-//        $this->h5pCore->filterParameters($content);
+        $this->h5pCore->filterParameters($content);
 
         // Move images and find all content dependencies
         $this->h5pEditor->processParameters($contentId, $content['library'], $params, $libraryBeforeUpdate->toAssocArray());
