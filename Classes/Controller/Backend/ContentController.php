@@ -96,13 +96,12 @@ class ContentController extends AbstractModuleController
 
         $content = $this->contentCreationService->handleContentCreation($title, $library, $parameters);
         if ($content === null) {
-            foreach ($this->h5pCore->h5pF->getMessages('error') as $errorMessage) {
-                $this->addFlashMessage($errorMessage->message, $errorMessage->code ?: 'H5P error', Message::SEVERITY_ERROR);
-            }
+            $this->showH5pErrorMessages();
             $this->redirect('index');
+        } else {
+            $this->addFlashMessage('The content "%s" has been created.', 'Content created', Message::SEVERITY_OK, [$content->getTitle()]);
+            $this->redirect('display', null, null, ['content' => $content]);
         }
-        $this->addFlashMessage('The content "%s" has been created.', 'Content created', Message::SEVERITY_OK, [$content->getTitle()]);
-        $this->redirect('display', null, null, ['content' => $content]);
     }
 
     /**
@@ -110,11 +109,20 @@ class ContentController extends AbstractModuleController
      * @param string $title
      * @param string $library
      * @param string $parameters
+     * @throws StopActionException
      * @return bool
      */
     public function updateAction(int $contentId, string $title, string $library, string $parameters)
     {
-        $this->contentUpdateService->handleContentUpdate($contentId, $title, $library, $parameters);
+        $content = $this->contentUpdateService->handleContentUpdate($contentId, $title, $library, $parameters);
+        if ($content === null) {
+            $this->showH5pErrorMessages();
+            $this->redirect('index');
+        } else {
+            $this->addFlashMessage('The content "%s" has been updated.', 'Content updated', Message::SEVERITY_OK, [$content->getTitle()]);
+            $this->redirect('display', null, null, ['content' => $content]);
+        }
+
         return false;
     }
 
@@ -181,5 +189,12 @@ class ContentController extends AbstractModuleController
     {
         // TODO: implement
         return false;
+    }
+
+    private function showH5pErrorMessages()
+    {
+        foreach ($this->h5pCore->h5pF->getMessages('error') as $errorMessage) {
+            $this->addFlashMessage($errorMessage->message, $errorMessage->code ?: 'H5P error', Message::SEVERITY_ERROR);
+        }
     }
 }
