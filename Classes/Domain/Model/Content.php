@@ -132,6 +132,12 @@ class Content
     protected $contentUserDatas;
 
     /**
+     * @var Collection<ContentResult>
+     * @ORM\OneToMany(mappedBy="content", cascade={"persist", "remove"})
+     */
+    protected $contentResults;
+
+    /**
      * Creates a Content from a metadata array.
      *
      * @param array $contentData
