@@ -20,7 +20,9 @@ class ContentUserData {
     /**
      * @var Account
      * @ORM\Id
-     * @ORM\OneToOne
+     * @ORM\ManyToOne
+     * @ORM\Column(nullable=false)
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $account;
 

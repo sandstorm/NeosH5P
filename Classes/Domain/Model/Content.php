@@ -26,14 +26,14 @@ class Content
      * @var Library
      * @ORM\ManyToOne(inversedBy="contents")
      * @ORM\Column(nullable=false)
-     * @ORM\JoinColumn(onDelete="restrict")
+     * @ORM\JoinColumn(onDelete="RESTRICT")
      */
     protected $library;
 
     /**
      * @var Account
      * @ORM\ManyToOne
-     * @ORM\Column(nullable=true)
+     * @ORM\Column(nullable=false)
      * @ORM\JoinColumn(onDelete="SET NULL")
      */
     protected $account;
