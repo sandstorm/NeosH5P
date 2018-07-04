@@ -1,6 +1,13 @@
 {namespace neos=Neos\Neos\ViewHelpers}
-<div class="neos-content neos-indented neos-fluid-container">
-    <h2>Create a new H5P content element</h2>
+<f:layout name="BackendSubModule"/>
+
+<f:section name="subtitle">
+    <div class="neos-module-container">
+        <h2>Update a new H5P content element</h2>
+    </div>
+</f:section>
+
+<f:section name="content">
     <f:form action="update" controller="Backend\Content" id="h5p-content-form">
         <div class="neos-row-fluid">
             <f:comment>
@@ -101,4 +108,4 @@
             )
         });
     </script>
-</div>
+</f:section>
