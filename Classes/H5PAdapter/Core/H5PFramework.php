@@ -315,7 +315,7 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function deleteContentData($contentId)
     {
-        // TODO: Implement deleteContentData() method.
+        $this->contentRepository->removeByContentId($contentId);
     }
 
     /**

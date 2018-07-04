@@ -9,7 +9,7 @@ use Neos\Neos\Controller\Module\AbstractModuleController;
 use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Model\Content;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
-use Sandstorm\NeosH5P\Domain\Service\ContentCreationService;
+use Sandstorm\NeosH5P\Domain\Service\ContentCRUDService;
 use Sandstorm\NeosH5P\Domain\Service\ContentUpdateService;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
 
@@ -35,15 +35,9 @@ class ContentController extends AbstractModuleController
 
     /**
      * @Flow\Inject
-     * @var ContentCreationService
+     * @var ContentCRUDService
      */
-    protected $contentCreationService;
-
-    /**
-     * @Flow\Inject
-     * @var ContentUpdateService
-     */
-    protected $contentUpdateService;
+    protected $contentCRUDService;
 
     /**
      * @Flow\Inject
@@ -94,7 +88,7 @@ class ContentController extends AbstractModuleController
             // TODO
         }
 
-        $content = $this->contentCreationService->handleContentCreation($title, $library, $parameters);
+        $content = $this->contentCRUDService->handleContentCreation($title, $library, $parameters);
         if ($content === null) {
             $this->showH5pErrorMessages();
             $this->redirect('index');
@@ -114,7 +108,7 @@ class ContentController extends AbstractModuleController
      */
     public function updateAction(int $contentId, string $title, string $library, string $parameters)
     {
-        $content = $this->contentUpdateService->handleContentUpdate($contentId, $title, $library, $parameters);
+        $content = $this->contentCRUDService->handleContentUpdate($contentId, $title, $library, $parameters);
         if ($content === null) {
             $this->showH5pErrorMessages();
             $this->redirect('index');
@@ -184,10 +178,15 @@ class ContentController extends AbstractModuleController
 
     /**
      * @param Content $content
+     * @throws StopActionException
+     * @return bool
      */
     public function deleteAction(Content $content)
     {
-        // TODO: implement
+        $this->contentCRUDService->handleContentDeletion($content);
+
+        $this->addFlashMessage('The content "%s" has been deleted.', 'Content updated', Message::SEVERITY_OK, [$content->getTitle()]);
+        $this->redirect('index', null, null);
         return false;
     }
 
