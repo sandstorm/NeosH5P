@@ -1,6 +1,13 @@
 {namespace neos=Neos\Neos\ViewHelpers}
-<div class="neos-content neos-indented neos-fluid-container">
-    <h2>Create a new H5P content element</h2>
+<f:layout name="BackendSubModule" />
+
+<f:section name="subtitle">
+    <div class="neos-module-container">
+        <h2>Create a new H5P content element</h2>
+    </div>
+</f:section>
+
+<f:section name="content">
     <f:form action="create" controller="Backend\Content" id="h5p-content-form">
         <div class="neos-row-fluid">
             <f:comment>
@@ -65,7 +72,13 @@
             </fieldset>
         </div>
         <div class="neos-footer">
-            <a class="neos-button" href="">Cancel (TODO)</a>
+            <neos:link.module
+                title="Back to overview"
+                path="h5p/content"
+                action="index"
+                class="neos-button">
+                Cancel
+            </neos:link.module>
             <f:form.submit name="submit" value="Create H5P Content" class="neos-button neos-button-primary"/>
         </div>
     </f:form>
@@ -101,4 +114,4 @@
             )
         });
     </script>
-</div>
+</f:section>
