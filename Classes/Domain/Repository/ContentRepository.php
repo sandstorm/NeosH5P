@@ -9,4 +9,14 @@ use Neos\Flow\Annotations as Flow;
  */
 class ContentRepository extends Repository {
 
+    /**
+     * @param $id
+     */
+    public function removeByContentId($id) {
+        $content = $this->findOneByContentId($id);
+        if ($content !== null) {
+            $this->remove($content);
+        }
+    }
+
 }

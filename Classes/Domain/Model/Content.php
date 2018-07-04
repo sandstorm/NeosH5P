@@ -132,6 +132,12 @@ class Content
     protected $contentUserDatas;
 
     /**
+     * @var Collection<ContentResult>
+     * @ORM\OneToMany(mappedBy="content", cascade={"persist", "remove"})
+     */
+    protected $contentResults;
+
+    /**
      * Creates a Content from a metadata array.
      *
      * @param array $contentData
@@ -181,6 +187,26 @@ class Content
     {
         $this->contentDependencies = new ArrayCollection();
         $this->contentUserDatas = new ArrayCollection();
+        $this->contentResults = new ArrayCollection();
+    }
+
+    /**
+     * @param array $contentData
+     * @param Library $library
+     */
+    public function updateFromMetadata(array $contentData, Library $library)
+    {
+        $this->setUpdatedAt(new \DateTime());
+        $this->setTitle($contentData['title']);
+        $this->setFiltered("");
+        $this->setLibrary($library);
+
+        if (isset($contentData['params'])) {
+            $this->setParameters($contentData['params']);
+        }
+        if (isset($contentData['disable'])) {
+            $this->setDisable($contentData['disable']);
+        }
     }
 
     /**

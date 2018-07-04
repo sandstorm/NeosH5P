@@ -77,6 +77,7 @@ class H5PCommandController extends CommandController
 
         // Start the library import
         $this->h5peditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $machineName);
+        //TODO: generate meaningful error output if installation fails
         $this->outputLine("");
         $this->outputLine("=======================================");
         $this->outputLine("Done installing libraries.");

@@ -9,7 +9,8 @@ use Neos\Neos\Controller\Module\AbstractModuleController;
 use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Model\Content;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
-use Sandstorm\NeosH5P\Domain\Service\ContentCreationService;
+use Sandstorm\NeosH5P\Domain\Service\ContentCRUDService;
+use Sandstorm\NeosH5P\Domain\Service\ContentUpdateService;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
 
 class ContentController extends AbstractModuleController
@@ -34,9 +35,9 @@ class ContentController extends AbstractModuleController
 
     /**
      * @Flow\Inject
-     * @var ContentCreationService
+     * @var ContentCRUDService
      */
-    protected $contentCreationService;
+    protected $contentCRUDService;
 
     /**
      * @Flow\Inject
@@ -66,12 +67,11 @@ class ContentController extends AbstractModuleController
 
     public function newAction()
     {
-        $coreSettings = $this->h5pIntegrationService->getCoreSettings($this->controllerContext);
-        $coreSettings['editor'] = $this->h5pIntegrationService->getEditorSettings($this->controllerContext);
+        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext, true);
 
-        $this->view->assign('settings', json_encode($coreSettings));
-        $this->view->assign('scripts', $coreSettings['core']['scripts']);
-        $this->view->assign('styles', $coreSettings['core']['styles']);
+        $this->view->assign('settings', json_encode($h5pIntegrationSettings));
+        $this->view->assign('scripts', $h5pIntegrationSettings['core']['scripts']);
+        $this->view->assign('styles', $h5pIntegrationSettings['core']['styles']);
     }
 
     /**
@@ -88,15 +88,36 @@ class ContentController extends AbstractModuleController
             // TODO
         }
 
-        $content = $this->contentCreationService->handleContentCreation($title, $library, $parameters);
+        $content = $this->contentCRUDService->handleContentCreation($title, $library, $parameters);
         if ($content === null) {
-            foreach ($this->h5pCore->h5pF->getMessages('error') as $errorMessage) {
-                $this->addFlashMessage($errorMessage->message, $errorMessage->code ?: 'H5P error', Message::SEVERITY_ERROR);
-            }
+            $this->showH5pErrorMessages();
             $this->redirect('index');
+        } else {
+            $this->addFlashMessage('The content "%s" has been created.', 'Content created', Message::SEVERITY_OK, [$content->getTitle()]);
+            $this->redirect('display', null, null, ['content' => $content]);
         }
-        $this->addFlashMessage('The content "%s" has been created.', 'Content created', Message::SEVERITY_OK, [$content->getTitle()]);
-        $this->redirect('display', null, null, ['content' => $content]);
+    }
+
+    /**
+     * @param int $contentId
+     * @param string $title
+     * @param string $library
+     * @param string $parameters
+     * @throws StopActionException
+     * @return bool
+     */
+    public function updateAction(int $contentId, string $title, string $library, string $parameters)
+    {
+        $content = $this->contentCRUDService->handleContentUpdate($contentId, $title, $library, $parameters);
+        if ($content === null) {
+            $this->showH5pErrorMessages();
+            $this->redirect('index');
+        } else {
+            $this->addFlashMessage('The content "%s" has been updated.', 'Content updated', Message::SEVERITY_OK, [$content->getTitle()]);
+            $this->redirect('display', null, null, ['content' => $content]);
+        }
+
+        return false;
     }
 
     /**
@@ -108,7 +129,7 @@ class ContentController extends AbstractModuleController
         // TODO: refactor
         $this->persistenceManager->whitelistObject($content);
 
-        $coreSettings = $this->h5pIntegrationService->getCoreSettings($this->controllerContext);
+        $coreSettings = $this->h5pIntegrationService->getSettings($this->controllerContext);
 
         /*
         // currently, embed type is hard-set to "div" during content creation. therefore we do not need to reflect the following
@@ -140,5 +161,39 @@ class ContentController extends AbstractModuleController
         $this->view->assign('settings', json_encode($coreSettings));
         $this->view->assign('scripts', $coreSettings['core']['scripts']);
         $this->view->assign('styles', $coreSettings['core']['styles']);
+    }
+
+    /**
+     * @param Content $content
+     */
+    public function editAction(Content $content)
+    {
+        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext, true, $content->getContentId());
+
+        $this->view->assign('settings', json_encode($h5pIntegrationSettings));
+        $this->view->assign('scripts', $h5pIntegrationSettings['core']['scripts']);
+        $this->view->assign('styles', $h5pIntegrationSettings['core']['styles']);
+        $this->view->assign('content', $content);
+    }
+
+    /**
+     * @param Content $content
+     * @throws StopActionException
+     * @return bool
+     */
+    public function deleteAction(Content $content)
+    {
+        $this->contentCRUDService->handleContentDeletion($content);
+
+        $this->addFlashMessage('The content "%s" has been deleted.', 'Content deleted', Message::SEVERITY_OK, [$content->getTitle()]);
+        $this->redirect('index', null, null);
+        return false;
+    }
+
+    private function showH5pErrorMessages()
+    {
+        foreach ($this->h5pCore->h5pF->getMessages('error') as $errorMessage) {
+            $this->addFlashMessage($errorMessage->message, $errorMessage->code ?: 'H5P error', Message::SEVERITY_ERROR);
+        }
     }
 }
