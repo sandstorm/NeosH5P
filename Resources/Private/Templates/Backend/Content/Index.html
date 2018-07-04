@@ -1,16 +1,8 @@
 {namespace neos=Neos\Neos\ViewHelpers}
-<div class="neos-content neos-indented neos-fluid-container">
+<f:layout name="BackendSubModule"/>
+
+<f:section name="content">
     <div class="neos-row-fluid">
-        <neos:link.module
-            title="New H5P Content"
-            class="neos-button neos-button-primary"
-            path="h5p/content"
-            action="new">
-            New H5P Content
-        </neos:link.module>
-    </div>
-    <div class="neos-row-fluid">
-        <legend>Existing H5P Contents</legend>
         <table class="neos-table">
             <thead>
             <tr>
@@ -86,4 +78,13 @@
             </tbody>
         </table>
     </div>
-</div>
+    <div class="neos-footer">
+        <neos:link.module
+            title="New H5P Content"
+            class="neos-button neos-button-primary"
+            path="h5p/content"
+            action="new">
+            New H5P Content
+        </neos:link.module>
+    </div>
+</f:section>

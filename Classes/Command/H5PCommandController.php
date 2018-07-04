@@ -122,5 +122,4 @@ class H5PCommandController extends CommandController
         $this->cachedAssetRepository->removeAll();
         $this->outputLine('Removed all cached assets.');
     }
-
 }

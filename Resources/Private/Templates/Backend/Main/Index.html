@@ -1,5 +1,7 @@
 {namespace neos=Neos\Neos\ViewHelpers}
-<div class="neos-content neos-indented neos-fluid-container">
+<f:layout name="BackendSubModule"/>
+
+<f:section name="content">
     <f:if condition="{moduleConfiguration.submodules}">
         <div class="neos-row-fluid">
             <f:for each="{moduleConfiguration.submodules}" key="submoduleIdentifier" as="submoduleConfiguration"
@@ -8,7 +10,7 @@
             </f:for>
         </div>
     </f:if>
-</div>
+</f:section>
 
 <f:section name="submodule">
     <div class="neos-span4">

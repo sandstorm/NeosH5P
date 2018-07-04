@@ -2,7 +2,9 @@
 
 namespace Sandstorm\NeosH5P\Controller\Backend;
 
+use Neos\Error\Messages\Message;
 use Neos\Flow\Mvc\Exception\StopActionException;
+use Neos\Flow\Mvc\View\ViewInterface;
 use Neos\Neos\Controller\Module\AbstractModuleController;
 use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Model\Content;
@@ -49,6 +51,20 @@ class ContentController extends AbstractModuleController
      */
     protected $contentRepository;
 
+    /**
+     * We add the Neos default partials and layouts here, so we can use them
+     * in our backend modules
+     *
+     * @param ViewInterface $view
+     * @return void
+     */
+    protected function initializeView(ViewInterface $view)
+    {
+        parent::initializeView($view);
+        $view->getTemplatePaths()->setLayoutRootPath('resource://Neos.Neos/Private/Layouts');
+        $view->getTemplatePaths()->setPartialRootPath('resource://Neos.Neos/Private/Partials');
+    }
+
     public function indexAction()
     {
         $contents = $this->contentRepository->findAll();
@@ -70,7 +86,6 @@ class ContentController extends AbstractModuleController
      * @param string $library
      * @param string $parameters
      * @throws StopActionException
-     * @return bool
      */
     public function createAction(string $action, string $title, string $library, string $parameters)
     {
@@ -81,9 +96,12 @@ class ContentController extends AbstractModuleController
 
         $content = $this->contentCreationService->handleContentCreation($title, $library, $parameters);
         if ($content === null) {
-            return false;
+            foreach ($this->h5pCore->h5pF->getMessages('error') as $errorMessage) {
+                $this->addFlashMessage($errorMessage->message, $errorMessage->code ?: 'H5P error', Message::SEVERITY_ERROR);
+            }
+            $this->redirect('index');
         }
-        // TODO flashmessage
+        $this->addFlashMessage('The content "%s" has been created.', 'Content created', Message::SEVERITY_OK, [$content->getTitle()]);
         $this->redirect('display', null, null, ['content' => $content]);
     }
 
