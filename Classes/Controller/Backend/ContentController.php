@@ -72,30 +72,25 @@ class ContentController extends AbstractModuleController
     {
         $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext);
 
-        /*
-        // currently, embed type is hard-set to "div" during content creation. therefore we do not need to reflect the following
-        // logic (copied from WP):
-        $embedType = \H5PCore::determineEmbedType($content->getEmbedType(), $content->getLibrary()->getEmbedTypes());
+        $contentId = 'cid-' . $content->getContentId();
+        $h5pIntegrationSettings['contents'][$contentId] = $this->h5pIntegrationService->getContentSettings($this->controllerContext, $content);
+
+        // Get assets for this content
+        $preloadedDependencies = $this->h5pCore->loadContentDependencies($content->getContentId(), 'preloaded');
+        $files = $this->h5pCore->getDependenciesFiles($preloadedDependencies, $this->h5pPublicFolderUrl);
+
+        $embedType = $this->h5pCore->determineEmbedType($content->getEmbedType(), $content->getLibrary()->getEmbedTypes());
         $this->view->assign('embedType', $embedType);
         if ($embedType === 'div') {
-            $this->enqueue_assets($files);
-        }
-        elseif ($embedType === 'iframe') {
-            self::$settings['contents'][$cid]['scripts'] = $core->getAssetsUrls($files['scripts']);
-            self::$settings['contents'][$cid]['styles'] = $core->getAssetsUrls($files['styles']);
-        }*/
-
-        // Make sure content isn't added twice - something like this will be needed when we render multiple content
-        // elements on pne page (in fusion)
-        $contentId = 'cid-' . $content->getContentId();
-        if (!isset($h5pIntegrationSettings['contents'][$contentId])) {
-            $h5pIntegrationSettings['contents'][$contentId] = $this->h5pIntegrationService->getContentSettings($this->controllerContext, $content);
-
-            // Get assets for this content
-            $preloadedDependencies = $this->h5pCore->loadContentDependencies($content->getContentId(), 'preloaded');
-            $files = $this->h5pCore->getDependenciesFiles($preloadedDependencies, $this->h5pPublicFolderUrl);
             $this->view->assign('dependencyScripts', $files['scripts']);
             $this->view->assign('dependencyStyles', $files['styles']);
+        }
+        elseif ($embedType === 'iframe') {
+            $buildUrl = function(\stdClass $asset) {
+                return $asset->path . $asset->version;
+            };
+            $h5pIntegrationSettings['contents'][$contentId]['scripts'] = array_map($buildUrl, $files['scripts']);
+            $h5pIntegrationSettings['contents'][$contentId]['styles'] = array_map($buildUrl, $files['styles']);
         }
 
         $this->view->assign('content', $content);
