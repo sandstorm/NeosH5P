@@ -332,7 +332,6 @@ class H5PFramework implements \H5PFrameworkInterface
             return;
         }
         foreach ($content->getContentDependencies() as $contentDependency) {
-            $this->persistenceManager->whitelistObject($contentDependency);
             $this->contentDependencyRepository->remove($contentDependency);
         }
         // Persist, because directly afterwards saveLibraryUsage() might be called
@@ -378,7 +377,6 @@ class H5PFramework implements \H5PFrameworkInterface
             $contentDependency->setDropCss(in_array($dependencyData['library']['machineName'], $dropLibraryCssList));
             $contentDependency->setWeight($dependencyData['weight']);
             $this->contentDependencyRepository->add($contentDependency);
-            $this->persistenceManager->whitelistObject($contentDependency);
         }
         $this->persistenceManager->persistAll();
     }

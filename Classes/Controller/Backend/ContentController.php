@@ -65,6 +65,45 @@ class ContentController extends AbstractModuleController
         $this->view->assign('contents', $contents);
     }
 
+    /**
+     * @param Content $content
+     */
+    public function displayAction(Content $content)
+    {
+        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext);
+
+        /*
+        // currently, embed type is hard-set to "div" during content creation. therefore we do not need to reflect the following
+        // logic (copied from WP):
+        $embedType = \H5PCore::determineEmbedType($content->getEmbedType(), $content->getLibrary()->getEmbedTypes());
+        $this->view->assign('embedType', $embedType);
+        if ($embedType === 'div') {
+            $this->enqueue_assets($files);
+        }
+        elseif ($embedType === 'iframe') {
+            self::$settings['contents'][$cid]['scripts'] = $core->getAssetsUrls($files['scripts']);
+            self::$settings['contents'][$cid]['styles'] = $core->getAssetsUrls($files['styles']);
+        }*/
+
+        // Make sure content isn't added twice - something like this will be needed when we render multiple content
+        // elements on pne page (in fusion)
+        $contentId = 'cid-' . $content->getContentId();
+        if (!isset($h5pIntegrationSettings['contents'][$contentId])) {
+            $h5pIntegrationSettings['contents'][$contentId] = $this->h5pIntegrationService->getContentSettings($this->controllerContext, $content);
+
+            // Get assets for this content
+            $preloadedDependencies = $this->h5pCore->loadContentDependencies($content->getContentId(), 'preloaded');
+            $files = $this->h5pCore->getDependenciesFiles($preloadedDependencies, $this->h5pPublicFolderUrl);
+            $this->view->assign('dependencyScripts', $files['scripts']);
+            $this->view->assign('dependencyStyles', $files['styles']);
+        }
+
+        $this->view->assign('content', $content);
+        $this->view->assign('settings', json_encode($h5pIntegrationSettings));
+        $this->view->assign('scripts', $h5pIntegrationSettings['core']['scripts']);
+        $this->view->assign('styles', $h5pIntegrationSettings['core']['styles']);
+    }
+
     public function newAction()
     {
         $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext, true);
@@ -88,7 +127,7 @@ class ContentController extends AbstractModuleController
             // TODO
         }
 
-        $content = $this->contentCRUDService->handleContentCreation($title, $library, $parameters);
+        $content = $this->contentCRUDService->handleCreateOrUpdate($title, $library, $parameters);
         if ($content === null) {
             $this->showH5pErrorMessages();
             $this->redirect('index');
@@ -96,71 +135,6 @@ class ContentController extends AbstractModuleController
             $this->addFlashMessage('The content "%s" has been created.', 'Content created', Message::SEVERITY_OK, [$content->getTitle()]);
             $this->redirect('display', null, null, ['content' => $content]);
         }
-    }
-
-    /**
-     * @param int $contentId
-     * @param string $title
-     * @param string $library
-     * @param string $parameters
-     * @throws StopActionException
-     * @return bool
-     */
-    public function updateAction(int $contentId, string $title, string $library, string $parameters)
-    {
-        $content = $this->contentCRUDService->handleContentUpdate($contentId, $title, $library, $parameters);
-        if ($content === null) {
-            $this->showH5pErrorMessages();
-            $this->redirect('index');
-        } else {
-            $this->addFlashMessage('The content "%s" has been updated.', 'Content updated', Message::SEVERITY_OK, [$content->getTitle()]);
-            $this->redirect('display', null, null, ['content' => $content]);
-        }
-
-        return false;
-    }
-
-    /**
-     * @param Content $content
-     */
-    public function displayAction(Content $content)
-    {
-        // Whitelist, because filterParams is run on the content.
-        // TODO: refactor
-        $this->persistenceManager->whitelistObject($content);
-
-        $coreSettings = $this->h5pIntegrationService->getSettings($this->controllerContext);
-
-        /*
-        // currently, embed type is hard-set to "div" during content creation. therefore we do not need to reflect the following
-        // logic (copied from WP):
-        $embedType = \H5PCore::determineEmbedType($content->getEmbedType(), $content->getLibrary()->getEmbedTypes());
-        $this->view->assign('embedType', $embedType);
-        if ($embedType === 'div') {
-            $this->enqueue_assets($files);
-        }
-        elseif ($embedType === 'iframe') {
-            self::$settings['contents'][$cid]['scripts'] = $core->getAssetsUrls($files['scripts']);
-            self::$settings['contents'][$cid]['styles'] = $core->getAssetsUrls($files['styles']);
-        }*/
-
-        // Make sure content isn't added twice - something like this will be needed when we render multiple content
-        // elements on pne page (in fusion)
-        $contentId = 'cid-' . $content->getContentId();
-        if (!isset($coreSettings['contents'][$contentId])) {
-            $coreSettings['contents'][$contentId] = $this->h5pIntegrationService->getContentSettings($this->controllerContext, $content);
-
-            // Get assets for this content
-            $preloadedDependencies = $this->h5pCore->loadContentDependencies($content->getContentId(), 'preloaded');
-            $files = $this->h5pCore->getDependenciesFiles($preloadedDependencies, $this->h5pPublicFolderUrl);
-            $this->view->assign('dependencyScripts', $files['scripts']);
-            $this->view->assign('dependencyStyles', $files['styles']);
-        }
-
-        $this->view->assign('content', $content);
-        $this->view->assign('settings', json_encode($coreSettings));
-        $this->view->assign('scripts', $coreSettings['core']['scripts']);
-        $this->view->assign('styles', $coreSettings['core']['styles']);
     }
 
     /**
@@ -177,13 +151,35 @@ class ContentController extends AbstractModuleController
     }
 
     /**
+     * @param int $contentId
+     * @param string $title
+     * @param string $library
+     * @param string $parameters
+     * @throws StopActionException
+     * @return bool
+     */
+    public function updateAction(int $contentId, string $title, string $library, string $parameters)
+    {
+        $content = $this->contentCRUDService->handleCreateOrUpdate($title, $library, $parameters, $contentId);
+        if ($content === null) {
+            $this->showH5pErrorMessages();
+            $this->redirect('index');
+        } else {
+            $this->addFlashMessage('The content "%s" has been updated.', 'Content updated', Message::SEVERITY_OK, [$content->getTitle()]);
+            $this->redirect('display', null, null, ['content' => $content]);
+        }
+
+        return false;
+    }
+
+    /**
      * @param Content $content
      * @throws StopActionException
      * @return bool
      */
     public function deleteAction(Content $content)
     {
-        $this->contentCRUDService->handleContentDeletion($content);
+        $this->contentCRUDService->handleDelete($content);
 
         $this->addFlashMessage('The content "%s" has been deleted.', 'Content deleted', Message::SEVERITY_OK, [$content->getTitle()]);
         $this->redirect('index', null, null);
