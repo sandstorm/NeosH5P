@@ -249,7 +249,7 @@ class FileAdapter implements \H5PFileStorage
                                 if (preg_match("/^(data:|([a-z0-9]+:)?\/)/i", $matches[1]) === 1) {
                                     return $matches[0]; // Not relative, skip
                                 }
-                                return 'url("../' . $cssRelPath . $matches[1] . '")';
+                                return 'url("../../..' . $cssRelPath . $matches[1] . '")';
                             },
                             $assetContent) . "\n";
                 }

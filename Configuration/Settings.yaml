@@ -41,7 +41,7 @@ Sandstorm:
     # Setting for the H5PCore->aggregateAssets switch. If set to TRUE, H5P triggers the generation of
     # aggregated assets (CachedAsset) for each content element.
     # TODO: Set to true and fix css url rewriting
-    aggregateAssets: false
+    aggregateAssets: true
     # Set to true to enable the export functionality.
     # !!! Not implemented yet !!!
     enableExport: false
