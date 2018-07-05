@@ -1315,7 +1315,18 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function t($message, $replacements = array())
     {
-        return $message;
+        // Insert !var as is, escape @var and emphasis %var.
+        foreach ($replacements as $key => $replacement) {
+            if ($key[0] === '@') {
+                $replacements[$key] = htmlspecialchars($replacement);
+            }
+            elseif ($key[0] === '%') {
+                $replacements[$key] = '<em>' . htmlspecialchars($replacement) . '</em>';
+            }
+        }
+        $message = preg_replace('/(!|@|%)[a-z0-9-]+/i', '%s', $message);
+
+        return vsprintf($message, $replacements);
     }
 
     /**
