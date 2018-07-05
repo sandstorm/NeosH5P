@@ -47,9 +47,14 @@ class EditorAjaxController extends ActionController
     public function contentTypeCacheAction()
     {
         $this->h5pEditor->ajax->action(\H5PEditorEndpoints::CONTENT_TYPE_CACHE);
-        // TODO: this probably has to do with output buffering - if we remove the "die", nothing is returned if errors occur.
+
+        /**
+         * We need the "die" here because otherwise Flow will set content headers that don't fit what
+         * H5P does. We can't influence H5P here, so we'll just live with this.
+         * @see \H5PCore::ajaxError()
+         * @see \H5PCore::ajaxSuccess()
+         */
         die;
-        return false;
     }
 
     /**
@@ -64,10 +69,9 @@ class EditorAjaxController extends ActionController
         // Publish the "libraries" collection so we get the unzipped file
         $libraryCollection = $this->resourceManager->getCollection('h5p-libraries');
         $libraryCollection->getTarget()->publishCollection($libraryCollection);
-        // TODO: This doesnt work e.g. for H5P.CoursePresentation. make error msg visible to user!
-        // TODO: this probably has to do with output buffering - if we remove the "die", nothing is returned if errors occur.
+
+        // See above
         die;
-        return false;
     }
 
     /**
@@ -92,9 +96,9 @@ class EditorAjaxController extends ActionController
             '',
             $this->h5pPublicFolderPath
         );
-        // TODO: this probably has to do with output buffering - if we remove the "die", nothing is returned if errors occur.
+
+        // See above
         die;
-        return false;
     }
 
     /**
@@ -111,9 +115,9 @@ class EditorAjaxController extends ActionController
          */
         $_POST['libraries'] = $libraries;
         $this->h5pEditor->ajax->action(\H5PEditorEndpoints::LIBRARIES);
-        // TODO: this probably has to do with output buffering - if we remove the "die", nothing is returned if errors occur.
+
+        // See above
         die;
-        return false;
     }
 
     protected function resolveQueryString(string $queryString): array
