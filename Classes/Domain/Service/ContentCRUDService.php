@@ -99,7 +99,7 @@ class ContentCRUDService
         $oldLibrary = null;
         $oldParameters = null;
         /** @var Content $existingContent */
-        $existingContent = $this->contentRepository->findOneByContentId($contentId);
+        $existingContent = $this->contentRepository->findOneByContentId($content['id']);
         if ($existingContent !== null) {
             $oldLibrary = $existingContent->getLibrary()->toAssocArray();
             $oldParameters = $existingContent->getParameters();
