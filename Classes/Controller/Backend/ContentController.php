@@ -70,20 +70,18 @@ class ContentController extends AbstractModuleController
      */
     public function displayAction(Content $content)
     {
-        $contentId = 'cid-' . $content->getContentId();
-        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext);
-        $h5pIntegrationSettings['contents'][$contentId] = $this->h5pIntegrationService->getContentSettings($this->controllerContext, $content);
-
-        $this->view->assign('embedType', $h5pIntegrationSettings['contents'][$contentId]['embedType']);
+        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext, [$content->getContentId()]);
         $this->view->assign('content', $content);
         $this->view->assign('settings', json_encode($h5pIntegrationSettings));
-        $this->view->assign('scripts', array_merge($h5pIntegrationSettings['core']['scripts'], $h5pIntegrationSettings['contents'][$contentId]['scripts']));
-        $this->view->assign('styles', array_merge($h5pIntegrationSettings['core']['styles'], $h5pIntegrationSettings['contents'][$contentId]['styles']));
+
+        $cid = 'cid-' . $content->getContentId();
+        $this->view->assign('scripts', array_merge($h5pIntegrationSettings['core']['scripts'], $h5pIntegrationSettings['contents'][$cid]['scripts']));
+        $this->view->assign('styles', array_merge($h5pIntegrationSettings['core']['styles'], $h5pIntegrationSettings['contents'][$cid]['styles']));
     }
 
     public function newAction()
     {
-        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext, true);
+        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettingsWithEditor($this->controllerContext);
 
         $this->view->assign('settings', json_encode($h5pIntegrationSettings));
         $this->view->assign('scripts', $h5pIntegrationSettings['core']['scripts']);
@@ -119,7 +117,7 @@ class ContentController extends AbstractModuleController
      */
     public function editAction(Content $content)
     {
-        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext, true, [$content->getContentId()]);
+        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettingsWithEditor($this->controllerContext, $content->getContentId());
 
         $this->view->assign('settings', json_encode($h5pIntegrationSettings));
         $this->view->assign('scripts', $h5pIntegrationSettings['core']['scripts']);

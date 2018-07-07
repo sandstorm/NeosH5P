@@ -11,6 +11,7 @@ use Neos\Flow\Security\Account;
 use Neos\Neos\Domain\Service\UserService;
 use Sandstorm\NeosH5P\Domain\Model\Content;
 use Sandstorm\NeosH5P\Domain\Model\ContentUserData;
+use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ContentUserDataRepository;
 use Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework;
 
@@ -77,20 +78,37 @@ class H5PIntegrationService
     protected $contentUserDataRepository;
 
     /**
+     * @Flow\Inject
+     * @var ContentRepository
+     */
+    protected $contentRepository;
+
+    /**
      * Returns an array with a set of core settings that the H5P JavaScript needs
      * to do its thing. Can also include editor settings.
      *
      * @param ControllerContext $controllerContext
-     * @param bool $includeEditorSettings
-     * @param int $contentId
+     * @param array<int> $displayContentIds content IDs for which display settings should be generated
      * @return array
      */
-    public function getSettings(ControllerContext $controllerContext, bool $includeEditorSettings = false, int $contentId = -1): array
+    public function getSettings(ControllerContext $controllerContext, array $displayContentIds = []): array
     {
-        $coreSettings = $this->getCoreSettings($controllerContext);
-        if ($includeEditorSettings) {
-            $coreSettings['editor'] = $this->getEditorSettings($controllerContext, $contentId);
+        $coreSettings = $this->generateCoreSettings($controllerContext);
+        foreach ($displayContentIds as $contentId) {
+            $coreSettings['contents']['cid-'.$contentId] = $this->generateContentSettings($controllerContext, $contentId);
         }
+        return $coreSettings;
+    }
+
+    /**
+     * @param ControllerContext $controllerContext
+     * @param int $editorContentId content ID for which editor settings should be generated
+     * @return array
+     */
+    public function getSettingsWithEditor(ControllerContext $controllerContext, int $editorContentId = -1)
+    {
+        $coreSettings = $this->generateCoreSettings($controllerContext);
+        $coreSettings['editor'] = $this->generateEditorSettings($controllerContext, $editorContentId);
         return $coreSettings;
     }
 
@@ -101,7 +119,7 @@ class H5PIntegrationService
      * @param ControllerContext $controllerContext
      * @return array
      */
-    private function getCoreSettings(ControllerContext $controllerContext): array
+    private function generateCoreSettings(ControllerContext $controllerContext): array
     {
         $currentUser = $this->userService->getCurrentUser();
         $baseUri = $controllerContext->getRequest()->getMainRequest()->getHttpRequest()->getBaseUri()->__toString();
@@ -152,7 +170,7 @@ class H5PIntegrationService
      * @param int $contentId provide this to set the "nodeVersionId" - needed to edit contents.
      * @return array
      */
-    private function getEditorSettings(ControllerContext $controllerContext, int $contentId = -1): array
+    private function generateEditorSettings(ControllerContext $controllerContext, int $contentId = -1): array
     {
         // Get the main request for URI building
         $mainRequest = $controllerContext->getRequest()->getMainRequest();
@@ -200,7 +218,7 @@ class H5PIntegrationService
      *
      * @return array
      */
-    public function getRelativeCoreScriptUrls(): array
+    private function getRelativeCoreScriptUrls(): array
     {
         $urls = [];
         foreach (\H5PCore::$scripts as $script) {
@@ -216,7 +234,7 @@ class H5PIntegrationService
      *
      * @return array
      */
-    public function getRelativeCoreStyleUrls(): array
+    private function getRelativeCoreStyleUrls(): array
     {
         $urls = [];
         foreach (\H5PCore::$styles as $style) {
@@ -232,7 +250,7 @@ class H5PIntegrationService
      *
      * @return array
      */
-    public function getRelativeEditorScriptUrls(): array
+    private function getRelativeEditorScriptUrls(): array
     {
         $urls = [];
         foreach (\H5peditor::$scripts as $script) {
@@ -260,7 +278,7 @@ class H5PIntegrationService
      *
      * @return array
      */
-    public function getRelativeEditorStyleUrls(): array
+    private function getRelativeEditorStyleUrls(): array
     {
         $urls = [];
         foreach (\H5peditor::$styles as $style) {
@@ -279,11 +297,15 @@ class H5PIntegrationService
      * Get settings for given content
      *
      * @param ControllerContext $controllerContext
-     * @param Content $content
+     * @param int $contentId
      * @return array
      */
-    public function getContentSettings(ControllerContext $controllerContext, Content $content)
+    private function generateContentSettings(ControllerContext $controllerContext, int $contentId)
     {
+        $content = $this->contentRepository->findOneByContentId($contentId);
+        if($content === null) {
+            return [];
+        }
         $contentArray = $content->toAssocArray();
 
         $baseUri = $controllerContext->getRequest()->getMainRequest()->getHttpRequest()->getBaseUri()->__toString();
@@ -297,7 +319,6 @@ class H5PIntegrationService
             'fullScreen' => $contentArray['library']['fullscreen'],
             // TODO: implement once export is enabled
             'exportUrl' => 'foo',
-            'embedType' => $this->h5pCore->determineEmbedType($content->getEmbedType(), $content->getLibrary()->getEmbedTypes()),
             // TODO: implement once iframe embedding is enabled
             // this doesn't seem to be used currently.
             'embedCode' => '<iframe src="embed-url-for-content-here-once-implemented" width=":w" height=":h" frameborder="0" allowfullscreen="allowfullscreen"></iframe>',
@@ -336,7 +357,7 @@ class H5PIntegrationService
      * @param Account $account
      * @return array
      */
-    protected function getContentUserData(Content $content, Account $account): array
+    private function getContentUserData(Content $content, Account $account): array
     {
         $contentUserDatas = $this->contentUserDataRepository->findBy([
             'content' => $content,

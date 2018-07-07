@@ -131,7 +131,7 @@ class Library
 
     /**
      * @var Collection<Content>
-     * @ORM\OneToMany(mappedBy="library")
+     * @ORM\OneToMany(mappedBy="library", cascade={"persist"})
      */
     protected $contents;
 
@@ -229,6 +229,11 @@ class Library
         }
         if (isset($libraryData['__embedTypes'])) {
             $this->setEmbedTypes($libraryData['__embedTypes']);
+            /** @var Content $content */
+            foreach ($this->getContents() as $content) {
+                /** Embed types might have changed, so we trigger a redetermination */
+                $content->determineEmbedType();
+            }
         }
         if (isset($libraryData['__preloadedJs'])) {
             $this->setPreloadedJs($libraryData['__preloadedJs']);

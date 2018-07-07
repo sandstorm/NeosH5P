@@ -154,10 +154,17 @@ class Content
         $content->setUpdatedAt(new \DateTime());
         $content->setTitle($contentData['title']);
         $content->setParameters($contentData['params']);
-        $content->setDisable($contentData['disable']);
-        $content->setSlug(''); // Set by h5p later, but must not be null
-        $content->setEmbedType('div');
         $content->setFiltered('');
+        $content->setDisable($contentData['disable']);
+        // Set by h5p later, but must not be null
+        $content->setSlug('');
+        /**
+         * The Wordpress plugin only determines this at render-time, but it always yields the same result unless the
+         * library changes. So we should be fine with setting it here and triggering a re-determine if the
+         * library is updated.
+         * @see Library::updateFromMetadata()
+         */
+        $content->determineEmbedType();
 
         return $content;
     }
@@ -207,6 +214,11 @@ class Content
         if (isset($contentData['disable'])) {
             $this->setDisable($contentData['disable']);
         }
+    }
+
+    public function determineEmbedType()
+    {
+        $this->setEmbedType(\H5PCore::determineEmbedType('div', $this->getLibrary()->getEmbedTypes()));
     }
 
     /**
