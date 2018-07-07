@@ -1,0 +1,27 @@
+Sandstorm.NeosH5P:H5PContent:
+  superTypes:
+    Neos.Neos:Content: true
+  ui:
+    label: 'H5P Content'
+    icon: 'icon-check-square'
+    inspector:
+      tabs:
+        h5pcontent:
+          label: 'H5P Content'
+          position: 1
+          icon: 'icon-check-square'
+      groups:
+        h5pcontent:
+          label: 'H5P Content'
+          tab: 'h5pcontent'
+          position: 1'
+  properties:
+    content:
+      type: string
+      ui:
+        label: 'Select H5P Content'
+        inspector:
+          group: 'h5pcontent'
+          editor: 'Neos.Neos/Inspector/Editors/SelectBoxEditor'
+          editorOptions:
+            dataSourceIdentifier: 'sandstorm-neosh5p-content'
