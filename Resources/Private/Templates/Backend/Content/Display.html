@@ -8,17 +8,11 @@
         <f:for each="{styles}" as="style">
             <link rel="stylesheet" href="{style -> f:format.raw()}"/>
         </f:for>
-        <f:for each="{dependencyStyles}" as="style">
-            <link rel="stylesheet" href="{style.path -> f:format.raw()}{style.version -> f:format.raw()}"/>
-        </f:for>
         <script>
             window.H5PIntegration = {settings -> f:format.raw()};
         </script>
         <f:for each="{scripts}" as="script">
             <script src="{script -> f:format.raw()}"></script>
-        </f:for>
-        <f:for each="{dependencyScripts}" as="script">
-            <script src="{script.path -> f:format.raw()}{script.version -> f:format.raw()}"></script>
         </f:for>
 
         <legend>{content.title}</legend>

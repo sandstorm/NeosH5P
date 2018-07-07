@@ -70,33 +70,15 @@ class ContentController extends AbstractModuleController
      */
     public function displayAction(Content $content)
     {
-        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext);
-
         $contentId = 'cid-' . $content->getContentId();
+        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext);
         $h5pIntegrationSettings['contents'][$contentId] = $this->h5pIntegrationService->getContentSettings($this->controllerContext, $content);
 
-        // Get assets for this content
-        $preloadedDependencies = $this->h5pCore->loadContentDependencies($content->getContentId(), 'preloaded');
-        $files = $this->h5pCore->getDependenciesFiles($preloadedDependencies, $this->h5pPublicFolderUrl);
-
-        $embedType = $this->h5pCore->determineEmbedType($content->getEmbedType(), $content->getLibrary()->getEmbedTypes());
-        $this->view->assign('embedType', $embedType);
-        if ($embedType === 'div') {
-            $this->view->assign('dependencyScripts', $files['scripts']);
-            $this->view->assign('dependencyStyles', $files['styles']);
-        }
-        elseif ($embedType === 'iframe') {
-            $buildUrl = function(\stdClass $asset) {
-                return $asset->path . $asset->version;
-            };
-            $h5pIntegrationSettings['contents'][$contentId]['scripts'] = array_map($buildUrl, $files['scripts']);
-            $h5pIntegrationSettings['contents'][$contentId]['styles'] = array_map($buildUrl, $files['styles']);
-        }
-
+        $this->view->assign('embedType', $h5pIntegrationSettings['contents'][$contentId]['embedType']);
         $this->view->assign('content', $content);
         $this->view->assign('settings', json_encode($h5pIntegrationSettings));
-        $this->view->assign('scripts', $h5pIntegrationSettings['core']['scripts']);
-        $this->view->assign('styles', $h5pIntegrationSettings['core']['styles']);
+        $this->view->assign('scripts', array_merge($h5pIntegrationSettings['core']['scripts'], $h5pIntegrationSettings['contents'][$contentId]['scripts']));
+        $this->view->assign('styles', array_merge($h5pIntegrationSettings['core']['styles'], $h5pIntegrationSettings['contents'][$contentId]['styles']));
     }
 
     public function newAction()
@@ -137,7 +119,7 @@ class ContentController extends AbstractModuleController
      */
     public function editAction(Content $content)
     {
-        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext, true, $content->getContentId());
+        $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext, true, [$content->getContentId()]);
 
         $this->view->assign('settings', json_encode($h5pIntegrationSettings));
         $this->view->assign('scripts', $h5pIntegrationSettings['core']['scripts']);

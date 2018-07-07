@@ -293,12 +293,13 @@ class H5PIntegrationService
         // Add JavaScript settings for this content
         $contentSettings = [
             'library' => \H5PCore::libraryToString($contentArray['library']),
-            // TODO: filterParameters if filtered is empty
-            'jsonContent' => $content->getFiltered(), //$this->h5pCore->filterParameters($contentArray),
+            'jsonContent' => $content->getFiltered(),
             'fullScreen' => $contentArray['library']['fullscreen'],
             // TODO: implement once export is enabled
             'exportUrl' => 'foo',
+            'embedType' => $this->h5pCore->determineEmbedType($content->getEmbedType(), $content->getLibrary()->getEmbedTypes()),
             // TODO: implement once iframe embedding is enabled
+            // this doesn't seem to be used currently.
             'embedCode' => '<iframe src="embed-url-for-content-here-once-implemented" width=":w" height=":h" frameborder="0" allowfullscreen="allowfullscreen"></iframe>',
             'resizeCode' => '<script src="' . $h5pCorePublicUrl . '/js/h5p-resizer.js' . '" charset="UTF-8"></script>',
             'url' => $baseUri, // TODO needed? admin_url('admin-ajax.php?action=h5p_embed&id=' . $contentArray['id']),
@@ -309,6 +310,15 @@ class H5PIntegrationService
                 0 => ['state' => '{}']
             ]
         ];
+
+        // Get assets for this content
+        $preloadedDependencies = $this->h5pCore->loadContentDependencies($content->getContentId(), 'preloaded');
+        $files = $this->h5pCore->getDependenciesFiles($preloadedDependencies, $this->h5pPublicFolderUrl);
+        $buildUrl = function (\stdClass $asset) {
+            return $asset->path . $asset->version;
+        };
+        $contentSettings['scripts'] = array_map($buildUrl, $files['scripts']);
+        $contentSettings['styles'] = array_map($buildUrl, $files['styles']);
 
         // Get preloaded user data for the current user, if we have one.
         // TODO - we will have to expose this to packages integrating us, as they might be using a
