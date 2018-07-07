@@ -382,9 +382,9 @@ class Content
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getContentType(): string
+    public function getContentType()
     {
         return $this->contentType;
     }
@@ -398,9 +398,9 @@ class Content
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getAuthor(): string
+    public function getAuthor()
     {
         return $this->author;
     }
@@ -414,9 +414,9 @@ class Content
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getLicense(): string
+    public function getLicense()
     {
         return $this->license;
     }
@@ -430,9 +430,9 @@ class Content
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getKeywords(): string
+    public function getKeywords()
     {
         return $this->keywords;
     }
@@ -446,9 +446,9 @@ class Content
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDescription(): string
+    public function getDescription()
     {
         return $this->description;
     }

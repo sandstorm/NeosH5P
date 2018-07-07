@@ -1,6 +1,6 @@
 Sandstorm.NeosH5P:H5PContent:
   superTypes:
-    Neos.Neos:Content: true
+    Neos.Neos:Plugin: true
   ui:
     label: 'H5P Content'
     icon: 'icon-check-square'
@@ -16,10 +16,12 @@ Sandstorm.NeosH5P:H5PContent:
           tab: 'h5pcontent'
           position: 1'
   properties:
-    content:
+    contentId:
       type: string
       ui:
         label: 'Select H5P Content'
+        # As we inject the necessary JS in a plugin, we need a full page reload if a different content is selected.
+        reloadPageIfChanged: true
         inspector:
           group: 'h5pcontent'
           editor: 'Neos.Neos/Inspector/Editors/SelectBoxEditor'

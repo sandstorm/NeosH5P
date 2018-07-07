@@ -81,6 +81,10 @@ Neos:
             description: 'Make administrative settings for H5P.'
             icon: icon-cogs
 
+    fusion:
+      autoInclude:
+        Sandstorm.NeosH5P: true
+
 
   Flow:
     # We need the tag "@variable" as an ignored annotation, because otherwise parsing of the

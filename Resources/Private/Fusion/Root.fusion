@@ -1,0 +1,21 @@
+prototype(Neos.Neos:Page) {
+    head {
+        javascripts.h5p = Sandstorm.NeosH5P:H5PScriptsAndStyles
+    }
+}
+
+
+prototype(Sandstorm.NeosH5P:H5PScriptsAndStyles) < prototype(Neos.Neos:Plugin) {
+    package = 'Sandstorm.NeosH5P'
+    controller = 'Plugin\\Content'
+    action = 'scriptsAndStyles'
+
+    h5pContentNodes = ${q(documentNode).find('[instanceof Sandstorm.NeosH5P:H5PContent]')}
+
+    // TODO cache
+}
+
+prototype(Sandstorm.NeosH5P:H5PContent) {
+    controller = 'Plugin\\Content'
+    action = 'content'
+}

@@ -10,17 +10,10 @@ use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Model\Content;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
 use Sandstorm\NeosH5P\Domain\Service\ContentCRUDService;
-use Sandstorm\NeosH5P\Domain\Service\ContentUpdateService;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
 
 class ContentController extends AbstractModuleController
 {
-    /**
-     * @Flow\InjectConfiguration(path="h5pPublicFolder.url")
-     * @var string
-     */
-    protected $h5pPublicFolderUrl;
-
     /**
      * @Flow\Inject
      * @var H5PIntegrationService

@@ -60,6 +60,9 @@ class ContentCRUDService
     public function handleCreateOrUpdate(string $title, string $library, string $parameters, $contentId = null)
     {
         $content = [];
+        if($contentId) {
+            $content['id'] = $contentId;
+        }
         // TODO: actually make the frame, embed, download etc... configurable.
         $content['disable'] = \H5PCore::DISABLE_FRAME;
         $content['title'] = $title;
@@ -87,7 +90,7 @@ class ContentCRUDService
             return null;
         }
 
-        $content['id'] = $this->h5pCore->saveContent($content, $contentId);
+        $content['id'] = $this->h5pCore->saveContent($content);
 
         // The call to filterParameters is done during content editing (before content is loaded into the form) in WP.
         // We do it here to save performance and avoid writes in GET requests. It expects $content['slug'] to exist.

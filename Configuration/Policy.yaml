@@ -2,10 +2,17 @@ privilegeTargets:
   'Neos\Flow\Security\Authorization\Privilege\Method\MethodPrivilege':
     'Sandstorm.NeosH5P:BackendControllerActions':
       matcher: 'method(Sandstorm\NeosH5P\Controller\Backend\.*Controller->(?!initialize).*Action())'
+    'Sandstorm.NeosH5P:PluginControllerActions':
+      matcher: 'method(Sandstorm\NeosH5P\Controller\Plugin\.*Controller->(?!initialize).*Action())'
 
 roles:
   Neos.Neos:Editor:
     privileges:
       -
         privilegeTarget: 'Sandstorm.NeosH5P:BackendControllerActions'
+        permission: GRANT
+  Neos.Flow:Everybody:
+    privileges:
+      -
+        privilegeTarget: 'Sandstorm.NeosH5P:PluginControllerActions'
         permission: GRANT
