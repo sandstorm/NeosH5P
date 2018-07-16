@@ -48,9 +48,10 @@
   httpMethods: ['POST']
 -
   name: 'H5P Frontend AJAX - save content user data'
-  uriPattern: 'neosh5p/userdata/save'
+  uriPattern: 'neosh5p/contentuserdata/save/{queryString}'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
-    '@controller': 'Frontend\UserData'
+    '@controller': 'Frontend\ContentUserData'
     '@action': 'save'
+    'queryString': 'contentId=:contentId&dataType=:dataType&subContentId=:subContentId'
   httpMethods: ['POST']

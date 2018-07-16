@@ -131,6 +131,14 @@ class H5PIntegrationService
             'Sandstorm.NeosH5P'
         );
 
+        $saveUserDataAction = $this->buildUri(
+            $controllerContext,
+            'save',
+            [],
+            'Frontend\ContentUserData',
+            'Sandstorm.NeosH5P'
+        );
+
         $settings = [
             'baseUrl' => $this->getBaseUri($controllerContext),
             'url' => $this->h5pPublicFolderUrl,
@@ -139,7 +147,7 @@ class H5PIntegrationService
                 'setFinished' => $saveResultAction,
                 // in wp looks like: http://127.0.0.1:8081/wp-admin/admin-ajax.php?token=19c5088239&action=h5p_contents_user_data&content_id=:contentId&data_type=:dataType&sub_content_id=:subContentId"
                 // !!!! mind the placeholders !!!
-                'contentUserData' => ""
+                'contentUserData' => $saveUserDataAction
             ],
             'saveFreq' => $this->h5pFramework->getOption('save_content_state') ? $this->h5pFramework->getOption('save_content_frequency') : false,
             'siteUrl' => $this->getBaseUri($controllerContext),
@@ -207,6 +215,60 @@ class H5PIntegrationService
         }
 
         return $editorSettings;
+    }
+
+    /**
+     * Get settings for given content
+     *
+     * @param ControllerContext $controllerContext
+     * @param int $contentId
+     * @return array
+     */
+    private function generateContentSettings(ControllerContext $controllerContext, int $contentId)
+    {
+        $content = $this->contentRepository->findOneByContentId($contentId);
+        if ($content === null) {
+            return [];
+        }
+        $contentArray = $content->toAssocArray();
+
+        $h5pCorePublicUrl = $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName;
+
+        // Add JavaScript settings for this content
+        $contentSettings = [
+            'library' => \H5PCore::libraryToString($contentArray['library']),
+            'jsonContent' => $content->getFiltered(),
+            'fullScreen' => $contentArray['library']['fullscreen'],
+            // TODO: implement once export is enabled
+            'exportUrl' => 'foo',
+            // TODO: implement once iframe embedding is enabled
+            // this doesn't seem to be used currently.
+            'embedCode' => '<iframe src="embed-url-for-content-here-once-implemented" width=":w" height=":h" frameborder="0" allowfullscreen="allowfullscreen"></iframe>',
+            'resizeCode' => '<script src="' . $h5pCorePublicUrl . '/js/h5p-resizer.js' . '" charset="UTF-8"></script>',
+            'url' => $this->getBaseUri($controllerContext), // TODO needed? admin_url('admin-ajax.php?action=h5p_embed&id=' . $contentArray['id']),
+            'title' => $contentArray['title'],
+            // TODO: use actual account identifier instead of 0 - this is needed only for an auth check, which we default to true currently.
+            'displayOptions' => $this->h5pCore->getDisplayOptionsForView($contentArray['disable'], 0)
+        ];
+
+        // Get assets for this content
+        $preloadedDependencies = $this->h5pCore->loadContentDependencies($content->getContentId(), 'preloaded');
+        $files = $this->h5pCore->getDependenciesFiles($preloadedDependencies, $this->h5pPublicFolderUrl);
+        $buildUrl = function (\stdClass $asset) {
+            return $asset->path . $asset->version;
+        };
+        $contentSettings['scripts'] = array_map($buildUrl, $files['scripts']);
+        $contentSettings['styles'] = array_map($buildUrl, $files['styles']);
+
+        // Get preloaded user data for the current user, if we have one.
+        // TODO - we will have to expose this to packages integrating us, as they might be using a
+        // frontend user model which doesnt get picked up by the Neos UserService.
+        $currentUser = $this->userService->getCurrentUser();
+        if ($this->h5pFramework->getOption('save_content_state', false) && $currentUser !== null) {
+            $contentSettings['contentUserData'] = $this->getContentUserData($content, $currentUser->getAccounts()->first());
+        }
+
+        return $contentSettings;
     }
 
     /**
@@ -292,82 +354,25 @@ class H5PIntegrationService
     }
 
     /**
-     * Get settings for given content
-     *
-     * @param ControllerContext $controllerContext
-     * @param int $contentId
-     * @return array
-     */
-    private function generateContentSettings(ControllerContext $controllerContext, int $contentId)
-    {
-        $content = $this->contentRepository->findOneByContentId($contentId);
-        if ($content === null) {
-            return [];
-        }
-        $contentArray = $content->toAssocArray();
-
-        $h5pCorePublicUrl = $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName;
-
-        // Add JavaScript settings for this content
-        $contentSettings = [
-            'library' => \H5PCore::libraryToString($contentArray['library']),
-            'jsonContent' => $content->getFiltered(),
-            'fullScreen' => $contentArray['library']['fullscreen'],
-            // TODO: implement once export is enabled
-            'exportUrl' => 'foo',
-            // TODO: implement once iframe embedding is enabled
-            // this doesn't seem to be used currently.
-            'embedCode' => '<iframe src="embed-url-for-content-here-once-implemented" width=":w" height=":h" frameborder="0" allowfullscreen="allowfullscreen"></iframe>',
-            'resizeCode' => '<script src="' . $h5pCorePublicUrl . '/js/h5p-resizer.js' . '" charset="UTF-8"></script>',
-            'url' => $this->getBaseUri($controllerContext), // TODO needed? admin_url('admin-ajax.php?action=h5p_embed&id=' . $contentArray['id']),
-            'title' => $contentArray['title'],
-            // TODO: use actual account identifier instead of 0 - this is needed only for an auth check, which we default to true currently.
-            'displayOptions' => $this->h5pCore->getDisplayOptionsForView($contentArray['disable'], 0),
-            'contentUserData' => [
-                0 => ['state' => '{}']
-            ]
-        ];
-
-        // Get assets for this content
-        $preloadedDependencies = $this->h5pCore->loadContentDependencies($content->getContentId(), 'preloaded');
-        $files = $this->h5pCore->getDependenciesFiles($preloadedDependencies, $this->h5pPublicFolderUrl);
-        $buildUrl = function (\stdClass $asset) {
-            return $asset->path . $asset->version;
-        };
-        $contentSettings['scripts'] = array_map($buildUrl, $files['scripts']);
-        $contentSettings['styles'] = array_map($buildUrl, $files['styles']);
-
-        // Get preloaded user data for the current user, if we have one.
-        // TODO - we will have to expose this to packages integrating us, as they might be using a
-        // frontend user model which doesnt get picked up by the Neos UserService.
-        $currentUser = $this->userService->getCurrentUser();
-        if ($this->h5pFramework->getOption('save_content_state', false) && $currentUser !== null) {
-            $contentSettings['contentUserData'] = $this->getContentUserData($content, $currentUser->getAccounts()->first());
-        }
-
-        return $contentSettings;
-    }
-
-    /**
      * @param Content $content
      * @param Account $account
      * @return array
      */
     private function getContentUserData(Content $content, Account $account): array
     {
-        $contentUserDatas = $this->contentUserDataRepository->findBy([
-            'content' => $content,
-            'account' => $account
-        ]);
+        $contentUserDatas = $this->contentUserDataRepository->findByContentAndAccount($content, $account);
 
-        $userDataArray = [
-            0 => ['state' => '{}']
-        ];
-
-        /** @var ContentUserData $contentUserData */
-        foreach ($contentUserDatas as $contentUserData) {
-            $settings['contentUserData'][$contentUserData->getSubContent()->getContentId()][$contentUserData->getDataId()] = $contentUserData->getData();
+        $userDataArray = [];
+        if (count($contentUserDatas) === 0) {
+            $userDataArray[] = ['state' => '{}'];
+        } else {
+            /** @var ContentUserData $contentUserData */
+            foreach ($contentUserDatas as $contentUserData) {
+                $subContentId = $contentUserData->getSubContent() !== null ? $contentUserData->getSubContent()->getContentId() : 0;
+                $userDataArray[$subContentId][$contentUserData->getDataId()] = $contentUserData->getData();
+            }
         }
+
         return $userDataArray;
     }
 
@@ -387,6 +392,7 @@ class H5PIntegrationService
      * so uris are built without the backend interfering (in case we're in a subrequest) and re-sets the original request
      * on the uribuilder so building can continue elsewhere in Neos.
      *
+     * @param ControllerContext $controllerContext
      * @param string $actionName Name of the action to be called
      * @param array $controllerArguments Additional query parameters. Will be merged with $this->arguments.
      * @param string $controllerName Name of the target controller. If not set, current ControllerName is used.

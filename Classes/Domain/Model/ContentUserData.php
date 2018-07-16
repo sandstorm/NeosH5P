@@ -66,6 +66,28 @@ class ContentUserData {
     protected $updatedAt;
 
     /**
+     * ContentUserData constructor.
+     * @param Content $content
+     * @param Account $account
+     * @param Content $subContent
+     * @param string $data
+     * @param string $dataId
+     * @param bool $preload
+     * @param bool $invalidate
+     */
+    public function __construct($content, $account, $subContent, $data, $dataId, $preload, $invalidate)
+    {
+        $this->setUpdatedAt(new \DateTime());
+        $this->setContent($content);
+        $this->setAccount($account);
+        $this->setSubContent($subContent);
+        $this->setData($data);
+        $this->setDataId($dataId);
+        $this->setPreload($preload);
+        $this->setInvalidate($invalidate);
+    }
+
+    /**
      * @return Content
      */
     public function getContent(): Content
@@ -114,9 +136,9 @@ class ContentUserData {
     }
 
     /**
-     * @return Content
+     * @return Content|null
      */
-    public function getSubContent(): Content
+    public function getSubContent()
     {
         return $this->subContent;
     }
@@ -124,7 +146,7 @@ class ContentUserData {
     /**
      * @param Content $subContent
      */
-    public function setSubContent(Content $subContent): void
+    public function setSubContent($subContent): void
     {
         $this->subContent = $subContent;
     }
