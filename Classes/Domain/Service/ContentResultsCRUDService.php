@@ -62,7 +62,7 @@ class ContentResultsCRUDService
     public function handleCreateOrUpdate($contentId, $score, $maxScore, $opened, $finished, $time)
     {
         // Check if user tracking is allowed
-        if (!$this->h5pFramework->getOption('track_user')) {
+        if (!$this->h5pFramework->getOption('track_user', false)) {
             return $this->makeResult(false, 'Result will not be saved as track_user is set to false.');
         }
 
@@ -71,7 +71,7 @@ class ContentResultsCRUDService
             $content = $this->contentRepository->findOneByContentId($contentId);
             if ($content !== null) {
                 /** @var ContentResult $existingContentResult */
-                $existingContentResult = $this->contentResultRepository->findOneByCondentAndAccount($content, $currentAccount);
+                $existingContentResult = $this->contentResultRepository->findOneByContentAndAccount($content, $currentAccount);
                 if ($existingContentResult !== null) {
                     $existingContentResult->setScore($score);
                     $existingContentResult->setMaxScore($maxScore);

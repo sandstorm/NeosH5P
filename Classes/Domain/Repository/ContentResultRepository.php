@@ -13,7 +13,7 @@ use Sandstorm\NeosH5P\Domain\Model\Content;
 class ContentResultRepository extends Repository
 {
 
-    public function findOneByCondentAndAccount(Content $content, Account $currentAccount)
+    public function findOneByContentAndAccount(Content $content, Account $currentAccount)
     {
         return $this->findOneBy(['content' => $content, 'account' => $currentAccount]);
     }

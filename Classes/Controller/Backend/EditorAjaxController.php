@@ -120,7 +120,7 @@ class EditorAjaxController extends ActionController
         exit;
     }
 
-    protected function resolveQueryString(string $queryString): array
+    private function resolveQueryString(string $queryString): array
     {
         $arguments = [];
         foreach (explode('&', urldecode($queryString)) as $queryParameterString) {
