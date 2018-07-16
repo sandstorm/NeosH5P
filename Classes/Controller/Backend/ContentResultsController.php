@@ -5,7 +5,7 @@ namespace Sandstorm\NeosH5P\Controller\Backend;
 use Neos\Flow\Mvc\View\ViewInterface;
 use Neos\Neos\Controller\Module\AbstractModuleController;
 
-class ResultsController extends AbstractModuleController {
+class ContentResultsController extends AbstractModuleController {
     /**
      * We add the Neos default partials and layouts here, so we can use them
      * in our backend modules

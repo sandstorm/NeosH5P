@@ -1,4 +1,5 @@
 <?php
+
 namespace Sandstorm\NeosH5P\Domain\Model;
 
 use Neos\Flow\Annotations as Flow;
@@ -8,7 +9,8 @@ use Neos\Flow\Security\Account;
 /**
  * @Flow\Entity
  */
-class ContentResult {
+class ContentResult
+{
 
     /**
      * @var Content
@@ -54,6 +56,17 @@ class ContentResult {
      * @ORM\Column(nullable=false)
      */
     protected $time;
+
+    public function __construct(Content $content, Account $account, int $score, int $maxScore, int $opened, int $finished, int $time)
+    {
+        $this->setContent($content);
+        $this->setAccount($account);
+        $this->setScore($score);
+        $this->setMaxScore($maxScore);
+        $this->setOpened($opened);
+        $this->setFinished($finished);
+        $this->setTime($time);
+    }
 
     /**
      * @return Content

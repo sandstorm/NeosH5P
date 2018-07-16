@@ -40,7 +40,6 @@ Sandstorm:
 
     # Setting for the H5PCore->aggregateAssets switch. If set to TRUE, H5P triggers the generation of
     # aggregated assets (CachedAsset) for each content element.
-    # TODO: Set to true and fix css url rewriting
     aggregateAssets: true
     # Set to true to enable the export functionality.
     # !!! Not implemented yet !!!
@@ -70,9 +69,9 @@ Neos:
             controller: 'Sandstorm\NeosH5P\Controller\Backend\LibraryController'
             description: 'Manage H5P libraries, get upgraded versions, and update the H5P hub cache.'
             icon: icon-book
-          results:
+          contentresults:
             label: 'H5P User Results'
-            controller: 'Sandstorm\NeosH5P\Controller\Backend\ResultsController'
+            controller: 'Sandstorm\NeosH5P\Controller\Backend\ContentResultsController'
             description: 'View and delete user results for H5P content elements.'
             icon: icon-flag-checkered
           administration:
@@ -172,3 +171,9 @@ Neos:
                 pattern: 'ControllerObjectName'
                 patternOptions:
                   controllerObjectNamePattern: 'Sandstorm\NeosH5P\Controller\Backend\.*'
+              # TODO: we should not ship this, as we don't really want to persist results for backend users.
+              # this is for testing only, and needs to be moved to the integrating package.
+              'Sandstorm.NeosH5P:FrontendControllers':
+                pattern: 'ControllerObjectName'
+                patternOptions:
+                  controllerObjectNamePattern: 'Sandstorm\NeosH5P\Controller\Frontend\.*'

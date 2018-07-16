@@ -36,3 +36,21 @@
     '@controller': 'Backend\EditorAjax'
     '@action': 'libraries'
   httpMethods: ['POST']
+
+# frontend ajax routes
+-
+  name: 'H5P Frontend AJAX - save results'
+  uriPattern: 'neosh5p/contentresults/save'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Frontend\ContentResults'
+    '@action': 'save'
+  httpMethods: ['POST']
+-
+  name: 'H5P Frontend AJAX - save content user data'
+  uriPattern: 'neosh5p/userdata/save'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Frontend\UserData'
+    '@action': 'save'
+  httpMethods: ['POST']

@@ -95,7 +95,7 @@ class H5PIntegrationService
     {
         $coreSettings = $this->generateCoreSettings($controllerContext);
         foreach ($displayContentIds as $contentId) {
-            $coreSettings['contents']['cid-'.$contentId] = $this->generateContentSettings($controllerContext, $contentId);
+            $coreSettings['contents']['cid-' . $contentId] = $this->generateContentSettings($controllerContext, $contentId);
         }
         return $coreSettings;
     }
@@ -122,22 +122,27 @@ class H5PIntegrationService
     private function generateCoreSettings(ControllerContext $controllerContext): array
     {
         $currentUser = $this->userService->getCurrentUser();
-        $baseUri = $controllerContext->getRequest()->getMainRequest()->getHttpRequest()->getBaseUri()->__toString();
+
+        $saveResultAction = $this->buildUri(
+            $controllerContext,
+            'save',
+            [],
+            'Frontend\ContentResults',
+            'Sandstorm.NeosH5P'
+        );
 
         $settings = [
-            'baseUrl' => $baseUri,
+            'baseUrl' => $this->getBaseUri($controllerContext),
             'url' => $this->h5pPublicFolderUrl,
             'postUserStatistics' => $this->h5pFramework->getOption('track_user') && $currentUser !== null,
             'ajax' => [
-                // TODO: set this to the correct routes for the Frontend\ContentAjaxController
-                // in wp looks like: http://127.0.0.1:8081/wp-admin/admin-ajax.php?token=bc3d523a30&action=h5p_setFinished
-                'setFinished' => $baseUri,
+                'setFinished' => $saveResultAction,
                 // in wp looks like: http://127.0.0.1:8081/wp-admin/admin-ajax.php?token=19c5088239&action=h5p_contents_user_data&content_id=:contentId&data_type=:dataType&sub_content_id=:subContentId"
                 // !!!! mind the placeholders !!!
-                'contentUserData' => $baseUri
+                'contentUserData' => ""
             ],
             'saveFreq' => $this->h5pFramework->getOption('save_content_state') ? $this->h5pFramework->getOption('save_content_frequency') : false,
-            'siteUrl' => $baseUri,
+            'siteUrl' => $this->getBaseUri($controllerContext),
             'l10n' => [
                 'H5P' => $this->h5pCore->getLocalization(),
             ],
@@ -172,30 +177,23 @@ class H5PIntegrationService
      */
     private function generateEditorSettings(ControllerContext $controllerContext, int $contentId = -1): array
     {
-        // Get the main request for URI building
-        $mainRequest = $controllerContext->getRequest()->getMainRequest();
-        $baseUri = $mainRequest->getHttpRequest()->getBaseUri()->__toString();
-        $uriBuilder = $controllerContext->getUriBuilder();
-        // Temporarily set the request to the main request so we get the correct URI
-        $uriBuilder->setRequest($mainRequest);
-        $editorAjaxAction = $uriBuilder->reset()->setCreateAbsoluteUri(true)->uriFor(
+        $editorAjaxAction = $this->buildUri(
+            $controllerContext,
             'index',
             [],
             'Backend\EditorAjax',
             'Sandstorm.NeosH5P'
         );
-        // Reset the URIBuilder to the subrequest to not mess with the backend module routing
-        $uriBuilder->setRequest($controllerContext->getRequest());
 
         $editorSettings = [
-            'filesPath' => $this->h5pPublicFolderUrl . 'editor', // TODO - from settings
+            'filesPath' => $this->h5pPublicFolderUrl . 'editor', // TODO - from settings - IS NOT h5p-editor but the editortempfiles dir!
             'fileIcon' => [
                 'path' => $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName . '/images/binary-file.png',
                 'width' => 50,
                 'height' => 50,
             ],
             'ajaxPath' => $editorAjaxAction . '/',
-            'libraryUrl' => $baseUri . $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName,
+            'libraryUrl' => $this->getBaseUri($controllerContext) . $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName,
             'copyrightSemantics' => $this->h5pContentValidator->getCopyrightSemantics(),
             'assets' => [
                 'css' => array_merge($this->getRelativeCoreStyleUrls(), $this->getRelativeEditorStyleUrls()),
@@ -303,12 +301,10 @@ class H5PIntegrationService
     private function generateContentSettings(ControllerContext $controllerContext, int $contentId)
     {
         $content = $this->contentRepository->findOneByContentId($contentId);
-        if($content === null) {
+        if ($content === null) {
             return [];
         }
         $contentArray = $content->toAssocArray();
-
-        $baseUri = $controllerContext->getRequest()->getMainRequest()->getHttpRequest()->getBaseUri()->__toString();
 
         $h5pCorePublicUrl = $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName;
 
@@ -323,7 +319,7 @@ class H5PIntegrationService
             // this doesn't seem to be used currently.
             'embedCode' => '<iframe src="embed-url-for-content-here-once-implemented" width=":w" height=":h" frameborder="0" allowfullscreen="allowfullscreen"></iframe>',
             'resizeCode' => '<script src="' . $h5pCorePublicUrl . '/js/h5p-resizer.js' . '" charset="UTF-8"></script>',
-            'url' => $baseUri, // TODO needed? admin_url('admin-ajax.php?action=h5p_embed&id=' . $contentArray['id']),
+            'url' => $this->getBaseUri($controllerContext), // TODO needed? admin_url('admin-ajax.php?action=h5p_embed&id=' . $contentArray['id']),
             'title' => $contentArray['title'],
             // TODO: use actual account identifier instead of 0 - this is needed only for an auth check, which we default to true currently.
             'displayOptions' => $this->h5pCore->getDisplayOptionsForView($contentArray['disable'], 0),
@@ -375,4 +371,46 @@ class H5PIntegrationService
         return $userDataArray;
     }
 
+    /**
+     * Extracts the base URI from the provided controller context.
+     *
+     * @param ControllerContext $cc
+     * @return string
+     */
+    private function getBaseUri(ControllerContext $cc): string
+    {
+        return $cc->getRequest()->getMainRequest()->getHttpRequest()->getBaseUri()->__toString();
+    }
+
+    /**
+     * Extracts the UriBuilder from the provided controller context, retrieves the main request, sets it on the uribuilder
+     * so uris are built without the backend interfering (in case we're in a subrequest) and re-sets the original request
+     * on the uribuilder so building can continue elsewhere in Neos.
+     *
+     * @param string $actionName Name of the action to be called
+     * @param array $controllerArguments Additional query parameters. Will be merged with $this->arguments.
+     * @param string $controllerName Name of the target controller. If not set, current ControllerName is used.
+     * @param string $packageKey Name of the target package. If not set, current Package is used.
+     * @param string $subPackageKey Name of the target SubPackage. If not set, current SubPackage is used.
+     * @return string the rendered URI
+     */
+    private function buildUri(ControllerContext $controllerContext, $actionName, $controllerArguments = [], $controllerName = null, $packageKey = null, $subPackageKey = null): string
+    {
+        // Get the main request for URI building
+        $mainRequest = $controllerContext->getRequest()->getMainRequest();
+        $uriBuilder = $controllerContext->getUriBuilder();
+        // Temporarily set the request to the main request so we get the correct URI
+        $uriBuilder->setRequest($mainRequest);
+        $uri = $uriBuilder->reset()->setCreateAbsoluteUri(true)->uriFor(
+            $actionName,
+            $controllerArguments,
+            $controllerName,
+            $packageKey,
+            $subPackageKey
+        );
+        // Reset the URIBuilder to the subrequest to not mess with the backend module routing
+        $uriBuilder->setRequest($controllerContext->getRequest());
+
+        return $uri;
+    }
 }

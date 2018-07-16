@@ -49,12 +49,12 @@ class EditorAjaxController extends ActionController
         $this->h5pEditor->ajax->action(\H5PEditorEndpoints::CONTENT_TYPE_CACHE);
 
         /**
-         * We need the "die" here because otherwise Flow will set content headers that don't fit what
+         * We need the "exit" here because otherwise Flow will set content headers that don't fit what
          * H5P does. We can't influence H5P here, so we'll just live with this.
          * @see \H5PCore::ajaxError()
          * @see \H5PCore::ajaxSuccess()
          */
-        die;
+        exit;
     }
 
     /**
@@ -71,7 +71,7 @@ class EditorAjaxController extends ActionController
         $libraryCollection->getTarget()->publishCollection($libraryCollection);
 
         // See above
-        die;
+        exit;
     }
 
     /**
@@ -98,7 +98,7 @@ class EditorAjaxController extends ActionController
         );
 
         // See above
-        die;
+        exit;
     }
 
     /**
@@ -117,7 +117,7 @@ class EditorAjaxController extends ActionController
         $this->h5pEditor->ajax->action(\H5PEditorEndpoints::LIBRARIES);
 
         // See above
-        die;
+        exit;
     }
 
     protected function resolveQueryString(string $queryString): array

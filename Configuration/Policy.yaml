@@ -4,6 +4,8 @@ privilegeTargets:
       matcher: 'method(Sandstorm\NeosH5P\Controller\Backend\.*Controller->(?!initialize).*Action())'
     'Sandstorm.NeosH5P:PluginControllerActions':
       matcher: 'method(Sandstorm\NeosH5P\Controller\Plugin\.*Controller->(?!initialize).*Action())'
+    'Sandstorm.NeosH5P:FrontendControllerActions':
+      matcher: 'method(Sandstorm\NeosH5P\Controller\Frontend\.*Controller->(?!initialize).*Action())'
 
 roles:
   Neos.Neos:Editor:
@@ -15,4 +17,9 @@ roles:
     privileges:
       -
         privilegeTarget: 'Sandstorm.NeosH5P:PluginControllerActions'
+        permission: GRANT
+      # TODO: we should not ship this, as we don't really want to persist results for backend users.
+      # this is for testing only, and needs to be moved to the integrating package.
+      -
+        privilegeTarget: 'Sandstorm.NeosH5P:FrontendControllerActions'
         permission: GRANT
