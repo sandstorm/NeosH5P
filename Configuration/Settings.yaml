@@ -25,7 +25,7 @@ Sandstorm:
       # if TRUE, saves ContentUserData for logged-in users. This saves data that a frontend user
       # enters during his work with a content, and will restore content state on page reloads.
       save_content_state: true
-      # interval in seconds fpr whcih the ContentUserData is saved
+      # interval in seconds for whcih the ContentUserData is saved
       save_content_frequency: 10
       # whether or not the H5P hub is enabled.
       hub_is_enabled: true

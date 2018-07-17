@@ -8,6 +8,7 @@ use Neos\Flow\Mvc\Routing\Exception\MissingActionNameException;
 use Neos\Flow\Mvc\Routing\UriBuilder;
 use Neos\Flow\Package\PackageManagerInterface;
 use Neos\Flow\Security\Account;
+use Neos\Flow\Security\Context;
 use Neos\Neos\Domain\Service\UserService;
 use Sandstorm\NeosH5P\Domain\Model\Content;
 use Sandstorm\NeosH5P\Domain\Model\ContentUserData;
@@ -61,15 +62,21 @@ class H5PIntegrationService
 
     /**
      * @Flow\Inject
-     * @var UserService
+     * @var xApiUserServiceInterface
      */
-    protected $userService;
+    protected $xApiUserService;
 
     /**
      * @Flow\Inject
      * @var PackageManagerInterface
      */
     protected $packageManager;
+
+    /**
+     * @Flow\Inject
+     * @var Context
+     */
+    protected $securityContext;
 
     /**
      * @Flow\Inject
@@ -121,8 +128,6 @@ class H5PIntegrationService
      */
     private function generateCoreSettings(ControllerContext $controllerContext): array
     {
-        $currentUser = $this->userService->getCurrentUser();
-
         $saveResultAction = $this->buildUri(
             $controllerContext,
             'save',
@@ -142,11 +147,9 @@ class H5PIntegrationService
         $settings = [
             'baseUrl' => $this->getBaseUri($controllerContext),
             'url' => $this->h5pPublicFolderUrl,
-            'postUserStatistics' => $this->h5pFramework->getOption('track_user') && $currentUser !== null,
+            'postUserStatistics' => $this->h5pFramework->getOption('track_user') && $this->securityContext->getAccount() !== null,
             'ajax' => [
                 'setFinished' => $saveResultAction,
-                // in wp looks like: http://127.0.0.1:8081/wp-admin/admin-ajax.php?token=19c5088239&action=h5p_contents_user_data&content_id=:contentId&data_type=:dataType&sub_content_id=:subContentId"
-                // !!!! mind the placeholders !!!
                 'contentUserData' => $saveUserDataAction
             ],
             'saveFreq' => $this->h5pFramework->getOption('save_content_state') ? $this->h5pFramework->getOption('save_content_frequency') : false,
@@ -162,14 +165,10 @@ class H5PIntegrationService
             ]
         ];
 
-        // If we have a current user, pass his data to the frontend too
-        if ($currentUser !== null) {
-            $settings['user'] = [
-                // TODO: we will have to expose the way user settings are injected here, because packages using our
-                // plugin might use different user models than the Neos model.
-                'name' => $currentUser->getName()->getFullName(),
-                'mail' => $currentUser->getElectronicAddresses()->first()
-            ];
+        // If we have a current user, pass his data to the frontend too so xAPI statements can be sent
+        $userData = $this->xApiUserService->getUserSettings();
+        if ($userData !== null) {
+            $settings['user'] = $userData;
         }
 
         return $settings;
@@ -226,6 +225,7 @@ class H5PIntegrationService
      */
     private function generateContentSettings(ControllerContext $controllerContext, int $contentId)
     {
+        /** @var Content $content */
         $content = $this->contentRepository->findOneByContentId($contentId);
         if ($content === null) {
             return [];
@@ -261,11 +261,9 @@ class H5PIntegrationService
         $contentSettings['styles'] = array_map($buildUrl, $files['styles']);
 
         // Get preloaded user data for the current user, if we have one.
-        // TODO - we will have to expose this to packages integrating us, as they might be using a
-        // frontend user model which doesnt get picked up by the Neos UserService.
-        $currentUser = $this->userService->getCurrentUser();
-        if ($this->h5pFramework->getOption('save_content_state', false) && $currentUser !== null) {
-            $contentSettings['contentUserData'] = $this->getContentUserData($content, $currentUser->getAccounts()->first());
+        $currentAccount = $this->securityContext->getAccount();
+        if ($this->h5pFramework->getOption('save_content_state', false) && $currentAccount !== null) {
+            $contentSettings['contentUserData'] = $this->getContentUserData($content, $currentAccount);
         }
 
         return $contentSettings;

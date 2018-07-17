@@ -6,6 +6,10 @@
 ## Settings.yaml
 * check the default settings and overwrite them where necessary
 * add a requestPattern for the H5P frontend controllers so we can get the account
+## xAPI
+* Control which username/mail is sent in xAPI statements by implementing your own xApiUserServiceInterface and
+  configuring the plugin to use it via Objects.yaml. This will give you the opportunity to interact with your 
+  own user model and extract name and email address.
 
 # License
 License: MIT.
