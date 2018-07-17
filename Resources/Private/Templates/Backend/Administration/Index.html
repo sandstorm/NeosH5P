@@ -3,6 +3,131 @@
 
 <f:section name="content">
     <div class="neos-row-fluid">
-        <legend>TBD</legend>
+        <legend>H5P Configuration Settings</legend>
+        <p>
+            This gives you an overview of the H5P config settings. You cannot change them directly here.
+            <f:if condition="{settings.site_uuid}">Your H5P hub site UUID is: <strong>{settings.site_uuid}</strong>.</f:if>
+        </p>
+        <p>&nbsp;</p>
+
+        <table class="neos-info-table">
+            <thead>
+            <tr>
+                <th>Config Setting</th>
+                <th>Value</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th>hub_is_enabled</th>
+                <td>{f:if(condition:settings.hub_is_enabled, then:'TRUE', else:'FALSE')}</td>
+                <td>
+                    Controls interaction with the H5P hub. If it is disabled, you can't load libraries from the hub,
+                    and can only use the "Upload" functionality to install new libraries. We recommend to keep this
+                    set to "TRUE".
+                </td>
+            </tr>
+            <tr>
+                <th>content_type_cache_updated_at</th>
+                <td style="white-space: nowrap;">
+                    <f:if condition="{settings.content_type_cache_updated_at}">
+                        <f:then>{settings.content_type_cache_updated_at -> f:format.date(format:'Y-m-d, H:i')}</f:then>
+                        <f:else>Never</f:else>
+                    </f:if>
+                </td>
+                <td>
+                    States when the H5P content type cache was last updated.
+                </td>
+            </tr>
+            <tr>
+                <th>send_usage_statistics</th>
+                <td>{f:if(condition:settings.send_usage_statistics, then:'TRUE', else:'FALSE')}</td>
+                <td>
+                    Controls whether anonymous usage statistics are sent to the H5P hub with every refresh of the
+                    content type cache. The data sent are the number of authors (Neos backend users), installed libraries,
+                    number of H5P content elements, and the number of creates, uploads, displays, deletions, views, and
+                    result views for content elements.
+                </td>
+            </tr>
+            <tr>
+                <th>track_user</th>
+                <td>{f:if(condition:settings.track_user, then:'TRUE', else:'FALSE')}</td>
+                <td>
+                    Controls the saving of results for users' interactions with content elements. If set to TRUE,
+                    you can view users' results in the "H5P User Results" section.
+                </td>
+            </tr>
+            <tr>
+                <th>save_content_state</th>
+                <td>{f:if(condition:settings.save_content_state, then:'TRUE', else:'FALSE')}</td>
+                <td>
+                    Controls whether the state of content that a user has interacted with should be saved. Only works
+                    for logged-in users. No additional personal data is saved.
+                </td>
+            </tr>
+            <tr>
+                <th>save_content_frequency</th>
+                <td>{settings.save_content_frequency}</td>
+                <td>
+                    Frequency (in seconds) in which content state should be saved, if it is enabled.
+                </td>
+            </tr>
+            <tr>
+                <th>enable_lrs_content_types</th>
+                <td>{f:if(condition:settings.enable_lrs_content_types, then:'TRUE', else:'FALSE')}</td>
+                <td>
+                    Enables the usage of content types which rely on the presence of an LRS to work.
+                    Currently, this is only H5P.Questionnaire.
+                </td>
+            </tr>
+            <tr>
+                <th>frame</th>
+                <td>{f:if(condition:settings.frame, then:'TRUE', else:'FALSE')}</td>
+                <td>
+                    Shows or hides the H5P content frame that contains buttons for export and embed, copyright and icon
+                </td>
+            </tr>
+            <tr>
+                <th>export</th>
+                <td>{f:if(condition:settings.export, then:'TRUE', else:'FALSE')}</td>
+                <td>
+                    Show or hide the option to export an H5P content element in the content frame.
+                </td>
+            </tr>
+            <tr>
+                <th>embed</th>
+                <td>{f:if(condition:settings.embed, then:'TRUE', else:'FALSE')}</td>
+                <td>
+                    Show or hide the option to generate embedding code for an H5P content element in the content frame.
+                </td>
+            </tr>
+            <tr>
+                <th>copyright</th>
+                <td>{f:if(condition:settings.copyright, then:'TRUE', else:'FALSE')}</td>
+                <td>
+                    Show or hide the copyright notice in the content frame.
+                </td>
+            </tr>
+            <tr>
+                <th>icon</th>
+                <td>{f:if(condition:settings.icon, then:'TRUE', else:'FALSE')}</td>
+                <td>
+                    Show or hide the H5P icon in the content frame.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    </div>
+
+    <div class="neos-footer">
+        <neos:link.module
+            title="Refresh the H5P content type cache"
+            path="h5p/administration"
+            action="refreshcontenttypecache"
+            class="neos-button">
+            Refresh Content Type Cache
+        </neos:link.module>
     </div>
 </f:section>
