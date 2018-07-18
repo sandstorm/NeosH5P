@@ -1,6 +1,6 @@
 <?php
 
-namespace Sandstorm\NeosH5P\Domain\Service;
+namespace Sandstorm\NeosH5P\Domain\Service\CRUD;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Persistence\PersistenceManagerInterface;

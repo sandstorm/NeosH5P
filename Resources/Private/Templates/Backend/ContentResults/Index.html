@@ -3,6 +3,84 @@
 
 <f:section name="content">
     <div class="neos-row-fluid">
-        <legend>TBD</legend>
+        <table class="neos-table">
+            <thead>
+            <tr>
+                <th>User</th>
+                <th># Results</th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <f:for each="{contentResults}" as="groupedContentResult" key="index">
+                <tr>
+                    <td>
+                        <neos:link.module
+                            title="View all results for this user"
+                            path="h5p/results"
+                            action="display"
+                            arguments="{account:groupedContentResult.0.account}">
+                            {groupedContentResult.0.account.accountIdentifier}
+                        </neos:link.module>
+                    </td>
+                    <td>
+                        {groupedContentResult.1}
+                    </td>
+                    <td class="neos-action">
+                        <div class="neos-pull-right">
+                            <neos:link.module
+                                title="View all results for this user"
+                                path="h5p/results"
+                                action="display"
+                                arguments="{account:groupedContentResult.0.account}"
+                                additionalAttributes="{data-neos-toggle: 'tooltip', class: 'neos-button neos-button-primary'}">
+                                <i class="icon-info-sign icon-white"></i>
+                            </neos:link.module>
+                            <button class="neos-button neos-button-danger" title="Remove all results for this user"
+                                    data-toggle="modal" href="#remove-{index}" data-neos-toggle="tooltip">
+                                <i class="icon-trash icon-white"></i>
+                            </button>
+                            <div class="neos-hide" id="remove-{index}">
+                                <div class="neos-modal-centered">
+                                    <div class="neos-modal-content">
+                                        <div class="neos-modal-header">
+                                            <button type="button" class="neos-close neos-button"
+                                                    data-dismiss="modal"></button>
+                                            <div class="neos-header">
+                                                Confirm deletion
+                                            </div>
+                                            <div>
+                                                <div class="neos-subheader">
+                                                    <p>
+                                                        All content results for user
+                                                        {groupedContentResult.0.account.accountIdentifier} will be
+                                                        removed permanently.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="neos-modal-footer">
+                                            <a href="#" class="neos-button" data-dismiss="modal">Cancel</a>
+                                            <f:form action="deleteAll" arguments="{content: content}"
+                                                    class="neos-inline">
+                                                <f:form.hidden name="account" value="{groupedContentResult.0.account}" />
+                                                <button type="submit" class="neos-button neos-button-danger"
+                                                        title="Confirm deletion">
+                                                    Delete
+                                                </button>
+                                            </f:form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="neos-modal-backdrop neos-in"></div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </f:for>
+
+            </tbody>
+        </table>
     </div>
 </f:section>

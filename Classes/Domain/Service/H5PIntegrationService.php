@@ -4,12 +4,9 @@ namespace Sandstorm\NeosH5P\Domain\Service;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\Controller\ControllerContext;
-use Neos\Flow\Mvc\Routing\Exception\MissingActionNameException;
-use Neos\Flow\Mvc\Routing\UriBuilder;
 use Neos\Flow\Package\PackageManagerInterface;
 use Neos\Flow\Security\Account;
 use Neos\Flow\Security\Context;
-use Neos\Neos\Domain\Service\UserService;
 use Sandstorm\NeosH5P\Domain\Model\Content;
 use Sandstorm\NeosH5P\Domain\Model\ContentUserData;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
@@ -62,9 +59,9 @@ class H5PIntegrationService
 
     /**
      * @Flow\Inject
-     * @var xApiUserServiceInterface
+     * @var FrontendUserServiceInterface
      */
-    protected $xApiUserService;
+    protected $frontendUserService;
 
     /**
      * @Flow\Inject
@@ -128,6 +125,8 @@ class H5PIntegrationService
      */
     private function generateCoreSettings(ControllerContext $controllerContext): array
     {
+        $currentAccount = $this->securityContext->getAccount();
+
         $saveResultAction = $this->buildUri(
             $controllerContext,
             'save',
@@ -147,7 +146,7 @@ class H5PIntegrationService
         $settings = [
             'baseUrl' => $this->getBaseUri($controllerContext),
             'url' => $this->h5pPublicFolderUrl,
-            'postUserStatistics' => $this->h5pFramework->getOption('track_user') && $this->securityContext->getAccount() !== null,
+            'postUserStatistics' => $this->h5pFramework->getOption('track_user') && $currentAccount !== null,
             'ajax' => [
                 'setFinished' => $saveResultAction,
                 'contentUserData' => $saveUserDataAction
@@ -166,9 +165,11 @@ class H5PIntegrationService
         ];
 
         // If we have a current user, pass his data to the frontend too so xAPI statements can be sent
-        $userData = $this->xApiUserService->getUserSettings();
-        if ($userData !== null) {
-            $settings['user'] = $userData;
+        if ($currentAccount !== null) {
+            $userData = $this->frontendUserService->getXAPIUserSettings($currentAccount);
+            if ($userData !== null) {
+                $settings['user'] = $userData;
+            }
         }
 
         return $settings;

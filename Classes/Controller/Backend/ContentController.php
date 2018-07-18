@@ -9,7 +9,7 @@ use Neos\Neos\Controller\Module\AbstractModuleController;
 use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Model\Content;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
-use Sandstorm\NeosH5P\Domain\Service\ContentCRUDService;
+use Sandstorm\NeosH5P\Domain\Service\CRUD\ContentCRUDService;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
 
 class ContentController extends AbstractModuleController

@@ -69,7 +69,7 @@ Neos:
             controller: 'Sandstorm\NeosH5P\Controller\Backend\LibraryController'
             description: 'Manage H5P libraries, get upgraded versions, and update the H5P hub cache.'
             icon: icon-book
-          contentresults:
+          results:
             label: 'H5P User Results'
             controller: 'Sandstorm\NeosH5P\Controller\Backend\ContentResultsController'
             description: 'View and delete user results for H5P content elements.'

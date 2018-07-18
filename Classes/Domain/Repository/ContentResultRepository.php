@@ -17,4 +17,10 @@ class ContentResultRepository extends Repository
     {
         return $this->findOneBy(['content' => $content, 'account' => $currentAccount]);
     }
+
+    public function findAllGroupedByAccount(){
+        $query = $this->createQuery();
+        $query->getQueryBuilder()->addSelect('COUNT(e)')->groupBy('e.account');
+        return $query->execute();
+    }
 }

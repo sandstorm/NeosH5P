@@ -1,11 +1,10 @@
 <?php
 
-namespace Sandstorm\NeosH5P\Domain\Service;
+namespace Sandstorm\NeosH5P\Domain\Service\CRUD;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Persistence\PersistenceManagerInterface;
 use Neos\Flow\Security\Context;
-use Neos\Neos\Domain\Service\UserService;
 use Sandstorm\NeosH5P\Domain\Model\ContentResult;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ContentResultRepository;

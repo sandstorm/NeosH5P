@@ -4,7 +4,7 @@ namespace Sandstorm\NeosH5P\Controller\Frontend;
 
 use Neos\Flow\Mvc\Controller\ActionController;
 use Neos\Flow\Annotations as Flow;
-use Sandstorm\NeosH5P\Domain\Service\ContentResultsCRUDService;
+use Sandstorm\NeosH5P\Domain\Service\CRUD\ContentResultsCRUDService;
 
 class ContentResultsController extends ActionController
 {
