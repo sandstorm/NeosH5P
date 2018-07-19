@@ -32,11 +32,11 @@ Sandstorm:
       # Enables LRS content types.
       enable_lrs_content_types: true
       # content display options
-      frame: false
-      export: false
-      embed: false
-      copyright: false
-      icon: false
+      frame: true
+      export: true
+      embed: true
+      copyright: true
+      icon: true
 
     # Setting for the H5PCore->aggregateAssets switch. If set to TRUE, H5P triggers the generation of
     # aggregated assets (CachedAsset) for each content element.
