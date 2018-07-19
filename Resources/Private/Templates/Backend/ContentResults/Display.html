@@ -1,0 +1,58 @@
+{namespace neos=Neos\Neos\ViewHelpers}
+<f:layout name="BackendSubModule" />
+
+<f:section name="content">
+
+    <div class="neos-row-fluid">
+
+        <legend>Results for user {contentResults.0.account.accountIdentifier}</legend>
+
+        <f:render partial="ContentResultTable" arguments="{_all}"></f:render>
+
+    <div class="neos-footer">
+        <neos:link.module
+            title="Back to overview"
+            path="h5p/results"
+            action="index"
+            class="neos-button">
+            Back
+        </neos:link.module>
+        <f:if condition="{contentResults -> f:count()} > 0">
+            <button class="neos-button neos-button-danger" title="Remove this content" data-toggle="modal" href="#remove-contentResults" data-neos-toggle="tooltip">
+                Delete all results
+            </button>
+            <div class="neos-hide" id="remove-contentResults">
+                <div class="neos-modal-centered">
+                    <div class="neos-modal-content">
+                        <div class="neos-modal-header">
+                            <button type="button" class="neos-close neos-button" data-dismiss="modal"></button>
+                            <div class="neos-header">
+                                Confirm deletion
+                            </div>
+                            <div>
+                                <div class="neos-subheader">
+                                    <p>
+                                        All results for user
+                                        {groupedContentResult.0.account.accountIdentifier} will be
+                                        removed permanently.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="neos-modal-footer">
+                            <a href="#" class="neos-button" data-dismiss="modal">Cancel</a>
+                            <f:form action="deleteAll" arguments="{account:contentResults.0.account}"
+                                    class="neos-inline">
+                                <button type="submit" class="neos-button neos-button-danger"
+                                        title="Confirm deletion">
+                                    Delete
+                                </button>
+                            </f:form>
+                        </div>
+                    </div>
+                </div>
+                <div class="neos-modal-backdrop neos-in"></div>
+            </div>
+        </f:if>
+    </div>
+</f:section>

@@ -141,6 +141,16 @@ class ContentResult
     }
 
     /**
+     * @return \DateTime
+     */
+    public function getOpenedDateTime(): \DateTime
+    {
+        $datetime = new \DateTime();
+        $datetime->setTimestamp($this->opened);
+        return $datetime;
+    }
+
+    /**
      * @param int $opened
      */
     public function setOpened(int $opened): void
@@ -154,6 +164,16 @@ class ContentResult
     public function getFinished(): int
     {
         return $this->finished;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getFinishedDateTime(): \DateTime
+    {
+        $datetime = new \DateTime();
+        $datetime->setTimestamp($this->finished);
+        return $datetime;
     }
 
     /**
@@ -173,11 +193,17 @@ class ContentResult
     }
 
     /**
+     * @return string
+     */
+    public function getFormattedTimeInterval(): string {
+        return $this->getFinishedDateTime()->diff($this->getOpenedDateTime())->format("%H:%M:%S");
+    }
+
+    /**
      * @param int $time
      */
     public function setTime(int $time): void
     {
         $this->time = $time;
     }
-
 }

@@ -76,10 +76,10 @@ class ContentResultsCRUDService
                     $existingContentResult->setMaxScore($maxScore);
                     $existingContentResult->setOpened($opened);
                     $existingContentResult->setFinished($finished);
-                    $existingContentResult->setTime($time);
+                    $existingContentResult->setTime($finished - $opened); // time isn't calculated client-side, even though it should be
                     $this->contentResultRepository->update($existingContentResult);
                 } else {
-                    $contentResult = new ContentResult($content, $currentAccount, $score, $maxScore, $opened, $finished, $time);
+                    $contentResult = new ContentResult($content, $currentAccount, $score, $maxScore, $opened, $finished, $finished - $opened);
                     $this->contentResultRepository->add($contentResult);
                 }
                 // Persist here, because exit() might be used after controller action

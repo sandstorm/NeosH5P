@@ -62,9 +62,8 @@
                                         </div>
                                         <div class="neos-modal-footer">
                                             <a href="#" class="neos-button" data-dismiss="modal">Cancel</a>
-                                            <f:form action="deleteAll" arguments="{content: content}"
+                                            <f:form action="deleteAll" arguments="{account:groupedContentResult.0.account}"
                                                     class="neos-inline">
-                                                <f:form.hidden name="account" value="{groupedContentResult.0.account}" />
                                                 <button type="submit" class="neos-button neos-button-danger"
                                                         title="Confirm deletion">
                                                     Delete

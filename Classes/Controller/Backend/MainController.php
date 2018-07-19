@@ -17,7 +17,10 @@ class MainController extends AbstractModuleController {
     {
         parent::initializeView($view);
         $view->getTemplatePaths()->setLayoutRootPath('resource://Neos.Neos/Private/Layouts');
-        $view->getTemplatePaths()->setPartialRootPath('resource://Neos.Neos/Private/Partials');
+        $view->getTemplatePaths()->setPartialRootPaths(array_merge(
+            ['resource://Neos.Neos/Private/Partials', 'resource://Neos.Neos/Private/Partials'],
+            $view->getTemplatePaths()->getPartialRootPaths()
+        ));
     }
 
 }

@@ -6,10 +6,12 @@ use Neos\Error\Messages\Message;
 use Neos\Flow\Mvc\View\ViewInterface;
 use Neos\Flow\Security\Account;
 use Neos\Neos\Controller\Module\AbstractModuleController;
+use Sandstorm\NeosH5P\Domain\Model\ContentResult;
 use Sandstorm\NeosH5P\Domain\Repository\ContentResultRepository;
 use Neos\Flow\Annotations as Flow;
 
-class ContentResultsController extends AbstractModuleController {
+class ContentResultsController extends AbstractModuleController
+{
 
     /**
      * @var ContentResultRepository
@@ -28,7 +30,10 @@ class ContentResultsController extends AbstractModuleController {
     {
         parent::initializeView($view);
         $view->getTemplatePaths()->setLayoutRootPath('resource://Neos.Neos/Private/Layouts');
-        $view->getTemplatePaths()->setPartialRootPath('resource://Neos.Neos/Private/Partials');
+        $view->getTemplatePaths()->setPartialRootPaths(array_merge(
+            ['resource://Neos.Neos/Private/Partials', 'resource://Neos.Neos/Private/Partials'],
+            $view->getTemplatePaths()->getPartialRootPaths()
+        ));
     }
 
     public function indexAction()
@@ -40,6 +45,13 @@ class ContentResultsController extends AbstractModuleController {
     public function displayAction(Account $account)
     {
         $this->view->assign('contentResults', $this->contentResultRepository->findByAccount($account));
+    }
+
+    public function deleteSingleAction(ContentResult $contentResult)
+    {
+        $this->contentResultRepository->remove($contentResult);
+        $this->addFlashMessage('The result has been deleted.', 'Result deleted', Message::SEVERITY_OK);
+        $this->redirect('display', null, null, ['account' => $contentResult->getAccount()]);
     }
 
     public function deleteAllAction(Account $account)
