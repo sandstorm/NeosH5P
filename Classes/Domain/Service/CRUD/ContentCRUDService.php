@@ -63,8 +63,8 @@ class ContentCRUDService
         if($contentId) {
             $content['id'] = $contentId;
         }
-        // TODO: actually make the frame, embed, download etc... configurable.
-        $content['disable'] = \H5PCore::DISABLE_FRAME;
+        // TODO: make the frame, embed, download etc... configurable per content element.
+        $content['disable'] = \H5PCore::DISABLE_NONE;
         $content['title'] = $title;
         $content['params'] = $parameters;
         $content['slug'] = '';
