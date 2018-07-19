@@ -5,7 +5,6 @@ namespace Sandstorm\NeosH5P\Controller\Plugin;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\Controller\ActionController;
-use Sandstorm\NeosH5P\Domain\Model\Content;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
 
@@ -33,6 +32,7 @@ class ContentController extends ActionController
 
     public function scriptsAndStylesAction()
     {
+        /** @var array $h5pContentNodes */
         $h5pContentNodes = $this->request->getInternalArgument('__h5pContentNodes');
         $contentIds = [];
         /** @var NodeInterface $node */
@@ -49,23 +49,8 @@ class ContentController extends ActionController
 
         $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext, $contentIds);
 
-        $scripts = $h5pIntegrationSettings['core']['scripts'];
-        $styles = $h5pIntegrationSettings['core']['styles'];
-        foreach ($h5pIntegrationSettings['contents'] as $contentSettings) {
-            if (isset($contentSettings['scripts'])) {
-                foreach ($contentSettings['scripts'] as $script) {
-                    $scripts[] = $script;
-                }
-            }
-            if (isset($contentSettings['styles'])) {
-                foreach ($contentSettings['styles'] as $style) {
-                    $styles[] = $style;
-                }
-            }
-        }
-
         $this->view->assign('settings', json_encode($h5pIntegrationSettings));
-        $this->view->assign('scripts', $scripts);
-        $this->view->assign('styles', $styles);
+        $this->view->assign('scripts', $this->h5pIntegrationService->getMergedScripts($h5pIntegrationSettings));
+        $this->view->assign('styles', $this->h5pIntegrationService->getMergedStyles($h5pIntegrationSettings));
     }
 }

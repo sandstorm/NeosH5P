@@ -117,6 +117,46 @@ class H5PIntegrationService
     }
 
     /**
+     * Merges the core scripts with all content scripts, so that there is one list of scripts that
+     * can be passed to a template for inclusion.
+     *
+     * @param array $h5pIntegrationSettings
+     * @return array
+     */
+    public function getMergedScripts(array $h5pIntegrationSettings): array
+    {
+        $scripts = $h5pIntegrationSettings['core']['scripts'];
+        foreach ($h5pIntegrationSettings['contents'] as $contentSettings) {
+            if (isset($contentSettings['scripts'])) {
+                foreach ($contentSettings['scripts'] as $script) {
+                    $scripts[] = $script;
+                }
+            }
+        }
+        return $scripts;
+    }
+
+    /**
+     * Merges the core styles with all content styles, so that there is one list of styles that
+     * can be passed to a template for inclusion.
+     *
+     * @param array $h5pIntegrationSettings
+     * @return array
+     */
+    public function getMergedStyles(array $h5pIntegrationSettings): array
+    {
+        $scripts = $h5pIntegrationSettings['core']['styles'];
+        foreach ($h5pIntegrationSettings['contents'] as $contentSettings) {
+            if (isset($contentSettings['styles'])) {
+                foreach ($contentSettings['styles'] as $script) {
+                    $scripts[] = $script;
+                }
+            }
+        }
+        return $scripts;
+    }
+
+    /**
      * Returns an array with a set of core settings that the H5P JavaScript needs
      * to do its thing.
      *
@@ -233,6 +273,14 @@ class H5PIntegrationService
         }
         $contentArray = $content->toAssocArray();
 
+        $embedUrl = $this->buildUri(
+            $controllerContext,
+            'index',
+            ['contentId' => $contentId],
+            'Frontend\ContentEmbed',
+            'Sandstorm.NeosH5P'
+        );
+
         $h5pCorePublicUrl = $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName;
 
         // Add JavaScript settings for this content
@@ -242,9 +290,7 @@ class H5PIntegrationService
             'fullScreen' => $contentArray['library']['fullscreen'],
             // TODO: implement once export is enabled
             'exportUrl' => 'foo',
-            // TODO: implement once iframe embedding is enabled
-            // this doesn't seem to be used currently.
-            'embedCode' => '<iframe src="embed-url-for-content-here-once-implemented" width=":w" height=":h" frameborder="0" allowfullscreen="allowfullscreen"></iframe>',
+            'embedCode' => '<iframe src="' . $embedUrl . '" width=":w" height=":h" frameborder="0" allowfullscreen="allowfullscreen"></iframe>',
             'resizeCode' => '<script src="' . $h5pCorePublicUrl . '/js/h5p-resizer.js' . '" charset="UTF-8"></script>',
             'url' => $this->getBaseUri($controllerContext), // TODO needed? admin_url('admin-ajax.php?action=h5p_embed&id=' . $contentArray['id']),
             'title' => $contentArray['title'],

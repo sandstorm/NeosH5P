@@ -77,10 +77,8 @@ class ContentController extends AbstractModuleController
         $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext, [$content->getContentId()]);
         $this->view->assign('content', $content);
         $this->view->assign('settings', json_encode($h5pIntegrationSettings));
-
-        $cid = 'cid-' . $content->getContentId();
-        $this->view->assign('scripts', array_merge($h5pIntegrationSettings['core']['scripts'], $h5pIntegrationSettings['contents'][$cid]['scripts']));
-        $this->view->assign('styles', array_merge($h5pIntegrationSettings['core']['styles'], $h5pIntegrationSettings['contents'][$cid]['styles']));
+        $this->view->assign('scripts', $this->h5pIntegrationService->getMergedScripts($h5pIntegrationSettings));
+        $this->view->assign('styles', $this->h5pIntegrationService->getMergedStyles($h5pIntegrationSettings));
     }
 
     /**

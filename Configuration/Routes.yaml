@@ -55,3 +55,12 @@
     '@action': 'save'
     'queryString': 'contentId=:contentId&dataType=:dataType&subContentId=:subContentId'
   httpMethods: ['POST']
+
+# embed route for content
+-
+  name: 'H5P Frontend - embed content as iframe'
+  uriPattern: 'neosh5p/content/embed/{contentId}'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Frontend\ContentEmbed'
+    '@action': 'index'
