@@ -8,7 +8,9 @@ use Neos\Flow\Mvc\View\ViewInterface;
 use Neos\Neos\Controller\Module\AbstractModuleController;
 use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Model\Content;
+use Sandstorm\NeosH5P\Domain\Model\ContentResult;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
+use Sandstorm\NeosH5P\Domain\Repository\ContentResultRepository;
 use Sandstorm\NeosH5P\Domain\Service\CRUD\ContentCRUDService;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
 
@@ -37,6 +39,12 @@ class ContentController extends AbstractModuleController
      * @var ContentRepository
      */
     protected $contentRepository;
+
+    /**
+     * @Flow\Inject
+     * @var ContentResultRepository
+     */
+    protected $contentResultRepository;
 
     /**
      * We add the Neos default partials and layouts here, so we can use them
@@ -73,6 +81,38 @@ class ContentController extends AbstractModuleController
         $cid = 'cid-' . $content->getContentId();
         $this->view->assign('scripts', array_merge($h5pIntegrationSettings['core']['scripts'], $h5pIntegrationSettings['contents'][$cid]['scripts']));
         $this->view->assign('styles', array_merge($h5pIntegrationSettings['core']['styles'], $h5pIntegrationSettings['contents'][$cid]['styles']));
+    }
+
+    /**
+     * @param Content $content
+     */
+    public function resultsAction(Content $content)
+    {
+        $this->view->assign('content', $content);
+        $this->view->assign('contentResults', $this->contentResultRepository->findByContent($content));
+        $this->view->assign('perUser', true);
+    }
+
+    /**
+     * @param ContentResult $contentResult
+     */
+    public function deleteSingleResultAction(ContentResult $contentResult)
+    {
+        $this->contentResultRepository->remove($contentResult);
+        $this->addFlashMessage('The content result has been deleted.', 'Result deleted', Message::SEVERITY_OK);
+        $this->redirect('display', null, null, ['content' => $contentResult->getContent()]);
+    }
+
+    /**
+     * @param Content $content
+     */
+    public function deleteResultsAction(Content $content)
+    {
+        foreach ($content->getContentResults() as $contentResult) {
+            $this->contentResultRepository->remove($contentResult);
+        }
+        $this->addFlashMessage('All results for content "%s" have been deleted.', 'Results deleted', Message::SEVERITY_OK, [$content->getTitle()]);
+        $this->redirect('display', null, null, ['content' => $content]);
     }
 
     public function newAction()

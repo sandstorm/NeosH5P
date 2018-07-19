@@ -12,7 +12,6 @@ use Neos\Flow\Annotations as Flow;
 
 class ContentResultsController extends AbstractModuleController
 {
-
     /**
      * @var ContentResultRepository
      * @Flow\Inject
@@ -45,9 +44,10 @@ class ContentResultsController extends AbstractModuleController
     public function displayAction(Account $account)
     {
         $this->view->assign('contentResults', $this->contentResultRepository->findByAccount($account));
+        $this->view->assign('perContent', true);
     }
 
-    public function deleteSingleAction(ContentResult $contentResult)
+    public function deleteSingleResultAction(ContentResult $contentResult)
     {
         $this->contentResultRepository->remove($contentResult);
         $this->addFlashMessage('The result has been deleted.', 'Result deleted', Message::SEVERITY_OK);

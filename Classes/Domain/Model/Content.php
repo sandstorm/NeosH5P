@@ -508,4 +508,20 @@ class Content
     {
         $this->contentId = $contentId;
     }
+
+    /**
+     * @return Collection
+     */
+    public function getContentResults(): Collection
+    {
+        return $this->contentResults;
+    }
+
+    /**
+     * @param Collection $contentResults
+     */
+    public function setContentResults(Collection $contentResults): void
+    {
+        $this->contentResults = $contentResults;
+    }
 }

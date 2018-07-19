@@ -3,7 +3,12 @@
     <table class="neos-table">
         <thead>
         <tr>
-            <th class="neos-span4">Content</th>
+            <f:if condition="{perUser}">
+                <th class="neos-span4">User</th>
+            </f:if>
+            <f:if condition="{perContent}">
+                <th class="neos-span4">Content</th>
+            </f:if>
             <th class="neos-span1">Score</th>
             <th class="neos-span1">Max. Score</th>
             <th class="neos-span2">Started</th>
@@ -15,7 +20,12 @@
         <tbody>
         <f:for each="{paginatedContentResults}" as="contentResult">
             <tr>
-                <td>{contentResult.content.title}</td>
+                <f:if condition="{perUser}">
+                    <td>{contentResult.account.accountIdentifier}</td>
+                </f:if>
+                <f:if condition="{perContent}">
+                    <td>{contentResult.content.title}</td>
+                </f:if>
                 <td>{contentResult.score}</td>
                 <td>{contentResult.maxScore}</td>
                 <td>{contentResult.openedDateTime -> f:format.date(format:'Y-m-d H:i:s')}</td>
@@ -48,7 +58,7 @@
                                     </div>
                                     <div class="neos-modal-footer">
                                         <a href="#" class="neos-button" data-dismiss="modal">Cancel</a>
-                                        <f:form action="deleteSingle" arguments="{contentResult: contentResult}"
+                                        <f:form action="deleteSingleResult" arguments="{contentResult: contentResult}"
                                                 class="neos-inline">
                                             <button type="submit" class="neos-button neos-button-danger"
                                                     title="Confirm deletion">

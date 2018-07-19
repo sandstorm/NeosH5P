@@ -5,15 +5,16 @@
 
     <div class="neos-row-fluid">
 
-        <legend>Results for user {contentResults.0.account.accountIdentifier}</legend>
+        <legend>Results for {content.title}</legend>
 
         <f:render partial="ContentResultTable" arguments="{_all}"></f:render>
 
         <div class="neos-footer">
             <neos:link.module
-                title="Back to overview"
-                path="h5p/results"
-                action="index"
+                title="Back to content"
+                path="h5p/content"
+                action="display"
+                arguments="{content:content}"
                 class="neos-button">
                 Back
             </neos:link.module>
@@ -33,8 +34,8 @@
                                 <div>
                                     <div class="neos-subheader">
                                         <p>
-                                            All results for user
-                                            {groupedContentResult.0.account.accountIdentifier} will be
+                                            All results for content
+                                            {content.title} will be
                                             removed permanently.
                                         </p>
                                     </div>
@@ -42,7 +43,7 @@
                             </div>
                             <div class="neos-modal-footer">
                                 <a href="#" class="neos-button" data-dismiss="modal">Cancel</a>
-                                <f:form action="deleteAll" arguments="{account:contentResults.0.account}"
+                                <f:form action="deleteResults" arguments="{content:content}"
                                         class="neos-inline">
                                     <button type="submit" class="neos-button neos-button-danger"
                                             title="Confirm deletion">
