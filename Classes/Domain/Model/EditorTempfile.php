@@ -12,7 +12,7 @@ class EditorTempfile {
 
     /**
      * @var PersistentResource
-     * @ORM\OneToOne
+     * @ORM\OneToOne(cascade={"persist", "remove"}))
      * @ORM\Column(nullable=false)
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
@@ -23,6 +23,12 @@ class EditorTempfile {
      * @ORM\Column(type="datetimetz", nullable=false)
      */
     protected $createdAt;
+
+    /**
+     * @var string
+     * @ORM\Column(nullable=false)
+     */
+    protected $temporaryFilename;
 
     /**
      * @return PersistentResource
@@ -54,5 +60,21 @@ class EditorTempfile {
     public function setCreatedAt(\DateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemporaryFilename(): string
+    {
+        return $this->temporaryFilename;
+    }
+
+    /**
+     * @param string $temporaryFilename
+     */
+    public function setTemporaryFilename(string $temporaryFilename): void
+    {
+        $this->temporaryFilename = $temporaryFilename;
     }
 }

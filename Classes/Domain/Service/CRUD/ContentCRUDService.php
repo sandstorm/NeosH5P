@@ -3,6 +3,7 @@
 namespace Sandstorm\NeosH5P\Domain\Service\CRUD;
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\ResourceManagement\ResourceManager;
 use Sandstorm\NeosH5P\Domain\Model\Content;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
 use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
@@ -45,6 +46,12 @@ class ContentCRUDService
     protected $contentRepository;
 
     /**
+     * @Flow\Inject
+     * @var ResourceManager
+     */
+    protected $resourceManager;
+
+    /**
      * Creates the content data structure that H5P expects and passes it into its API.
      * If a $contentId is provided, will try to find and update that content. If there
      * is no content with that ID, it will be created.
@@ -60,10 +67,19 @@ class ContentCRUDService
     public function handleCreateOrUpdate(string $title, string $library, string $parameters, $contentId = null)
     {
         $content = [];
+        $oldLibrary = null;
+        $oldParameters = null;
+
+        // Before we save the new data, load the old data from the DB.
         if ($contentId) {
             $content['id'] = $contentId;
+            $contentObject = $this->contentRepository->findOneByContentId($content['id']);
+
+            if($contentObject !== null) {
+                $oldLibrary = $contentObject->getLibrary()->toAssocArray();
+                $oldParameters = json_decode($contentObject->getParameters());
+            }
         }
-        // TODO: make the frame, embed, download etc... configurable per content element.
         $content['disable'] = \H5PCore::DISABLE_NONE;
         $content['title'] = $title;
         $content['params'] = $parameters;
@@ -95,18 +111,34 @@ class ContentCRUDService
             return null;
         }
 
-        // The call to filterParameters is done during content editing (before content is loaded into the form) in WP.
-        // We do it here to save performance and avoid writes in GET requests. It expects $content['slug'] and
-        // $content['filtered'] to be set.
-        /** @var Content $existingContent */
-        $existingContent = $this->contentRepository->findOneByContentId($content['id']);
-        $content['slug'] = $existingContent->getSlug();
+        /**
+         * The call to filterParameters is done during content editing (before content is loaded into the form) in WP.
+         * We do it here to save performance and avoid writes in GET requests. It expects $content['slug'] and
+         * $content['filtered'] to be set.
+         */
+        /** @var Content $contentObject */
+        $contentObject = $this->contentRepository->findOneByContentId($content['id']);
+        $content['slug'] = $contentObject->getSlug();
         $this->h5pCore->filterParameters($content);
 
-        $oldLibrary = $existingContent->getLibrary()->toAssocArray();
-        $oldParameters = $existingContent->getParameters();
         // Move images and find all content dependencies
         $this->h5pEditor->processParameters($content['id'], $content['library'], $params, $oldLibrary, $oldParameters);
+
+        // Re-Import the content files as a zipfile for the content element.
+        $contentObject->createZippedContentFileFromTemporaryDirectory();
+
+        // Persist again as the zippedresource object may have changed
+        $this->contentRepository->update($contentObject);
+
+        // If there is a zipped content file now, publish it.
+        if($contentObject->getZippedContentFile() !== null) {
+            $collection = $this->resourceManager->getCollection('h5p-content');
+            $target = $collection->getTarget();
+            // PublishResource does not work as apparently a different logic is used, so we publish the whole
+            // collection here for now
+            // $target->publishResource($contentObject->getZippedContentFile(), $collection);
+            $target->publishCollection($collection);
+        }
 
         return $this->contentRepository->findOneByContentId($content['id']);
     }

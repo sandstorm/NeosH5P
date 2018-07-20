@@ -153,7 +153,7 @@ Neos:
         h5p-editor-files:
           storage: 'h5pEditorStorage'
           target: 'h5pTarget'
-        h5p-editorTempfiles:
+        h5p-editor-tempfiles:
           storage: 'h5pEditorTempfilesStorage'
           target: 'h5pTarget'
 

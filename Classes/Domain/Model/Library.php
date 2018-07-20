@@ -162,7 +162,6 @@ class Library
     /**
      * @var PersistentResource
      * @ORM\OneToOne(cascade={"persist", "remove"})
-     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $zippedLibraryFile;
 

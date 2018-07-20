@@ -59,6 +59,8 @@ class FileAdapter implements \H5PFileStorage
      */
     protected $persistenceManager;
 
+    const H5P_TEMP_DIR = FLOW_PATH_DATA . 'Temporary/H5P';
+
     /**
      * Store the library folder.
      *
@@ -158,9 +160,8 @@ class FileAdapter implements \H5PFileStorage
      */
     public function getTmpPath()
     {
-        $tmpDir = FLOW_PATH_DATA . 'Temporary/H5P';
-        Files::createDirectoryRecursively($tmpDir);
-        return $tmpDir . '/' . uniqid('h5p-');
+        Files::createDirectoryRecursively(self::H5P_TEMP_DIR);
+        return self::H5P_TEMP_DIR . DIRECTORY_SEPARATOR . uniqid('h5p-');
     }
 
     /**
@@ -440,18 +441,20 @@ class FileAdapter implements \H5PFileStorage
         $editorTempfile = new EditorTempfile();
         $editorTempfile->setResource($persistentResource);
         $editorTempfile->setCreatedAt(new \DateTime());
+        // With this, we can find the editor temp file again later - see below in cloneContentFile
+        $editorTempfile->setTemporaryFilename($file->getName());
         $this->editorTempfileRepository->add($editorTempfile);
         // Persist all, because this is fetched directly below when we publish
         $this->persistenceManager->persistAll();
 
         /**
-         * We need to publish all resources from the collection 'h5p-editorTempfiles' before
+         * We need to publish all resources from the collection 'h5p-editor-tempfiles' before
          * we can return, as this moves the EditorTempfile asset to the right location so
          * the H5P editor can find it. This takes a bit, but should not be an issues as
          * the EditorTempfiles should be cleaned up regularly.
          * @see H5PCommandController::clearEditorTempFilesCommand()
          */
-        $collection = $this->resourceManager->getCollection('h5p-editorTempfiles');
+        $collection = $this->resourceManager->getCollection('h5p-editor-tempfiles');
         $target = $collection->getTarget();
         $target->publishCollection($collection);
 
@@ -468,7 +471,26 @@ class FileAdapter implements \H5PFileStorage
      */
     public function cloneContentFile($file, $fromId, $toId)
     {
-        // TODO: Implement cloneContentFile() method.
+        /** @var Content $content */
+        $content = $this->contentRepository->findOneByContentId($toId);
+        // Dump the contents of the zipfile to disk temporarily
+        $content->dumpContentFileToTemporaryDirectory();
+
+        // Determine source path. $fromId can also be a content ID, we don't support this yet.
+        if ($fromId !== 'editor') {
+            throw new Exception('Copying files from another content is not supported yet.');
+        }
+
+        // We can find the asset again by looking for the editortempfile
+        /** @var EditorTempfile $editorTempfile */
+        $filenameParts = explode('/', $file);
+        $editorTempfile = $this->editorTempfileRepository->findOneByTemporaryFilename(end($filenameParts));
+
+        // Determine target path
+        $targetPath = $content->buildContentFileTempPath() . DIRECTORY_SEPARATOR . $file;
+        // Make sure the target directory exists
+        Files::createDirectoryRecursively(dirname($targetPath));
+        file_put_contents($targetPath, $editorTempfile->getResource()->getStream());
     }
 
     /**
@@ -495,7 +517,14 @@ class FileAdapter implements \H5PFileStorage
      */
     public function getContentFile($file, $contentId)
     {
-        // TODO: Implement getContentFile() method.
+        /** @var Content $content */
+        $content = $this->contentRepository->findOneByContentId($contentId);
+        // Dump the contents of the zipfile to disk temporarily
+        $content->dumpContentFileToTemporaryDirectory();
+
+        $filePath = $content->buildContentFileTempPath() . DIRECTORY_SEPARATOR . $file;
+
+        return file_exists($filePath) ? $filePath : null;
     }
 
     /**
@@ -507,7 +536,17 @@ class FileAdapter implements \H5PFileStorage
      */
     public function removeContentFile($file, $contentId)
     {
-        // TODO: Implement removeContentFile() method.
+        /** @var Content $content */
+        $content = $this->contentRepository->findOneByContentId($contentId);
+        // Dump the contents of the zipfile to disk temporarily
+        $content->dumpContentFileToTemporaryDirectory();
+
+        $path = $content->buildContentFileTempPath() . DIRECTORY_SEPARATOR . $file;
+        if (file_exists($path)) {
+            unlink($path);
+            // Clean up any empty parent directories to avoid cluttering the file system
+            Files::removeEmptyDirectoriesOnPath($path);
+        }
     }
 
     /**

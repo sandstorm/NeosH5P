@@ -149,7 +149,11 @@ abstract class AbstractExtractedStorage implements StorageInterface
         $items = $this->repository->findAll();
         foreach ($items as $item) {
             $resourceGetterMethod = $this->options['resourceGetterMethod'];
-            $h5pPathAndFilename = $item->$resourceGetterMethod()->createTemporaryLocalCopy();
+            $resource = $item->$resourceGetterMethod();
+            if (!$resource instanceof PersistentResource) {
+                continue;
+            }
+            $h5pPathAndFilename = $resource->createTemporaryLocalCopy();
             $zipArchive = new \ZipArchive();
 
             $zipArchive->open($h5pPathAndFilename);

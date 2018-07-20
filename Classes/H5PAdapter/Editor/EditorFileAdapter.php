@@ -127,7 +127,10 @@ class EditorFileAdapter implements \H5peditorStorage
      */
     public function keepFile($fileId)
     {
-        // TODO: Implement keepFile() method.
+        /**
+         * Nothing has to be done here, as we don't need the assets connected to EditorTempfiles anymore - they are
+         * all zipped up and stored with the content itself.
+         */
     }
 
     /**
