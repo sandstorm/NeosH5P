@@ -4,26 +4,19 @@ namespace Sandstorm\NeosH5P\Resource\Storage;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Exception;
-use Neos\Flow\Persistence\Doctrine\Repository;
 use Neos\Flow\ResourceManagement\CollectionInterface;
 use Neos\Flow\ResourceManagement\PersistentResource;
 use Neos\Flow\ResourceManagement\ResourceManager;
 use Neos\Flow\ResourceManagement\Storage\StorageInterface;
 use Neos\Flow\ResourceManagement\Storage\StorageObject;
 use Neos\Flow\Utility\Environment;
+use Sandstorm\NeosH5P\Domain\Model\EditorTempfile;
+use Sandstorm\NeosH5P\Domain\Repository\EditorTempfileRepository;
 
 /**
- * Abstract base class for the extracted file storages for Library and Content.
- * Expects three storage Options:
- *
- * - Subfolder of the H5P Public web directory to publish to. Example:
- *   publishingSubfolder: 'libraries'
- * - Name of the method that yields the zipped PersistentResource which should be extracted. Example:
- *   resourceGetterMethod: 'getZippedLibraryFile'
- * - Method that returns the name of the directory for each individual extracted item. Example:
- *   itemFolderNameMethod: 'getFolderName'
+ * Extracts EditorTempfile assets to a subfolder per type.
  */
-abstract class AbstractExtractedH5PStorage implements StorageInterface
+class EditorTempfileStorage implements StorageInterface
 {
     /**
      * Name which identifies this resource storage
@@ -50,13 +43,10 @@ abstract class AbstractExtractedH5PStorage implements StorageInterface
     protected $options;
 
     /**
-     * Subclasses must inject the repository from which the asset resources should come here.
-     * (Will be a LibraryRepository or a ContentRepository)
-     * @api
-     *
-     * @var Repository
+     * @var EditorTempfileRepository
+     * @Flow\Inject
      */
-    protected $repository;
+    protected $editorTempfileRepository;
 
     /**
      * Constructor
@@ -71,8 +61,6 @@ abstract class AbstractExtractedH5PStorage implements StorageInterface
         foreach ($options as $key => $value) {
             switch ($key) {
                 case 'publishingSubfolder':
-                case 'resourceGetterMethod':
-                case 'itemFolderNameMethod':
                     $this->options[$key] = $value;
                     break;
                 default:
@@ -145,45 +133,21 @@ abstract class AbstractExtractedH5PStorage implements StorageInterface
      */
     public function getObjectsByCollection(CollectionInterface $collection, callable $callback = null)
     {
-        $iteration = 0;
-        $items = $this->repository->findAll();
-        foreach ($items as $item) {
-            $resourceGetterMethod = $this->options['resourceGetterMethod'];
-            $h5pPathAndFilename = $item->$resourceGetterMethod()->createTemporaryLocalCopy();
-            $zipArchive = new \ZipArchive();
-
-            $zipArchive->open($h5pPathAndFilename);
-            for ($i = 0; $i < $zipArchive->numFiles; $i++) {
-                $pathAndFilenameInZip = $zipArchive->getNameIndex($i);
-                if (substr($pathAndFilenameInZip, -1) === '/') {
-                    // Skip directories (everything ending with "/")
-                    continue;
-                }
-                $fileContents = stream_get_contents($zipArchive->getStream($pathAndFilenameInZip));
-
-                $stream = fopen('php://memory', 'r+');
-                fwrite($stream, $fileContents);
-                rewind($stream);
-                $object = new StorageObject();
-                $object->setFilename($pathAndFilenameInZip);
-                $object->setSha1(sha1($fileContents));
-                $object->setMd5(md5($fileContents));
-                $object->setFileSize(strlen($fileContents));
-                $object->setStream($stream);
-                $itemFolderNameMethod = $this->options['itemFolderNameMethod'];
-                $object->setRelativePublicationPath(
-                    DIRECTORY_SEPARATOR . $this->options['publishingSubfolder'] .
-                    DIRECTORY_SEPARATOR . $item->$itemFolderNameMethod() .
-                    DIRECTORY_SEPARATOR . dirname($pathAndFilenameInZip) .
-                    DIRECTORY_SEPARATOR);
-                yield $object;
-
-                if (is_callable($callback)) {
-                    call_user_func($callback, $iteration, $object);
-                }
-                $iteration++;
-            }
-            $zipArchive->close();
+        $editorTempfiles = $this->editorTempfileRepository->findAll();
+        /** @var EditorTempfile $editorTempfile */
+        foreach ($editorTempfiles as $editorTempfile) {
+            $resource = $editorTempfile->getResource();
+            $object = new StorageObject();
+            $object->setFilename($resource->getFilename());
+            $object->setSha1($resource->getSha1());
+            $object->setMd5($resource->getMd5());
+            $object->setFileSize($resource->getFileSize());
+            $object->setStream($resource->getStream());
+            $object->setRelativePublicationPath(
+                DIRECTORY_SEPARATOR . $this->options['publishingSubfolder'] .
+                DIRECTORY_SEPARATOR . $resource->getRelativePublicationPath() . DIRECTORY_SEPARATOR
+            );
+            yield $object;
         }
     }
 }

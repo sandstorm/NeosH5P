@@ -14,6 +14,8 @@ Sandstorm:
         core: &h5pCoreSubfolderName 'h5p-core'
         # Directory where the H5P editor assets (from 3rd party package) are published to.
         editor: &h5pEditorSubfolderName 'h5p-editor'
+        # Directory where temporary editor files are put.
+        editorTempfiles: &h5pEditorTempfilesSubfolderName 'editor-temp'
     # These can be generated as ConfigSettings by the flow command
     # ./flow h5p:generatedefaultconfigsettings.
     defaultConfigSettings:
@@ -99,8 +101,14 @@ Neos:
 
     resource:
       storages:
+        h5pContentStorage:
+          storage: 'Sandstorm\NeosH5P\Resource\Storage\ExtractedContentStorage'
+          storageOptions:
+            publishingSubfolder: *h5pContentSubfolderName
+            resourceGetterMethod: 'getZippedContentFile'
+            itemFolderNameMethod: 'getContentId'
         h5pLibraryStorage:
-          storage: 'Sandstorm\NeosH5P\Resource\Storage\ExtractedH5PLibraryStorage'
+          storage: 'Sandstorm\NeosH5P\Resource\Storage\ExtractedLibraryStorage'
           storageOptions:
             publishingSubfolder: *h5pLibrarySubfolderName
             resourceGetterMethod: 'getZippedLibraryFile'
@@ -127,32 +135,30 @@ Neos:
               - 'libs'
               - 'scripts'
               - 'styles'
+        h5pEditorTempfilesStorage:
+          storage: 'Sandstorm\NeosH5P\Resource\Storage\EditorTempfileStorage'
+          storageOptions:
+            publishingSubfolder: *h5pEditorTempfilesSubfolderName
 
       collections:
+        h5p-content:
+          storage: 'h5pContentStorage'
+          target: 'h5pTarget'
         h5p-libraries:
           storage: 'h5pLibraryStorage'
-          target: 'h5pLibraryTarget'
+          target: 'h5pTarget'
         h5p-core-files:
           storage: 'h5pCoreStorage'
-          target: 'h5pCoreTarget'
+          target: 'h5pTarget'
         h5p-editor-files:
           storage: 'h5pEditorStorage'
-          target: 'h5pEditorTarget'
+          target: 'h5pTarget'
+        h5p-editorTempfiles:
+          storage: 'h5pEditorTempfilesStorage'
+          target: 'h5pTarget'
 
       targets:
-        h5pLibraryTarget:
-          target: 'Neos\Flow\ResourceManagement\Target\FileSystemTarget'
-          targetOptions:
-            path: *h5pPublicFolderPath
-            baseUri: *h5pPublicFolderUrl
-            subdivideHashPathSegment: false
-        h5pCoreTarget:
-          target: 'Neos\Flow\ResourceManagement\Target\FileSystemTarget'
-          targetOptions:
-            path: *h5pPublicFolderPath
-            baseUri: *h5pPublicFolderUrl
-            subdivideHashPathSegment: false
-        h5pEditorTarget:
+        h5pTarget:
           target: 'Neos\Flow\ResourceManagement\Target\FileSystemTarget'
           targetOptions:
             path: *h5pPublicFolderPath

@@ -8,9 +8,14 @@ use Neos\Flow\Persistence\PersistenceManagerInterface;
 use Neos\Flow\ResourceManagement\ResourceManager;
 use Neos\Utility\Exception\FilesException;
 use Neos\Utility\Files;
+use Sandstorm\NeosH5P\Command\H5PCommandController;
 use Sandstorm\NeosH5P\Domain\Model\CachedAsset;
+use Sandstorm\NeosH5P\Domain\Model\Content;
+use Sandstorm\NeosH5P\Domain\Model\EditorTempfile;
 use Sandstorm\NeosH5P\Domain\Model\Library;
 use Sandstorm\NeosH5P\Domain\Repository\CachedAssetRepository;
+use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
+use Sandstorm\NeosH5P\Domain\Repository\EditorTempfileRepository;
 use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
 
 /**
@@ -26,6 +31,12 @@ class FileAdapter implements \H5PFileStorage
 
     /**
      * @Flow\Inject
+     * @var ContentRepository
+     */
+    protected $contentRepository;
+
+    /**
+     * @Flow\Inject
      * @var LibraryRepository
      */
     protected $libraryRepository;
@@ -35,6 +46,12 @@ class FileAdapter implements \H5PFileStorage
      * @var CachedAssetRepository
      */
     protected $cachedAssetRepository;
+
+    /**
+     * @Flow\Inject
+     * @var EditorTempfileRepository
+     */
+    protected $editorTempfileRepository;
 
     /**
      * @Flow\Inject
@@ -156,7 +173,29 @@ class FileAdapter implements \H5PFileStorage
      */
     public function exportContent($id, $target)
     {
-        // TODO: Implement once export is enabled as a feature
+        // We essentially need to fetch to contents of the zippedContentFile here, and
+        // extract them to another (temporary) location.
+        /** @var Content $content */
+        $content = $this->contentRepository->findOneByContentId($id);
+        if ($content === null || $content->getExportFile() === null) {
+            // No content or no content zip, we're done
+            return;
+        }
+
+        $zipArchive = new \ZipArchive();
+
+        $zipArchive->open($content->getExportFile()->createTemporaryLocalCopy());
+        for ($i = 0; $i < $zipArchive->numFiles; $i++) {
+            $pathAndFilenameInZip = $zipArchive->getNameIndex($i);
+            if (substr($pathAndFilenameInZip, -1) === '/') {
+                // Skip directories (everything ending with "/")
+                continue;
+            }
+            $fileContents = stream_get_contents($zipArchive->getStream($pathAndFilenameInZip));
+            $temporaryFilename = $target . DIRECTORY_SEPARATOR . $pathAndFilenameInZip;
+            file_put_contents($temporaryFilename, $fileContents);
+        }
+        $zipArchive->close();
     }
 
     /**
@@ -192,7 +231,17 @@ class FileAdapter implements \H5PFileStorage
      */
     public function deleteExport($filename)
     {
-        // TODO: Implement once export is enabled as a feature
+        /**
+         * Because of a bug, we get a different filename here than below in hasExport.
+         * We get e.g. "5.h5p" here instead of "my-slug-5.h5p".
+         * however, our regex can handle it and will return the correct Content object.
+         */
+        $content = $this->getContentFromExportFilename($filename);
+        if ($content !== null && $content->getExportFile() !== null) {
+            $this->resourceManager->deleteResource($content->getExportFile());
+            $content->setExportFile(null);
+            $this->contentRepository->update($content);
+        }
     }
 
     /**
@@ -203,8 +252,34 @@ class FileAdapter implements \H5PFileStorage
      */
     public function hasExport($filename)
     {
-        // TODO: Implement once export is enabled as a feature
-        return false;
+        /**
+         * The filename we get here is $content['slug'] . '-' . $content['id'] . '.h5p').
+         * As we don't want to search the resource repository by filename (there could be
+         * other files with the same name), we will extract the content ID from it again,
+         * retrieve the Content and ask it for its export file.
+         */
+        $content = $this->getContentFromExportFilename($filename);
+        if ($content === null) {
+            return false;
+        }
+        return $content->getExportFile() !== null;
+    }
+
+    /**
+     * The filename we get here is $content['slug'] . '-' . $content['id'] . '.h5p').
+     * As we don't want to search the resource repository by filename (there could be
+     * other files with the same name), we will extract the content ID from it again,
+     * retrieve the Content based on that.
+     *
+     * @param string $filename
+     * @return Content|null
+     */
+    private function getContentFromExportFilename(string $filename)
+    {
+        $matches = [];
+        preg_match('/^.*-*(\d).h5p$/is', $filename, $matches);
+        $contentId = end($matches);
+        return $this->contentRepository->findOneByContentId($contentId);
     }
 
     /**
@@ -348,7 +423,39 @@ class FileAdapter implements \H5PFileStorage
      */
     public function saveFile($file, $contentId)
     {
-        // TODO: Implement saveFile() method.
+        // This creates an editortempfile, attaches a resource, publishes that resource, and returns a file ID.
+
+        // If we have a content id set, we assign the file directly to a content element.
+        // In the current implementation, this doesn't happen yet - all uploaded editor files are
+        // first saved as an EditorTempfile. Therefore, we throw an Excaption if we get a content id.
+        if (is_int($contentId) && $contentId > 0) {
+            throw new Exception("Uploading files directly to a Content element is not supported yet.");
+        }
+
+        $persistentResource = $this->resourceManager->importResourceFromContent(
+            $file->getData() ?: file_get_contents($_FILES['file']['tmp_name']),
+            $file->getName());
+        $persistentResource->setRelativePublicationPath($file->getType() . 's');
+
+        $editorTempfile = new EditorTempfile();
+        $editorTempfile->setResource($persistentResource);
+        $editorTempfile->setCreatedAt(new \DateTime());
+        $this->editorTempfileRepository->add($editorTempfile);
+        // Persist all, because this is fetched directly below when we publish
+        $this->persistenceManager->persistAll();
+
+        /**
+         * We need to publish all resources from the collection 'h5p-editorTempfiles' before
+         * we can return, as this moves the EditorTempfile asset to the right location so
+         * the H5P editor can find it. This takes a bit, but should not be an issues as
+         * the EditorTempfiles should be cleaned up regularly.
+         * @see H5PCommandController::clearEditorTempFilesCommand()
+         */
+        $collection = $this->resourceManager->getCollection('h5p-editorTempfiles');
+        $target = $collection->getTarget();
+        $target->publishCollection($collection);
+
+        return $file;
     }
 
     /**

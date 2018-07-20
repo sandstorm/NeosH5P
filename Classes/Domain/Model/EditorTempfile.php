@@ -14,7 +14,7 @@ class EditorTempfile {
      * @var PersistentResource
      * @ORM\OneToOne
      * @ORM\Column(nullable=false)
-     * @ORM\JoinColumn(onDelete="cascade")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $resource;
 
@@ -24,4 +24,35 @@ class EditorTempfile {
      */
     protected $createdAt;
 
+    /**
+     * @return PersistentResource
+     */
+    public function getResource(): PersistentResource
+    {
+        return $this->resource;
+    }
+
+    /**
+     * @param PersistentResource $resource
+     */
+    public function setResource(PersistentResource $resource): void
+    {
+        $this->resource = $resource;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime $createdAt
+     */
+    public function setCreatedAt(\DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
 }

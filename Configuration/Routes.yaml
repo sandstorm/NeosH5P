@@ -36,6 +36,14 @@
     '@controller': 'Backend\EditorAjax'
     '@action': 'libraries'
   httpMethods: ['POST']
+-
+  name: 'H5P Backend Editor AJAX - editor file upload'
+  uriPattern: 'neosh5p/editor/files'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Backend\EditorAjax'
+    '@action': 'fileUpload'
+  httpMethods: ['POST']
 
 # frontend ajax routes
 -

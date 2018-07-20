@@ -60,14 +60,13 @@ class ContentCRUDService
     public function handleCreateOrUpdate(string $title, string $library, string $parameters, $contentId = null)
     {
         $content = [];
-        if($contentId) {
+        if ($contentId) {
             $content['id'] = $contentId;
         }
         // TODO: make the frame, embed, download etc... configurable per content element.
         $content['disable'] = \H5PCore::DISABLE_NONE;
         $content['title'] = $title;
         $content['params'] = $parameters;
-        $content['slug'] = '';
 
         // Get library
         $content['library'] = $this->h5pCore->libraryFromString($library);
@@ -91,19 +90,21 @@ class ContentCRUDService
         }
 
         $content['id'] = $this->h5pCore->saveContent($content);
+        if (!$content['library']['libraryId']) {
+            $this->h5pCore->h5pF->setErrorMessage('No such library.');
+            return null;
+        }
 
         // The call to filterParameters is done during content editing (before content is loaded into the form) in WP.
-        // We do it here to save performance and avoid writes in GET requests. It expects $content['slug'] to exist.
-        $this->h5pCore->filterParameters($content);
-
-        $oldLibrary = null;
-        $oldParameters = null;
+        // We do it here to save performance and avoid writes in GET requests. It expects $content['slug'] and
+        // $content['filtered'] to be set.
         /** @var Content $existingContent */
         $existingContent = $this->contentRepository->findOneByContentId($content['id']);
-        if ($existingContent !== null) {
-            $oldLibrary = $existingContent->getLibrary()->toAssocArray();
-            $oldParameters = $existingContent->getParameters();
-        }
+        $content['slug'] = $existingContent->getSlug();
+        $this->h5pCore->filterParameters($content);
+
+        $oldLibrary = $existingContent->getLibrary()->toAssocArray();
+        $oldParameters = $existingContent->getParameters();
         // Move images and find all content dependencies
         $this->h5pEditor->processParameters($content['id'], $content['library'], $params, $oldLibrary, $oldParameters);
 

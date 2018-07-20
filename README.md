@@ -10,6 +10,8 @@
 * Control which username/mail is sent in xAPI statements by implementing your own xApiUserServiceInterface and
   configuring the plugin to use it via Objects.yaml. This will give you the opportunity to interact with your 
   own user model and extract name and email address.
+## Cronjob to remove editor temp files
+* Plan a cronjob to remove all EditorTempfiles and associated resources.
 
 # License
 License: MIT.

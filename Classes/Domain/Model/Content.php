@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Neos\Flow\Annotations as Flow;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use Neos\Flow\ResourceManagement\PersistentResource;
 use Neos\Flow\Security\Account;
 
 /**
@@ -115,6 +116,22 @@ class Content
      * @ORM\Column(type="text", nullable=true)
      */
     protected $description;
+
+    /**
+     * @var PersistentResource
+     * @ORM\OneToOne(cascade={"persist", "remove"})
+     * @ORM\Column(nullable=true)
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     */
+    protected $zippedContentFile;
+
+    /**
+     * @var PersistentResource
+     * @ORM\OneToOne
+     * @ORM\Column(nullable=true)
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     */
+    protected $exportFile;
 
 
     // Inversed relations (not in DB)
@@ -523,5 +540,37 @@ class Content
     public function setContentResults(Collection $contentResults): void
     {
         $this->contentResults = $contentResults;
+    }
+
+    /**
+     * @return PersistentResource|null
+     */
+    public function getExportFile()
+    {
+        return $this->exportFile;
+    }
+
+    /**
+     * @param PersistentResource|null $exportFile
+     */
+    public function setExportFile($exportFile): void
+    {
+        $this->exportFile = $exportFile;
+    }
+
+    /**
+     * @return PersistentResource|null
+     */
+    public function getZippedContentFile()
+    {
+        return $this->zippedContentFile;
+    }
+
+    /**
+     * @param PersistentResource $zippedContentFile
+     */
+    public function setZippedContentFile(PersistentResource $zippedContentFile): void
+    {
+        $this->zippedContentFile = $zippedContentFile;
     }
 }

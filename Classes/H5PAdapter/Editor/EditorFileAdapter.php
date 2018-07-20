@@ -9,6 +9,7 @@ use Neos\Utility\Exception\FilesException;
 use Neos\Utility\Files;
 use Sandstorm\NeosH5P\Domain\Model\Library;
 use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
+use Sandstorm\NeosH5P\H5PAdapter\Core\FileAdapter;
 
 /**
  * @Flow\Scope("singleton")
@@ -167,7 +168,12 @@ class EditorFileAdapter implements \H5peditorStorage
      */
     public static function markFileForCleanup($file, $content_id)
     {
-        // TODO: Implement markFileForCleanup() method.
+        /**
+         * This is called after
+         * @see FileAdapter::saveFile()
+         * and is supposed to create an entry in the DB. Since we already do that
+         * in the method above, this does nothing.
+         */
     }
 
     /**

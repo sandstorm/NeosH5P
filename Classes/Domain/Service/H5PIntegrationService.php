@@ -40,6 +40,12 @@ class H5PIntegrationService
     protected $h5pEditorPublicFolderName;
 
     /**
+     * @Flow\InjectConfiguration(path="h5pPublicFolder.subfolders.editorTempfiles")
+     * @var string
+     */
+    protected $h5pEditorTempfilesPublicFolderName;
+
+    /**
      * @Flow\Inject
      * @var H5PFramework
      */
@@ -234,14 +240,14 @@ class H5PIntegrationService
         );
 
         $editorSettings = [
-            'filesPath' => $this->h5pPublicFolderUrl . 'editor', // TODO - from settings - IS NOT h5p-editor but the editortempfiles dir!
+            'filesPath' => $this->h5pPublicFolderUrl . $this->h5pEditorTempfilesPublicFolderName,
             'fileIcon' => [
                 'path' => $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName . '/images/binary-file.png',
                 'width' => 50,
                 'height' => 50,
             ],
             'ajaxPath' => $editorAjaxAction . '/',
-            'libraryUrl' => $this->getBaseUri($controllerContext) . $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName,
+            'libraryUrl' => $this->getBaseUri($controllerContext) . $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName . '/',
             'copyrightSemantics' => $this->h5pContentValidator->getCopyrightSemantics(),
             'assets' => [
                 'css' => array_merge($this->getRelativeCoreStyleUrls(), $this->getRelativeEditorStyleUrls()),
