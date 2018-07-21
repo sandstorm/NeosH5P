@@ -258,6 +258,117 @@ class Content
     }
 
     /**
+     * Writes the contents of the zipped content file to disk, for easier
+     * file operations during Content creation or update.
+     */
+    public function dumpContentFileToTemporaryDirectory()
+    {
+        // Don't dump more than once per request
+        if ($this->hasDumpedContentFile()) {
+            return;
+        }
+        $this->hasDumpedContentFile = true;
+
+        $tempPath = $this->buildContentFileTempPath();
+        Files::createDirectoryRecursively($tempPath);
+
+        $zippedContentFolderResource = $this->getZippedContentFile();
+        if ($zippedContentFolderResource === null) {
+            // There is no content file yet, so return
+            return;
+        }
+        $zippedContentFilePathAndFilename = $this->getZippedContentFile()->createTemporaryLocalCopy();
+        $zipArchive = new \ZipArchive();
+        $zipArchive->open($zippedContentFilePathAndFilename);
+        $zipArchive->extractTo($tempPath);
+        $zipArchive->close();
+    }
+
+    /**
+     * Reads all the contents of the dumped content file and stores them as one zip.
+     */
+    public function createZippedContentFileFromTemporaryDirectory()
+    {
+        // First, try to remove the folder if it's empty
+        Files::removeEmptyDirectoriesOnPath($this->buildContentFileTempPath());
+
+        // If the directory does not exist now, we set the resource to null and return.
+        $hasDirectoryWithExportFiles = true;
+        if (!is_dir($this->buildContentFileTempPath())) {
+            $hasDirectoryWithExportFiles = false;
+        }
+
+        // If the directory is empty, we set the resource to null and return.
+        if ($hasDirectoryWithExportFiles) {
+            $directoryIterator = new \RecursiveDirectoryIterator($this->buildContentFileTempPath(), \FilesystemIterator::SKIP_DOTS);
+            if (iterator_count($directoryIterator) === 0) {
+                $hasDirectoryWithExportFiles = false;
+            }
+        }
+
+        if (!$hasDirectoryWithExportFiles) {
+            if ($this->getZippedContentFile() !== null) {
+                $this->resourceManager->deleteResource($this->getZippedContentFile());
+            }
+            $this->setZippedContentFile(null);
+            return;
+        }
+
+        // We have a directory with something in it, so we add that as the new zipped content file.
+        $zipfilePath = FileAdapter::H5P_TEMP_DIR . DIRECTORY_SEPARATOR . $this->contentId . '.zip';
+        $zipArchive = new \ZipArchive();
+        $zipArchive->open(
+            $zipfilePath,
+            \ZipArchive::CREATE | \ZipArchive::OVERWRITE
+        );
+
+        // Create recursive directory iterator
+        /** @var \SplFileInfo[] $files */
+        $files = new \RecursiveIteratorIterator(
+            $directoryIterator,
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($files as $name => $file) {
+            // Skip directories (they will be added automatically)
+            if (!$file->isDir()) {
+                // Get real and relative path for current file
+                $filePath = $file->getRealPath();
+                $relativePath = substr($filePath, strlen($this->buildContentFileTempPath()) + 1);
+
+                // Add current file to archive
+                $zipArchive->addFile($filePath, $relativePath);
+            }
+        }
+
+        // Zip archive will be created only after closing object
+        $zipArchive->close();
+
+        // Import the zipfile as a new resource and remove the old one, if it existed
+        if ($this->getZippedContentFile() !== null) {
+            $this->resourceManager->deleteResource($this->getZippedContentFile());
+        }
+        $this->setZippedContentFile($this->resourceManager->importResource($zipfilePath));
+
+        // Cleanup the temp dir, deleting the zip file and the folder
+        unlink($zipfilePath);
+        Files::removeDirectoryRecursively($this->buildContentFileTempPath());
+    }
+
+    public function buildContentFileTempPath(): string
+    {
+        return FileAdapter::H5P_TEMP_DIR . DIRECTORY_SEPARATOR . $this->contentId;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasDumpedContentFile(): bool
+    {
+        return $this->hasDumpedContentFile;
+    }
+
+    /**
      * @return Library
      */
     public function getLibrary(): Library
@@ -591,101 +702,5 @@ class Content
     public function setZippedContentFile($zippedContentFile): void
     {
         $this->zippedContentFile = $zippedContentFile;
-    }
-
-    /**
-     * Writes the contents of the zipped content file to disk, for easier
-     * file operations during Content creation or update.
-     */
-    public function dumpContentFileToTemporaryDirectory()
-    {
-        // Don't dump more than once per request
-        if ($this->hasDumpedContentFile()) {
-            return;
-        }
-        $this->hasDumpedContentFile = true;
-
-        $tempPath = $this->buildContentFileTempPath();
-        Files::createDirectoryRecursively($tempPath);
-
-        $zippedContentFolderResource = $this->getZippedContentFile();
-        if ($zippedContentFolderResource === null) {
-            // There is no content file yet, so return
-            return;
-        }
-        $zippedContentFilePathAndFilename = $this->getZippedContentFile()->createTemporaryLocalCopy();
-        $zipArchive = new \ZipArchive();
-        $zipArchive->open($zippedContentFilePathAndFilename);
-        $zipArchive->extractTo($tempPath);
-        $zipArchive->close();
-    }
-
-    /**
-     * Reads all the contents of the dumped content file and stores them as one zip.
-     */
-    public function createZippedContentFileFromTemporaryDirectory()
-    {
-        // If the directory does not exist or is empty, we set the resource to null here.
-        $directoryIterator = new \RecursiveDirectoryIterator($this->buildContentFileTempPath(), \FilesystemIterator::SKIP_DOTS);
-        if (!is_dir($this->buildContentFileTempPath()) || iterator_count($directoryIterator) === 0) {
-            if ($this->getZippedContentFile() !== null) {
-                $this->resourceManager->deleteResource($this->getZippedContentFile());
-            }
-            $this->setZippedContentFile(null);
-            return;
-        }
-
-        // We have a directory with something in it, so we add that as the new zipped content file.
-        $zipfilePath = FileAdapter::H5P_TEMP_DIR . DIRECTORY_SEPARATOR . $this->contentId . '.zip';
-        $zipArchive = new \ZipArchive();
-        $zipArchive->open(
-            $zipfilePath,
-            \ZipArchive::CREATE | \ZipArchive::OVERWRITE
-        );
-
-        // Create recursive directory iterator
-        /** @var \SplFileInfo[] $files */
-        $files = new \RecursiveIteratorIterator(
-            $directoryIterator,
-            \RecursiveIteratorIterator::LEAVES_ONLY
-        );
-
-        foreach ($files as $name => $file) {
-            // Skip directories (they will be added automatically)
-            if (!$file->isDir()) {
-                // Get real and relative path for current file
-                $filePath = $file->getRealPath();
-                $relativePath = substr($filePath, strlen($this->buildContentFileTempPath()) + 1);
-
-                // Add current file to archive
-                $zipArchive->addFile($filePath, $relativePath);
-            }
-        }
-
-        // Zip archive will be created only after closing object
-        $zipArchive->close();
-
-        // Import the zipfile as a new resource and remove the old one, if it existed
-        if ($this->getZippedContentFile() !== null) {
-            $this->resourceManager->deleteResource($this->getZippedContentFile());
-        }
-        $this->setZippedContentFile($this->resourceManager->importResource($zipfilePath));
-
-        // Cleanup the temp dir, deleting the zip file and the folder
-        unlink($zipfilePath);
-        Files::removeDirectoryRecursively($this->buildContentFileTempPath());
-    }
-
-    public function buildContentFileTempPath(): string
-    {
-        return FileAdapter::H5P_TEMP_DIR . DIRECTORY_SEPARATOR . $this->contentId;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasDumpedContentFile(): bool
-    {
-        return $this->hasDumpedContentFile;
     }
 }

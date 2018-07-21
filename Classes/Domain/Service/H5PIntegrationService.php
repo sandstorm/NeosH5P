@@ -5,6 +5,7 @@ namespace Sandstorm\NeosH5P\Domain\Service;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\Controller\ControllerContext;
 use Neos\Flow\Package\PackageManagerInterface;
+use Neos\Flow\ResourceManagement\ResourceManager;
 use Neos\Flow\Security\Account;
 use Neos\Flow\Security\Context;
 use Sandstorm\NeosH5P\Domain\Model\Content;
@@ -74,6 +75,12 @@ class H5PIntegrationService
      * @var PackageManagerInterface
      */
     protected $packageManager;
+
+    /**
+     * @Flow\Inject
+     * @var ResourceManager
+     */
+    protected $resourceManager;
 
     /**
      * @Flow\Inject
@@ -294,11 +301,10 @@ class H5PIntegrationService
             'library' => \H5PCore::libraryToString($contentArray['library']),
             'jsonContent' => $content->getFiltered(),
             'fullScreen' => $contentArray['library']['fullscreen'],
-            // TODO: implement once export is enabled
-            'exportUrl' => 'foo',
+            'exportUrl' => $this->resourceManager->getPublicPersistentResourceUri($content->getExportFile()),
             'embedCode' => '<iframe src="' . $embedUrl . '" width=":w" height=":h" frameborder="0" allowfullscreen="allowfullscreen"></iframe>',
             'resizeCode' => '<script src="' . $h5pCorePublicUrl . '/js/h5p-resizer.js' . '" charset="UTF-8"></script>',
-            'url' => $this->getBaseUri($controllerContext), // TODO needed? admin_url('admin-ajax.php?action=h5p_embed&id=' . $contentArray['id']),
+            'url' => $embedUrl,
             'title' => $contentArray['title'],
             // TODO: use actual account identifier instead of 0 - this is needed only for an auth check, which we default to true currently.
             'displayOptions' => $this->h5pCore->getDisplayOptionsForView($contentArray['disable'], 0)

@@ -43,9 +43,9 @@ Sandstorm:
     # Setting for the H5PCore->aggregateAssets switch. If set to TRUE, H5P triggers the generation of
     # aggregated assets (CachedAsset) for each content element.
     aggregateAssets: true
-    # Set to true to enable the export functionality.
-    # !!! Not implemented yet !!!
-    enableExport: false
+    # Set to true to enable the export functionality. This only controls the generation of export files.
+    # To make them available for download, you have to enable the "export" config setting above.
+    enableExport: true
 
 Neos:
 

@@ -111,23 +111,26 @@ class ContentCRUDService
             return null;
         }
 
-        /**
-         * The call to filterParameters is done during content editing (before content is loaded into the form) in WP.
-         * We do it here to save performance and avoid writes in GET requests. It expects $content['slug'] and
-         * $content['filtered'] to be set.
-         */
-        /** @var Content $contentObject */
-        $contentObject = $this->contentRepository->findOneByContentId($content['id']);
-        $content['slug'] = $contentObject->getSlug();
-        $this->h5pCore->filterParameters($content);
-
         // Move images and find all content dependencies
         $this->h5pEditor->processParameters($content['id'], $content['library'], $params, $oldLibrary, $oldParameters);
 
         // Re-Import the content files as a zipfile for the content element.
+        $contentObject = $this->contentRepository->findOneByContentId($content['id']);
         $contentObject->createZippedContentFileFromTemporaryDirectory();
 
-        // Persist again as the zippedresource object may have changed
+        /**
+         * The call to filterParameters is done during content editing (before content is loaded into the form) in WP.
+         * We do it here to save performance and avoid writes in GET requests. It expects the full content array to
+         * be populated.
+         */
+        /** @var Content $contentObject */
+        $content = $contentObject->toAssocArray();
+        // If "slug" is not empty, filterParameters thinks that we don't have to delete old exports, so make sure
+        // it's empty so it gets repopulated and old exports get removed. Crazy...
+        $content['slug'] = '';
+        $this->h5pCore->filterParameters($content);
+
+        // Persist again as the zippedresource object, export file etc. may have changed
         $this->contentRepository->update($contentObject);
 
         // If there is a zipped content file now, publish it.

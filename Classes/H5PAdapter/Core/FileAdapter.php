@@ -178,24 +178,15 @@ class FileAdapter implements \H5PFileStorage
         // extract them to another (temporary) location.
         /** @var Content $content */
         $content = $this->contentRepository->findOneByContentId($id);
-        if ($content === null || $content->getExportFile() === null) {
-            // No content or no content zip, we're done
+        if ($content->getZippedContentFile() === null) {
+            // We have no zip - all we need to do is make sure the directory exists
+            Files::createDirectoryRecursively($target);
             return;
         }
 
         $zipArchive = new \ZipArchive();
-
-        $zipArchive->open($content->getExportFile()->createTemporaryLocalCopy());
-        for ($i = 0; $i < $zipArchive->numFiles; $i++) {
-            $pathAndFilenameInZip = $zipArchive->getNameIndex($i);
-            if (substr($pathAndFilenameInZip, -1) === '/') {
-                // Skip directories (everything ending with "/")
-                continue;
-            }
-            $fileContents = stream_get_contents($zipArchive->getStream($pathAndFilenameInZip));
-            $temporaryFilename = $target . DIRECTORY_SEPARATOR . $pathAndFilenameInZip;
-            file_put_contents($temporaryFilename, $fileContents);
-        }
+        $zipArchive->open($content->getZippedContentFile()->createTemporaryLocalCopy());
+        $zipArchive->extractTo($target);
         $zipArchive->close();
     }
 
@@ -209,7 +200,15 @@ class FileAdapter implements \H5PFileStorage
      */
     public function exportLibrary($library, $target)
     {
-        // TODO: Implement once export is enabled as a feature
+        // We essentially need to fetch to contents of the zippedLibraryFile here, and
+        // extract them to another (temporary) location.
+        /** @var Library $library */
+        $library = $this->libraryRepository->findOneByLibraryId($library['libraryId']);
+
+        $zipArchive = new \ZipArchive();
+        $zipArchive->open($library->getZippedLibraryFile()->createTemporaryLocalCopy());
+        $zipArchive->extractTo($target . DIRECTORY_SEPARATOR . $library->getFolderName()); // crazy, but the API does that..
+        $zipArchive->close();
     }
 
     /**
@@ -222,7 +221,15 @@ class FileAdapter implements \H5PFileStorage
      */
     public function saveExport($source, $filename)
     {
-        // TODO: Implement once export is enabled as a feature
+        // Get the content from the filename again
+        $content = $this->getContentFromExportFilename($filename);
+
+        // Import the new export file as a resource
+        $exportResource = $this->resourceManager->importResource($source);
+        $exportResource->setFilename($filename);
+        $exportResource->setMediaType('application/zip');
+        $content->setExportFile($exportResource);
+        $this->contentRepository->update($content);
     }
 
     /**
@@ -545,7 +552,7 @@ class FileAdapter implements \H5PFileStorage
         if (file_exists($path)) {
             unlink($path);
             // Clean up any empty parent directories to avoid cluttering the file system
-            Files::removeEmptyDirectoriesOnPath($path);
+            Files::removeEmptyDirectoriesOnPath(dirname($path));
         }
     }
 
