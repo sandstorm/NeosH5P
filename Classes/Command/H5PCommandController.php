@@ -8,8 +8,11 @@ use Neos\Flow\Cli\Request;
 use Neos\Flow\Cli\Response;
 use Neos\Flow\Exception;
 use Neos\Flow\Mvc\Dispatcher;
+use Neos\Flow\ResourceManagement\ResourceManager;
+use Sandstorm\NeosH5P\Domain\Model\EditorTempfile;
 use Sandstorm\NeosH5P\Domain\Repository\CachedAssetRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ConfigSettingRepository;
+use Sandstorm\NeosH5P\Domain\Repository\EditorTempfileRepository;
 use Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework;
 
 class H5PCommandController extends CommandController
@@ -51,6 +54,12 @@ class H5PCommandController extends CommandController
     protected $cachedAssetRepository;
 
     /**
+     * @Flow\Inject
+     * @var EditorTempfileRepository
+     */
+    protected $editorTempfileRepository;
+
+    /**
      * @var array
      * @Flow\InjectConfiguration(path="defaultConfigSettings")
      */
@@ -61,7 +70,12 @@ class H5PCommandController extends CommandController
      */
     public function clearEditorTempFilesCommand()
     {
-        $this->outputLine("TODO");
+        /** @var EditorTempfile $editorTempFile */
+        foreach ($this->editorTempfileRepository->findAll() as $editorTempFile) {
+            $this->outputLine("Removing ".$editorTempFile->getResource()->getFilename());
+            $this->editorTempfileRepository->remove($editorTempFile);
+        }
+        $this->outputLine("Done.");
     }
 
     /**
