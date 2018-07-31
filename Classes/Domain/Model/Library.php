@@ -309,7 +309,7 @@ class Library
             'preloadedJs' => $this->getPreloadedJs(),
             'preloadedCss' => $this->getPreloadedCss(),
             'dropLibraryCss' => $this->getDropLibraryCss(),
-            'fullscreen' => $this->isFullscreen(),
+            'fullscreen' => $this->getFullscreen(),
             'runnable' => $this->isRunnable(),
             'semantics' => $this->getSemantics(),
             'hasIcon' => $this->hasIcon()
@@ -494,7 +494,7 @@ class Library
     /**
      * @return bool
      */
-    public function isFullscreen(): bool
+    public function getFullscreen(): bool
     {
         return $this->fullscreen;
     }
