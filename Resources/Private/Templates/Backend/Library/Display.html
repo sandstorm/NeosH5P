@@ -14,7 +14,7 @@
             <script src="{script -> f:format.raw()}"></script>
         </f:for>
 
-        <legend>{library.name}</legend>
+        <legend>{library.title}</legend>
 
         <table>
             <tr>
@@ -39,4 +39,24 @@
 
         <f:render partial="ContentTable" arguments="{contents:contentsUsingThisLibrary}" />
     </div>
+
+    <div class="neos-footer">
+        <f:if condition="{library.contents -> f:count()} > 0">
+            <f:then>
+                <button class="neos-button neos-button-danger neos-disabled"
+                        title="Cannot be removed while contents are using it"
+                        href="#">
+                    Uninstall library
+                </button>
+            </f:then>
+            <f:else>
+                <button class="neos-button neos-button-danger" title="Remove this content"
+                        data-toggle="modal" href="#remove-" data-neos-toggle="tooltip">
+                    Uninstall library
+                </button>
+            </f:else>
+        </f:if>
+    </div>
+
+    <f:render partial="DeleteLibraryModal" arguments="{library:library}" />
 </f:section>

@@ -1,0 +1,31 @@
+<div class="neos-hide" id="remove-{index}">
+    <div class="neos-modal-centered">
+        <div class="neos-modal-content">
+            <div class="neos-modal-header">
+                <button type="button" class="neos-close neos-button"
+                        data-dismiss="modal"></button>
+                <div class="neos-header">
+                    Confirm deletion
+                </div>
+                <div>
+                    <div class="neos-subheader">
+                        <p>
+                            {library.name} will be deleted permanently.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="neos-modal-footer">
+                <a href="#" class="neos-button" data-dismiss="modal">Cancel</a>
+                <f:form action="delete" arguments="{library: library}"
+                        class="neos-inline">
+                    <button type="submit" class="neos-button neos-button-danger"
+                            title="Confirm deletion">
+                        Delete
+                    </button>
+                </f:form>
+            </div>
+        </div>
+    </div>
+    <div class="neos-modal-backdrop neos-in"></div>
+</div>

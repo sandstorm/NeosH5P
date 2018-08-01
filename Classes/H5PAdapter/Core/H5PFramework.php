@@ -931,7 +931,8 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function deleteLibrary($library)
     {
-        // TODO: Implement deleteLibrary() method.
+        $this->deleteLibraryDependencies($library->libraryId);
+        $this->libraryRepository->removeByLibraryId($library->libraryId);
     }
 
     /**
