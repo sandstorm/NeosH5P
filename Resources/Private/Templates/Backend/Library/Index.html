@@ -76,7 +76,7 @@
                                     </f:else>
                                 </f:if>
 
-                                <f:render partial="DeleteLibraryModal" arguments="{_all}" />
+                                <f:render partial="DeleteLibraryModal" arguments="{_all}"/>
                             </div>
                         </td>
                     </tr>
@@ -85,5 +85,15 @@
                 </tbody>
             </table>
         </f:widget.paginate>
+    </div>
+
+    <div class="neos-footer">
+        <neos:link.module
+            title="Refresh the H5P content type cache"
+            path="h5p/library"
+            action="refreshcontenttypecache"
+            class="neos-button">
+            Refresh Content Type Cache
+        </neos:link.module>
     </div>
 </f:section>

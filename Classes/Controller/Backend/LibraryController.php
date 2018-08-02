@@ -40,6 +40,12 @@ class LibraryController extends AbstractModuleController {
     protected $libraryCRUDService;
 
     /**
+     * @Flow\Inject
+     * @var \H5PCore
+     */
+    protected $h5pCore;
+
+    /**
      * We add the Neos default partials and layouts here, so we can use them
      * in our backend modules
      *
@@ -90,4 +96,31 @@ class LibraryController extends AbstractModuleController {
         $this->redirect('index', null, null);
         return false;
     }
+
+    public function refreshContentTypeCacheAction()
+    {
+        if ($this->h5pCore->updateContentTypeCache() === false) {
+            $this->addFlashMessage(
+                'The cache could not be refreshed because the H5P Hub did not respond.',
+                '',
+                Message::SEVERITY_ERROR
+            );
+        } else {
+            $this->addFlashMessage('The content type cache was refreshed successfully.');
+        }
+        $this->redirect('index');
+    }
+
+    public function upgradeAction() {
+        // (render progress bar)
+
+        // Hat eigenes template -> in dem template lade ich javascript, das (bei workpress abgucken):
+        // 1. alle zu upgradenden contenttypes runterlädt
+        // 2. upgraded
+        // 3. wieder hochlädt
+
+        // in wordpress sind die ajax endpoints: ajax_upgrade_progress (übernimmt das Umschreiben es Contents), ajax_upgrade_library
+        // display_content_upgrades -> hier wird das settings-array gebaut für den client und die JS-Files geladen
+    }
+
 }
