@@ -1252,7 +1252,7 @@ class H5PFramework implements \H5PFrameworkInterface
         return [
             "name" => "Neos",
             "version" => $this->packageManager->getPackage("Neos.Neos")->getInstalledVersion(),
-            "h5pVersion" => $this->packageManager->getPackage("Sandstorm.NeosH5P")->getInstalledVersion()
+            "h5pVersion" => $this->packageManager->getPackage($this->packageManager->getPackageKeyFromComposerName('h5p/h5p-core'))->getInstalledVersion()
         ];
     }
 
