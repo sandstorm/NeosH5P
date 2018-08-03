@@ -20,4 +20,15 @@ class LibraryRepository extends Repository {
         }
     }
 
+    public function findLibrariesWithNewerVersion(Library $library)
+    {
+        $query = $this->createQuery();
+
+        $query->getQueryBuilder()
+            ->where('e.name = ?0 AND e.libraryId != ?1 AND (e.majorVersion > ?2 OR (e.majorVersion = ?2 AND e.minorVersion > ?3))')
+            ->setParameters([$library->getName(), $library->getLibraryId(), $library->getMajorVersion(), $library->getMinorVersion()]);
+
+        return $query->execute();
+    }
+
 }
