@@ -30,6 +30,8 @@ class LibraryUpgradeService
      */
     public function upgradeAvailable(Library $library)
     {
+        if ($library->getContents()->count() === 0) return false;
+
         $installedLibraries = $this->h5pFramework->loadLibraries();
         $availableUpgrades = $this->h5pCore->getUpgrades($library->toStdClass(), $installedLibraries[$library->getName()]);
 

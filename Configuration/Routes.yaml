@@ -64,7 +64,6 @@
     'libraryName': ''
     'majorVersion': '0'
     'minorVersion': '0'
-  httpMethods: ['POST']
 
 # frontend ajax routes
 -

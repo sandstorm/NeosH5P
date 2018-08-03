@@ -184,6 +184,13 @@ class LibraryController extends AbstractModuleController {
 
         $scriptBaseUrl = $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName . '/js';
 
+        $libraryIndexUri = $this->uriBuilder->reset()->setCreateAbsoluteUri(true)->uriFor(
+            'index',
+            null,
+            'Backend\Library',
+            'Sandstorm.NeosH5P'
+        );
+
         $migrateContentUri = $this->uriGenerationService->buildUriWithMainRequest(
             $this->controllerContext,
             'migrateContent',
@@ -200,6 +207,11 @@ class LibraryController extends AbstractModuleController {
             'Sandstorm.NeosH5P'
         );
 
+        $versions = [];
+        foreach ($libsWithNewerVersion as $library) {
+            $versions[$library->getLibraryId()] = $library->getVersionString();
+        }
+
         $settings = array(
             'containerSelector' => '#h5p-admin-container',
             'libraryInfo' => array(
@@ -210,15 +222,15 @@ class LibraryController extends AbstractModuleController {
                 'errorContent' => 'Could not upgrade content %id:',
                 'errorScript' => 'Could not load upgrades script for %lib.',
                 'errorParamsBroken' => 'Parameters are broken.',
-                'done' => vsprintf('You have successfully upgraded %s. <br/><a href=" %s"> Return </a>', ['[TODO: see wp plugin]', 'www.foo.de']),
+                'done' => vsprintf('You have successfully upgraded %s. <br/><a href=" %s"> Return </a>', ['[TODO: see wp plugin]', $libraryIndexUri]),
                 'library' => [
                     'name' => $library->getName(),
                     'version' => $library->getMajorVersion() . '.' . $library->getMinorVersion()
                 ],
-                'libraryBaseUrl' => $libraryInfoUri . '/',
+                'libraryBaseUrl' => $libraryInfoUri,
                 'scriptBaseUrl' => $scriptBaseUrl,
                 'buster' => '?ver=' . $installedH5pVersion,
-                'versions' => array_map(function ($libraryVersion) {return $libraryVersion->getVersionString();}, $libsWithNewerVersion),
+                'versions' => $versions,
                 'contents' => $numberOfContentsUsingLibrary,
                 'buttonLabel' => 'Upgrade',
                 'infoUrl' => $migrateContentUri,

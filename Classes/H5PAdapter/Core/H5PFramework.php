@@ -51,7 +51,7 @@ class H5PFramework implements \H5PFrameworkInterface
      * Because this object is itself a construction parameter of H5PCore, we cannot use lazy=false as that would lead
      * to a circular DI graph.
      *
-     * @Flow\Inject(lazy=false)
+     * @Flow\Inject
      * @var \H5PCore
      */
     protected $h5pCore;
@@ -518,7 +518,8 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function getNumContent($libraryId)
     {
-        // TODO: Implement getNumContent() method.
+        $library = $this->libraryRepository->findOneByLibraryId($libraryId);
+        return $this->contentRepository->countContents($library);
     }
 
     /**
