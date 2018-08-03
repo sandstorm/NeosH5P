@@ -31,4 +31,18 @@ class LibraryRepository extends Repository {
         return $query->execute();
     }
 
+    /**
+     * @param string $libraryName
+     * @param int $majorVersion
+     * @param int $minorVersion
+     * @return Library
+     */
+    public function findOneByNameMajorVersionAndMinorVersion(string $libraryName, int $majorVersion, int $minorVersion) {
+        return $this->findOneBy([
+            'name' => $libraryName,
+            'majorVersion' => $majorVersion,
+            'minorVersion' => $minorVersion
+        ]);
+    }
+
 }

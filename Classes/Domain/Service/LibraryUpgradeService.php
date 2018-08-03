@@ -13,7 +13,7 @@ class LibraryUpgradeService
 {
 
     /**
-     * @Flow\Inject
+     * @Flow\Inject(lazy=false)
      * @var \H5PCore
      */
     protected $h5pCore;

@@ -56,12 +56,14 @@
   httpMethods: ['POST']
 -
   name: 'H5P Backend content upgrade AJAX - get library info'
-  uriPattern: 'neosh5p/contentupgrade/libraryinfo(/{libraryId})'
+  uriPattern: 'neosh5p/contentupgrade/libraryinfo(/{libraryName}/{majorVersion}/{minorVersion})'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\ContentUpgradeAjax'
     '@action': 'libraryInfo'
-    'libraryId': '0'
+    'libraryName': ''
+    'majorVersion': '0'
+    'minorVersion': '0'
   httpMethods: ['POST']
 
 # frontend ajax routes

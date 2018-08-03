@@ -54,7 +54,7 @@ class LibraryController extends AbstractModuleController {
     protected $libraryCRUDService;
 
     /**
-     * @Flow\Inject
+     * @Flow\Inject(lazy=false)
      * @var \H5PCore
      */
     protected $h5pCore;

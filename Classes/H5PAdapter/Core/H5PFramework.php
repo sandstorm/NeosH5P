@@ -51,7 +51,7 @@ class H5PFramework implements \H5PFrameworkInterface
      * Because this object is itself a construction parameter of H5PCore, we cannot use lazy=false as that would lead
      * to a circular DI graph.
      *
-     * @Flow\Inject
+     * @Flow\Inject(lazy=false)
      * @var \H5PCore
      */
     protected $h5pCore;
@@ -837,11 +837,7 @@ class H5PFramework implements \H5PFrameworkInterface
     public function loadLibrary($machineName, $majorVersion, $minorVersion)
     {
         /** @var Library $library */
-        $library = $this->libraryRepository->findOneBy([
-            'name' => $machineName,
-            'majorVersion' => $majorVersion,
-            'minorVersion' => $minorVersion
-        ]);
+        $library = $this->libraryRepository->findOneByNameMajorVersionAndMinorVersion($machineName, $majorVersion, $minorVersion);
         if ($library === null) {
             return false;
         }
@@ -864,11 +860,7 @@ class H5PFramework implements \H5PFrameworkInterface
     public function loadLibrarySemantics($machineName, $majorVersion, $minorVersion)
     {
         /** @var Library $library */
-        $library = $this->libraryRepository->findOneBy([
-            'name' => $machineName,
-            'majorVersion' => $majorVersion,
-            'minorVersion' => $minorVersion
-        ]);
+        $library = $this->libraryRepository->findOneByNameMajorVersionAndMinorVersion($machineName, $majorVersion, $minorVersion);
         if ($library === null) {
             return null;
         }
