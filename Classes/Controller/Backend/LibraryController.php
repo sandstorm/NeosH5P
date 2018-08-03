@@ -13,6 +13,7 @@ use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
 use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Service\CRUD\LibraryCRUDService;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
+use Sandstorm\NeosH5P\Domain\Service\UriGenerationService;
 
 class LibraryController extends AbstractModuleController {
 
@@ -63,6 +64,12 @@ class LibraryController extends AbstractModuleController {
      * @var PackageManagerInterface
      */
     protected $packageManager;
+
+    /**
+     * @Flow\Inject
+     * @var UriGenerationService
+     */
+    protected $uriGenerationService;
 
     /**
      * We add the Neos default partials and layouts here, so we can use them
@@ -175,6 +182,24 @@ class LibraryController extends AbstractModuleController {
             $this->redirect('index');
         }
 
+        $scriptBaseUrl = $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName . '/js';
+
+        $migrateContentUri = $this->uriGenerationService->buildUriWithMainRequest(
+            $this->controllerContext,
+            'migrateContent',
+            ['oldLibraryId' => $library->getLibraryId()],
+            'Backend\ContentUpgradeAjax',
+            'Sandstorm.NeosH5P'
+        );
+
+        $libraryInfoUri = $this->uriGenerationService->buildUriWithMainRequest(
+            $this->controllerContext,
+            'libraryInfo',
+            null,
+            'Backend\ContentUpgradeAjax',
+            'Sandstorm.NeosH5P'
+        );
+
         $settings = array(
             'containerSelector' => '#h5p-admin-container',
             'libraryInfo' => array(
@@ -190,13 +215,13 @@ class LibraryController extends AbstractModuleController {
                     'name' => $library->getName(),
                     'version' => $library->getMajorVersion() . '.' . $library->getMinorVersion()
                 ],
-                'libraryBaseUrl' => 'www.foo.de',
-                'scriptBaseUrl' => 'www.foo.de',
+                'libraryBaseUrl' => $libraryInfoUri . '/',
+                'scriptBaseUrl' => $scriptBaseUrl,
                 'buster' => '?ver=' . $installedH5pVersion,
                 'versions' => array_map(function ($libraryVersion) {return $libraryVersion->getVersionString();}, $libsWithNewerVersion),
                 'contents' => $numberOfContentsUsingLibrary,
                 'buttonLabel' => 'Upgrade',
-                'infoUrl' => 'www.foo.de',
+                'infoUrl' => $migrateContentUri,
                 'total' => $numberOfContentsUsingLibrary,
                 'token' => 'dummy'
             )
@@ -208,9 +233,9 @@ class LibraryController extends AbstractModuleController {
         $this->view->assign('coreScripts', $coreSettings['core']['scripts']);
         $this->view->assign('library', $library);
         $this->view->assign('adminSettings', json_encode($settings));
-        $this->view->assign('h5pVersionScriptUrl', $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName . '/js/h5p-version.js');
-        $this->view->assign('h5pContentUpgradeScriptUrl', $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName . '/js/h5p-content-upgrade.js');
-        $this->view->assign('h5pUtilsScriptUrl', $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName . '/js/h5p-utils.js');
+        $this->view->assign('h5pVersionScriptUrl', $scriptBaseUrl . '/h5p-version.js');
+        $this->view->assign('h5pContentUpgradeScriptUrl', $scriptBaseUrl . '/h5p-content-upgrade.js');
+        $this->view->assign('h5pUtilsScriptUrl', $scriptBaseUrl . '/h5p-utils.js');
     }
 
 }
