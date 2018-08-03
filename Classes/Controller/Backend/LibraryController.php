@@ -97,6 +97,10 @@ class LibraryController extends AbstractModuleController {
         return false;
     }
 
+    /**
+     * @throws StopActionException
+     * @return bool
+     */
     public function refreshContentTypeCacheAction()
     {
         if ($this->h5pCore->updateContentTypeCache() === false) {
@@ -109,9 +113,15 @@ class LibraryController extends AbstractModuleController {
             $this->addFlashMessage('The content type cache was refreshed successfully.');
         }
         $this->redirect('index');
+        return false;
     }
 
-    public function upgradeAction() {
+    /**
+     * @param Library $library
+     * @throws StopActionException
+     * @return bool
+     */
+    public function upgradeAction(Library $library) {
         // (render progress bar)
 
         // Hat eigenes template -> in dem template lade ich javascript, das (bei workpress abgucken):
@@ -121,6 +131,9 @@ class LibraryController extends AbstractModuleController {
 
         // in wordpress sind die ajax endpoints: ajax_upgrade_progress (übernimmt das Umschreiben es Contents), ajax_upgrade_library
         // display_content_upgrades -> hier wird das settings-array gebaut für den client und die JS-Files geladen
+
+        $this->redirect('index');
+        return false;
     }
 
 }

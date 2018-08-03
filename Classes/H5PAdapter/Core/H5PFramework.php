@@ -561,8 +561,15 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function loadLibraries()
     {
-        // TODO: Implement loadLibraries() method.
-        return [];
+        $installedLibraries = $this->libraryRepository->findAll();
+
+        $versionsArray = array();
+        foreach($installedLibraries as $library) {
+            /** @var Library $library */
+            $versionsArray[$library->getName()][] = $library->toStdClass();
+        }
+
+        return $versionsArray;
     }
 
     /**

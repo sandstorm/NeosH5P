@@ -9,7 +9,7 @@
                 <thead>
                 <tr>
                     <th class="neos-span3">Library</th>
-                    <th class="neos-span1">Restricted</th>
+                    <th class="neos-span1">Version</th>
                     <th class="neos-span1">Contents</th>
                     <th class="neos-span2">Contents using it</th>
                     <th class="neos-span2">Libraries using it</th>
@@ -30,7 +30,7 @@
                             </neos:link.module>
                         </td>
                         <td>
-                            {library.restricted ? "yes" : "no"}
+                            {library.versionString}
                         </td>
                         <td>
                             {library.contentDependencies -> f:count()}
@@ -43,6 +43,16 @@
                         </td>
                         <td class="neos-action">
                             <div class="neos-pull-right">
+                                <f:if condition="{library.upgradeAvailable}">
+                                    <neos:link.module
+                                        title="Upgrade library"
+                                        path="h5p/library"
+                                        action="upgrade"
+                                        arguments="{library:library}"
+                                        additionalAttributes="{data-neos-toggle: 'tooltip', class: 'neos-button neos-button-primary'}">
+                                        <i class="icon-arrow-up icon-white"></i>
+                                    </neos:link.module>
+                                </f:if>
                                 <neos:link.module
                                     title="View Library"
                                     path="h5p/library"

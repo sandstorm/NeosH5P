@@ -7,6 +7,7 @@ use Neos\Flow\Annotations as Flow;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Neos\Flow\ResourceManagement\PersistentResource;
+use Sandstorm\NeosH5P\Domain\Service\LibraryUpgradeService;
 use Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework;
 
 /**
@@ -166,6 +167,12 @@ class Library
     protected $zippedLibraryFile;
 
     /**
+     * @var LibraryUpgradeService
+     * @Flow\Inject
+     */
+    protected $libraryUpgradeService;
+
+    /**
      * Creates a library from a metadata array.
      *
      * @param array $libraryData
@@ -297,13 +304,18 @@ class Library
      */
     public function toAssocArray(): array
     {
+        // the keys majorVersion and major_version are both used within the h5p library classes. Same goes for minor and patch.
         $libraryArray = [
+            'id' => $this->getLibraryId(),
             'libraryId' => $this->getLibraryId(),
             'name' => $this->getName(),
             'machineName' => $this->getName(),
             'title' => $this->getTitle(),
+            'major_version' => $this->getMajorVersion(),
             'majorVersion' => $this->getMajorVersion(),
+            'minor_version' => $this->getMinorVersion(),
             'minorVersion' => $this->getMinorVersion(),
+            'patch_version' => $this->getPatchVersion(),
             'patchVersion' => $this->getPatchVersion(),
             'embedTypes' => $this->getEmbedTypes(),
             'preloadedJs' => $this->getPreloadedJs(),
@@ -345,6 +357,14 @@ class Library
         $this->libraryDependencies = new ArrayCollection();
         $this->libraryTranslations = new ArrayCollection();
         $this->cachedAssets = new ArrayCollection();
+    }
+
+    /**
+     * @return string
+     */
+    public function getVersionString() : string
+    {
+        return $this->getMajorVersion() . '.' . $this->getMinorVersion() . '.' . $this->getPatchVersion();
     }
 
     /**
@@ -729,5 +749,13 @@ class Library
     public function getLibraryId()
     {
         return $this->libraryId;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getUpgradeAvailable()
+    {
+        return $this->libraryUpgradeService->upgradeAvailable($this);
     }
 }
