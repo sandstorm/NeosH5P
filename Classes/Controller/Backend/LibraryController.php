@@ -15,7 +15,8 @@ use Sandstorm\NeosH5P\Domain\Service\CRUD\LibraryCRUDService;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
 use Sandstorm\NeosH5P\Domain\Service\UriGenerationService;
 
-class LibraryController extends AbstractModuleController {
+class LibraryController extends AbstractModuleController
+{
 
     /**
      * @Flow\InjectConfiguration(path="h5pPublicFolder.url")
@@ -145,19 +146,9 @@ class LibraryController extends AbstractModuleController {
     /**
      * @param Library $library
      * @throws StopActionException
-     * @return bool
      */
-    public function upgradeAction(Library $library) {
-        // (render progress bar)
-
-        // Hat eigenes template -> in dem template lade ich javascript, das (bei workpress abgucken):
-        // 1. alle zu upgradenden contenttypes runterlädt
-        // 2. upgraded
-        // 3. wieder hochlädt
-
-        // in wordpress sind die ajax endpoints: ajax_upgrade_progress (übernimmt das Umschreiben es Contents), ajax_upgrade_library
-        // display_content_upgrades -> hier wird das settings-array gebaut für den client und die JS-Files geladen
-
+    public function upgradeAction(Library $library)
+    {
         $packageName = $this->packageManager->getPackageKeyFromComposerName('h5p/h5p-core');
         $installedH5pVersion = $this->packageManager->getPackage($packageName)->getInstalledVersion();
 
@@ -181,13 +172,15 @@ class LibraryController extends AbstractModuleController {
             );
             $this->redirect('index');
         }
+        $numberOfContentsString = $numberOfContentsUsingLibrary == 1 ? '1 content' : "$numberOfContentsUsingLibrary contents";
 
         $scriptBaseUrl = $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName . '/js';
 
-        $libraryIndexUri = $this->uriBuilder->reset()->setCreateAbsoluteUri(true)->uriFor(
-            'index',
+        $libraryInfoUri = $this->uriGenerationService->buildUriWithMainRequest(
+            $this->controllerContext,
+            'libraryInfo',
             null,
-            'Backend\Library',
+            'Backend\ContentUpgradeAjax',
             'Sandstorm.NeosH5P'
         );
 
@@ -199,30 +192,22 @@ class LibraryController extends AbstractModuleController {
             'Sandstorm.NeosH5P'
         );
 
-        $libraryInfoUri = $this->uriGenerationService->buildUriWithMainRequest(
-            $this->controllerContext,
-            'libraryInfo',
-            null,
-            'Backend\ContentUpgradeAjax',
-            'Sandstorm.NeosH5P'
-        );
-
-        $versions = [];
+        $availableVersions = [];
         foreach ($libsWithNewerVersion as $library) {
-            $versions[$library->getLibraryId()] = $library->getVersionString();
+            $availableVersions[$library->getLibraryId()] = $library->getVersionString();
         }
 
         $settings = array(
             'containerSelector' => '#h5p-admin-container',
             'libraryInfo' => array(
-                'message' => sprintf('You are about to upgrade %s. Please select upgrade version.', '[TODO: see wp plugin]'),
+                'message' => "You are about to upgrade $numberOfContentsString to a new library version. Please select the upgrade version.",
                 'inProgress' => 'Upgrading to %ver...',
                 'error' => 'An error occurred while processing parameters:',
                 'errorData' => 'Could not load data for library %lib.',
                 'errorContent' => 'Could not upgrade content %id:',
                 'errorScript' => 'Could not load upgrades script for %lib.',
                 'errorParamsBroken' => 'Parameters are broken.',
-                'done' => vsprintf('You have successfully upgraded %s. <br/><a href=" %s"> Return </a>', ['[TODO: see wp plugin]', $libraryIndexUri]),
+                'done' => "You have successfully upgraded $numberOfContentsString",
                 'library' => [
                     'name' => $library->getName(),
                     'version' => $library->getMajorVersion() . '.' . $library->getMinorVersion()
@@ -230,7 +215,7 @@ class LibraryController extends AbstractModuleController {
                 'libraryBaseUrl' => $libraryInfoUri,
                 'scriptBaseUrl' => $scriptBaseUrl,
                 'buster' => '?ver=' . $installedH5pVersion,
-                'versions' => $versions,
+                'versions' => $availableVersions,
                 'contents' => $numberOfContentsUsingLibrary,
                 'buttonLabel' => 'Upgrade',
                 'infoUrl' => $migrateContentUri,
