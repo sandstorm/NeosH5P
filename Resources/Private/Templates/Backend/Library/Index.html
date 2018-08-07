@@ -62,10 +62,10 @@
                                     <i class="icon-info-sign icon-white"></i>
                                 </neos:link.module>
 
-                                <f:if condition="{library.contents -> f:count()} > 0">
+                                <f:if condition="{library.contents -> f:count()} > 0 || {library.librariesUsingThisLibrary -> f:count()} > 0">
                                     <f:then>
                                         <button class="neos-button neos-button-danger neos-disabled"
-                                                title="Cannot be removed while contents are using it"
+                                                title="Contents or other libraries are using this library"
                                                 href="#">
                                             <i class="icon-trash icon-white"></i>
                                         </button>
