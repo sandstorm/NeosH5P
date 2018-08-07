@@ -149,6 +149,12 @@ class Library
     protected $libraryDependencies;
 
     /**
+     * @var Collection<LibraryDependency>
+     * @ORM\OneToMany(mappedBy="requiredLibrary", cascade={"persist", "remove"})
+     */
+    protected $librariesUsingThisLibrary;
+
+    /**
      * @var Collection<LibraryTranslation>
      * @ORM\OneToMany(mappedBy="library", cascade={"persist", "remove"})
      */
@@ -685,6 +691,14 @@ class Library
     public function setLibraryDependencies(Collection $libraryDependencies): void
     {
         $this->libraryDependencies = $libraryDependencies;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getLibrariesUsingThisLibrary(): Collection
+    {
+        return $this->librariesUsingThisLibrary;
     }
 
     /**
