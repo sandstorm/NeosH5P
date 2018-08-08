@@ -10,4 +10,14 @@ use Sandstorm\NeosH5P\Domain\Model\Library;
  */
 class LibraryRepository extends Repository {
 
+    /**
+     * @param $id
+     */
+    public function removeByLibraryId($id) {
+        $library = $this->findOneByLibraryId($id);
+        if ($library !== null) {
+            $this->remove($library);
+        }
+    }
+
 }

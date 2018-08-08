@@ -3,6 +3,87 @@
 
 <f:section name="content">
     <div class="neos-row-fluid">
-        <legend>TBD</legend>
+        <f:widget.paginate objects="{libraries}" as="paginatedLibraries"
+                           configuration="{itemsPerPage: 30, maximumNumberOfLinks: 7}">
+            <table class="neos-table">
+                <thead>
+                <tr>
+                    <th class="neos-span3">Library</th>
+                    <th class="neos-span1">Restricted</th>
+                    <th class="neos-span1">Contents</th>
+                    <th class="neos-span2">Contents using it</th>
+                    <th class="neos-span2">Libraries using it</th>
+                    <th class="neos-span1">&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <f:for each="{paginatedLibraries}" as="library" key="index">
+                    <tr>
+                        <td>
+                            <neos:link.module
+                                title="View Library"
+                                path="h5p/library"
+                                action="display"
+                                arguments="{library:library}">
+                                {library.title}
+                            </neos:link.module>
+                        </td>
+                        <td>
+                            {library.restricted ? "yes" : "no"}
+                        </td>
+                        <td>
+                            {library.contentDependencies -> f:count()}
+                        </td>
+                        <td>
+                            {library.contents -> f:count()}
+                        </td>
+                        <td>
+                            {library.libraryDependencies -> f:count()}
+                        </td>
+                        <td class="neos-action">
+                            <div class="neos-pull-right">
+                                <neos:link.module
+                                    title="View Library"
+                                    path="h5p/library"
+                                    action="display"
+                                    arguments="{library:library}"
+                                    additionalAttributes="{data-neos-toggle: 'tooltip', class: 'neos-button neos-button-primary'}">
+                                    <i class="icon-info-sign icon-white"></i>
+                                </neos:link.module>
+                                <neos:link.module
+                                    title="Edit Library"
+                                    path="h5p/library"
+                                    action="edit"
+                                    arguments="{content:content}"
+                                    additionalAttributes="{data-neos-toggle: 'tooltip', class: 'neos-button neos-button-primary'}">
+                                    <i class="icon-pencil icon-white"></i>
+                                </neos:link.module>
+
+                                <f:if condition="{library.contents -> f:count()} > 0">
+                                    <f:then>
+                                        <button class="neos-button neos-button-danger neos-disabled"
+                                                title="Cannot be removed while contents are using it"
+                                                href="#">
+                                            <i class="icon-trash icon-white"></i>
+                                        </button>
+                                    </f:then>
+                                    <f:else>
+                                        <button class="neos-button neos-button-danger" title="Remove this content"
+                                                data-toggle="modal" href="#remove-{index}" data-neos-toggle="tooltip">
+                                            <i class="icon-trash icon-white"></i>
+                                        </button>
+                                    </f:else>
+                                </f:if>
+
+                                <f:render partial="DeleteLibraryModal" arguments="{_all}" />
+                            </div>
+                        </td>
+                    </tr>
+                </f:for>
+
+                </tbody>
+            </table>
+        </f:widget.paginate>
     </div>
 </f:section>

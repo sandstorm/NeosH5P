@@ -1,0 +1,62 @@
+{namespace neos=Neos\Neos\ViewHelpers}
+<f:layout name="BackendSubModule" />
+
+<f:section name="content">
+    <div class="neos-row-fluid">
+
+        <f:for each="{styles}" as="style">
+            <link rel="stylesheet" href="{style -> f:format.raw()}"/>
+        </f:for>
+        <script>
+            window.H5PIntegration = {settings -> f:format.raw()};
+        </script>
+        <f:for each="{scripts}" as="script">
+            <script src="{script -> f:format.raw()}"></script>
+        </f:for>
+
+        <legend>{library.title}</legend>
+
+        <table>
+            <tr>
+                <th>Version</th>
+                <td>{library.majorVersion}.{library.minorVersion}.{library.patchVersion}</td>
+            </tr>
+            <tr>
+                <th>Fullscreen</th>
+                <td>{library.fullscreen ? "yes" : "no"}</td>
+            </tr>
+            <tr>
+                <th>Content library</th>
+                <td>TODO</td>
+            </tr>
+            <tr>
+                <th>Used by</th>
+                <td>{contentsUsingThisLibrary -> f:count()}</td>
+            </tr>
+        </table>
+        <br><br><br>
+        <h1>Contents using this library</h1>
+
+        <f:render partial="ContentTable" arguments="{contents:contentsUsingThisLibrary}" />
+    </div>
+
+    <div class="neos-footer">
+        <f:if condition="{library.contents -> f:count()} > 0">
+            <f:then>
+                <button class="neos-button neos-button-danger neos-disabled"
+                        title="Cannot be removed while contents are using it"
+                        href="#">
+                    Uninstall library
+                </button>
+            </f:then>
+            <f:else>
+                <button class="neos-button neos-button-danger" title="Remove this content"
+                        data-toggle="modal" href="#remove-" data-neos-toggle="tooltip">
+                    Uninstall library
+                </button>
+            </f:else>
+        </f:if>
+    </div>
+
+    <f:render partial="DeleteLibraryModal" arguments="{library:library}" />
+</f:section>
