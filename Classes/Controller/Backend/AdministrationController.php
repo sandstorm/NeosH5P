@@ -66,17 +66,4 @@ class AdministrationController extends AbstractModuleController
         ]);
     }
 
-    public function refreshContentTypeCacheAction()
-    {
-        if ($this->h5pCore->updateContentTypeCache() === false) {
-            $this->addFlashMessage(
-                'The cache could not be refreshed because the H5P Hub did not respond.',
-                '',
-                Message::SEVERITY_ERROR
-            );
-        } else {
-            $this->addFlashMessage('The content type cache was refreshed successfully.');
-        }
-        $this->redirect('index');
-    }
 }

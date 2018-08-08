@@ -45,6 +45,26 @@
     '@action': 'fileUpload'
   httpMethods: ['POST']
 
+# backend content upgrade ajax routes
+-
+  name: 'H5P Backend content upgrade AJAX - execute content upgrade'
+  uriPattern: 'neosh5p/contentupgrade/migrate/{oldLibraryId}'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Backend\ContentUpgradeAjax'
+    '@action': 'migrateContent'
+  httpMethods: ['POST']
+-
+  name: 'H5P Backend content upgrade AJAX - get library info'
+  uriPattern: 'neosh5p/contentupgrade/libraryinfo(/{libraryName}/{majorVersion}/{minorVersion})'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Backend\ContentUpgradeAjax'
+    '@action': 'libraryInfo'
+    'libraryName': ''
+    'majorVersion': '0'
+    'minorVersion': '0'
+
 # frontend ajax routes
 -
   name: 'H5P Frontend AJAX - save results'

@@ -518,7 +518,8 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function getNumContent($libraryId)
     {
-        // TODO: Implement getNumContent() method.
+        $library = $this->libraryRepository->findOneByLibraryId($libraryId);
+        return $this->contentRepository->countContents($library);
     }
 
     /**
@@ -561,8 +562,15 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function loadLibraries()
     {
-        // TODO: Implement loadLibraries() method.
-        return [];
+        $installedLibraries = $this->libraryRepository->findAll();
+
+        $versionsArray = array();
+        foreach($installedLibraries as $library) {
+            /** @var Library $library */
+            $versionsArray[$library->getName()][] = $library->toStdClass();
+        }
+
+        return $versionsArray;
     }
 
     /**
@@ -830,11 +838,7 @@ class H5PFramework implements \H5PFrameworkInterface
     public function loadLibrary($machineName, $majorVersion, $minorVersion)
     {
         /** @var Library $library */
-        $library = $this->libraryRepository->findOneBy([
-            'name' => $machineName,
-            'majorVersion' => $majorVersion,
-            'minorVersion' => $minorVersion
-        ]);
+        $library = $this->libraryRepository->findOneByNameMajorVersionAndMinorVersion($machineName, $majorVersion, $minorVersion);
         if ($library === null) {
             return false;
         }
@@ -857,11 +861,7 @@ class H5PFramework implements \H5PFrameworkInterface
     public function loadLibrarySemantics($machineName, $majorVersion, $minorVersion)
     {
         /** @var Library $library */
-        $library = $this->libraryRepository->findOneBy([
-            'name' => $machineName,
-            'majorVersion' => $majorVersion,
-            'minorVersion' => $minorVersion
-        ]);
+        $library = $this->libraryRepository->findOneByNameMajorVersionAndMinorVersion($machineName, $majorVersion, $minorVersion);
         if ($library === null) {
             return null;
         }

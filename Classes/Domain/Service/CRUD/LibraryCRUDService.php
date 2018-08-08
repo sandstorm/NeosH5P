@@ -23,6 +23,16 @@ class LibraryCRUDService
     protected $h5pCore;
 
     /**
+     * Upgrades a library to its newest version
+     *
+     * @param Library $library
+     */
+    public function handleUpgrade(Library $library)
+    {
+
+    }
+
+    /**
      * Deletes an already existing library.
      *
      * @param Library $library

@@ -1,0 +1,32 @@
+{namespace neos=Neos\Neos\ViewHelpers}
+<f:layout name="BackendSubModule" />
+
+<f:section name="content">
+    <div class="neos-row-fluid">
+
+        <script>
+            window.H5PAdminIntegration = {adminSettings -> f:format.raw()};
+            window.H5PIntegration = {coreSettings -> f:format.raw()};
+        </script>
+
+        <f:for each="{coreScripts}" as="script">
+            <script src="{script}" charset="UTF-8"></script>
+        </f:for>
+        <script src="{h5pVersionScriptUrl}" charset="UTF-8"></script>
+        <script src="{h5pContentUpgradeScriptUrl}" charset="UTF-8"></script>
+        <script src="{h5pUtilsScriptUrl}" charset="UTF-8"></script>
+
+        <legend>{library.title}</legend>
+
+        <div id="h5p-admin-container">Please enable JavaScript.</div>
+
+        <div class="neos-footer">
+            <neos:link.module
+                title="Back to overview"
+                path="h5p/library"
+                action="index"
+                class="neos-button">
+                Back
+            </neos:link.module>
+        </div>
+</f:section>

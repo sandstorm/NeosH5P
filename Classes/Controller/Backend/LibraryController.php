@@ -5,6 +5,7 @@ namespace Sandstorm\NeosH5P\Controller\Backend;
 use Neos\Error\Messages\Message;
 use Neos\Flow\Mvc\Exception\StopActionException;
 use Neos\Flow\Mvc\View\ViewInterface;
+use Neos\Flow\Package\PackageManagerInterface;
 use Neos\Neos\Controller\Module\AbstractModuleController;
 use Sandstorm\NeosH5P\Domain\Model\Library;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
@@ -12,8 +13,22 @@ use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
 use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Service\CRUD\LibraryCRUDService;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
+use Sandstorm\NeosH5P\Domain\Service\UriGenerationService;
 
-class LibraryController extends AbstractModuleController {
+class LibraryController extends AbstractModuleController
+{
+
+    /**
+     * @Flow\InjectConfiguration(path="h5pPublicFolder.url")
+     * @var string
+     */
+    protected $h5pPublicFolderUrl;
+
+    /**
+     * @Flow\InjectConfiguration(path="h5pPublicFolder.subfolders.core")
+     * @var string
+     */
+    protected $h5pCorePublicFolderName;
 
     /**
      * @Flow\Inject
@@ -38,6 +53,24 @@ class LibraryController extends AbstractModuleController {
      * @var LibraryCRUDService
      */
     protected $libraryCRUDService;
+
+    /**
+     * @Flow\Inject(lazy=false)
+     * @var \H5PCore
+     */
+    protected $h5pCore;
+
+    /**
+     * @Flow\Inject
+     * @var PackageManagerInterface
+     */
+    protected $packageManager;
+
+    /**
+     * @Flow\Inject
+     * @var UriGenerationService
+     */
+    protected $uriGenerationService;
 
     /**
      * We add the Neos default partials and layouts here, so we can use them
@@ -90,4 +123,116 @@ class LibraryController extends AbstractModuleController {
         $this->redirect('index', null, null);
         return false;
     }
+
+    /**
+     * @throws StopActionException
+     * @return bool
+     */
+    public function refreshContentTypeCacheAction()
+    {
+        if ($this->h5pCore->updateContentTypeCache() === false) {
+            $this->addFlashMessage(
+                'The cache could not be refreshed because the H5P Hub did not respond.',
+                '',
+                Message::SEVERITY_ERROR
+            );
+        } else {
+            $this->addFlashMessage('The content type cache was refreshed successfully.');
+        }
+        $this->redirect('index');
+        return false;
+    }
+
+    /**
+     * @param Library $library
+     * @throws StopActionException
+     */
+    public function upgradeAction(Library $library)
+    {
+        $packageName = $this->packageManager->getPackageKeyFromComposerName('h5p/h5p-core');
+        $installedH5pVersion = $this->packageManager->getPackage($packageName)->getInstalledVersion();
+
+        $libsWithNewerVersion = $this->libraryRepository->findLibrariesWithNewerVersion($library)->toArray();
+
+        if (empty($libsWithNewerVersion)) {
+            $this->addFlashMessage(
+                'There are no available upgrades for this library.',
+                '',
+                Message::SEVERITY_ERROR
+            );
+            $this->redirect('index');
+        }
+
+        $numberOfContentsUsingLibrary = $library->getContents()->count();
+        if ($numberOfContentsUsingLibrary == 0) {
+            $this->addFlashMessage(
+                'There\'s no content instances to upgrade.',
+                '',
+                Message::SEVERITY_ERROR
+            );
+            $this->redirect('index');
+        }
+        $numberOfContentsString = $numberOfContentsUsingLibrary == 1 ? '1 content' : "$numberOfContentsUsingLibrary contents";
+
+        $scriptBaseUrl = $this->h5pPublicFolderUrl . $this->h5pCorePublicFolderName . '/js';
+
+        $libraryInfoUri = $this->uriGenerationService->buildUriWithMainRequest(
+            $this->controllerContext,
+            'libraryInfo',
+            null,
+            'Backend\ContentUpgradeAjax',
+            'Sandstorm.NeosH5P'
+        );
+
+        $migrateContentUri = $this->uriGenerationService->buildUriWithMainRequest(
+            $this->controllerContext,
+            'migrateContent',
+            ['oldLibraryId' => $library->getLibraryId()],
+            'Backend\ContentUpgradeAjax',
+            'Sandstorm.NeosH5P'
+        );
+
+        $availableVersions = [];
+        foreach ($libsWithNewerVersion as $library) {
+            $availableVersions[$library->getLibraryId()] = $library->getVersionString();
+        }
+
+        $settings = array(
+            'containerSelector' => '#h5p-admin-container',
+            'libraryInfo' => array(
+                'message' => "You are about to upgrade $numberOfContentsString to a new library version. Please select the upgrade version.",
+                'inProgress' => 'Upgrading to %ver...',
+                'error' => 'An error occurred while processing parameters:',
+                'errorData' => 'Could not load data for library %lib.',
+                'errorContent' => 'Could not upgrade content %id:',
+                'errorScript' => 'Could not load upgrades script for %lib.',
+                'errorParamsBroken' => 'Parameters are broken.',
+                'done' => "You have successfully upgraded $numberOfContentsString",
+                'library' => [
+                    'name' => $library->getName(),
+                    'version' => $library->getMajorVersion() . '.' . $library->getMinorVersion()
+                ],
+                'libraryBaseUrl' => $libraryInfoUri,
+                'scriptBaseUrl' => $scriptBaseUrl,
+                'buster' => '?ver=' . $installedH5pVersion,
+                'versions' => $availableVersions,
+                'contents' => $numberOfContentsUsingLibrary,
+                'buttonLabel' => 'Upgrade',
+                'infoUrl' => $migrateContentUri,
+                'total' => $numberOfContentsUsingLibrary,
+                'token' => 'dummy'
+            )
+        );
+
+        $coreSettings = $this->h5pIntegrationService->getSettings($this->controllerContext);
+
+        $this->view->assign('coreSettings', json_encode($coreSettings));
+        $this->view->assign('coreScripts', $coreSettings['core']['scripts']);
+        $this->view->assign('library', $library);
+        $this->view->assign('adminSettings', json_encode($settings));
+        $this->view->assign('h5pVersionScriptUrl', $scriptBaseUrl . '/h5p-version.js');
+        $this->view->assign('h5pContentUpgradeScriptUrl', $scriptBaseUrl . '/h5p-content-upgrade.js');
+        $this->view->assign('h5pUtilsScriptUrl', $scriptBaseUrl . '/h5p-utils.js');
+    }
+
 }

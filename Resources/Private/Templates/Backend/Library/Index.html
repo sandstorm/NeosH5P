@@ -8,8 +8,8 @@
             <table class="neos-table">
                 <thead>
                 <tr>
-                    <th class="neos-span3">Library</th>
-                    <th class="neos-span1">Restricted</th>
+                    <th class="neos-span5">Library</th>
+                    <th class="neos-span1">Version</th>
                     <th class="neos-span1">Contents</th>
                     <th class="neos-span2">Contents using it</th>
                     <th class="neos-span2">Libraries using it</th>
@@ -30,7 +30,7 @@
                             </neos:link.module>
                         </td>
                         <td>
-                            {library.restricted ? "yes" : "no"}
+                            {library.versionString}
                         </td>
                         <td>
                             {library.contentDependencies -> f:count()}
@@ -39,10 +39,20 @@
                             {library.contents -> f:count()}
                         </td>
                         <td>
-                            {library.libraryDependencies -> f:count()}
+                            {library.librariesUsingThisLibrary -> f:count()}
                         </td>
                         <td class="neos-action">
                             <div class="neos-pull-right">
+                                <f:if condition="{library.upgradeAvailable}">
+                                    <neos:link.module
+                                        title="Upgrade library"
+                                        path="h5p/library"
+                                        action="upgrade"
+                                        arguments="{library:library}"
+                                        additionalAttributes="{data-neos-toggle: 'tooltip', class: 'neos-button neos-button-primary'}">
+                                        <i class="icon-arrow-up icon-white"></i>
+                                    </neos:link.module>
+                                </f:if>
                                 <neos:link.module
                                     title="View Library"
                                     path="h5p/library"
@@ -51,19 +61,11 @@
                                     additionalAttributes="{data-neos-toggle: 'tooltip', class: 'neos-button neos-button-primary'}">
                                     <i class="icon-info-sign icon-white"></i>
                                 </neos:link.module>
-                                <neos:link.module
-                                    title="Edit Library"
-                                    path="h5p/library"
-                                    action="edit"
-                                    arguments="{content:content}"
-                                    additionalAttributes="{data-neos-toggle: 'tooltip', class: 'neos-button neos-button-primary'}">
-                                    <i class="icon-pencil icon-white"></i>
-                                </neos:link.module>
 
-                                <f:if condition="{library.contents -> f:count()} > 0">
+                                <f:if condition="{library.contents -> f:count()} > 0 || {library.librariesUsingThisLibrary -> f:count()} > 0">
                                     <f:then>
                                         <button class="neos-button neos-button-danger neos-disabled"
-                                                title="Cannot be removed while contents are using it"
+                                                title="Contents or other libraries are using this library"
                                                 href="#">
                                             <i class="icon-trash icon-white"></i>
                                         </button>
@@ -76,7 +78,7 @@
                                     </f:else>
                                 </f:if>
 
-                                <f:render partial="DeleteLibraryModal" arguments="{_all}" />
+                                <f:render partial="DeleteLibraryModal" arguments="{_all}"/>
                             </div>
                         </td>
                     </tr>
@@ -85,5 +87,15 @@
                 </tbody>
             </table>
         </f:widget.paginate>
+    </div>
+
+    <div class="neos-footer">
+        <neos:link.module
+            title="Refresh the H5P content type cache"
+            path="h5p/library"
+            action="refreshcontenttypecache"
+            class="neos-button">
+            Refresh Content Type Cache
+        </neos:link.module>
     </div>
 </f:section>

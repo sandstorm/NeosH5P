@@ -101,6 +101,12 @@ class H5PIntegrationService
     protected $contentRepository;
 
     /**
+     * @Flow\Inject
+     * @var UriGenerationService
+     */
+    protected $uriGenerationService;
+
+    /**
      * Returns an array with a set of core settings that the H5P JavaScript needs
      * to do its thing. Can also include editor settings.
      *
@@ -180,7 +186,7 @@ class H5PIntegrationService
     {
         $currentAccount = $this->securityContext->getAccount();
 
-        $saveResultAction = $this->buildUri(
+        $saveResultAction = $this->uriGenerationService->buildUriWithMainRequest(
             $controllerContext,
             'save',
             [],
@@ -188,7 +194,7 @@ class H5PIntegrationService
             'Sandstorm.NeosH5P'
         );
 
-        $saveUserDataAction = $this->buildUri(
+        $saveUserDataAction = $this->uriGenerationService->buildUriWithMainRequest(
             $controllerContext,
             'save',
             [],
@@ -238,7 +244,7 @@ class H5PIntegrationService
      */
     private function generateEditorSettings(ControllerContext $controllerContext, int $contentId = -1): array
     {
-        $editorAjaxAction = $this->buildUri(
+        $editorAjaxAction = $this->uriGenerationService->buildUriWithMainRequest(
             $controllerContext,
             'index',
             [],
@@ -286,7 +292,7 @@ class H5PIntegrationService
         }
         $contentArray = $content->toAssocArray();
 
-        $embedUrl = $this->buildUri(
+        $embedUrl = $this->uriGenerationService->buildUriWithMainRequest(
             $controllerContext,
             'index',
             ['contentId' => $contentId],
@@ -442,38 +448,5 @@ class H5PIntegrationService
     private function getBaseUri(ControllerContext $cc): string
     {
         return $cc->getRequest()->getMainRequest()->getHttpRequest()->getBaseUri()->__toString();
-    }
-
-    /**
-     * Extracts the UriBuilder from the provided controller context, retrieves the main request, sets it on the uribuilder
-     * so uris are built without the backend interfering (in case we're in a subrequest) and re-sets the original request
-     * on the uribuilder so building can continue elsewhere in Neos.
-     *
-     * @param ControllerContext $controllerContext
-     * @param string $actionName Name of the action to be called
-     * @param array $controllerArguments Additional query parameters. Will be merged with $this->arguments.
-     * @param string $controllerName Name of the target controller. If not set, current ControllerName is used.
-     * @param string $packageKey Name of the target package. If not set, current Package is used.
-     * @param string $subPackageKey Name of the target SubPackage. If not set, current SubPackage is used.
-     * @return string the rendered URI
-     */
-    private function buildUri(ControllerContext $controllerContext, $actionName, $controllerArguments = [], $controllerName = null, $packageKey = null, $subPackageKey = null): string
-    {
-        // Get the main request for URI building
-        $mainRequest = $controllerContext->getRequest()->getMainRequest();
-        $uriBuilder = $controllerContext->getUriBuilder();
-        // Temporarily set the request to the main request so we get the correct URI
-        $uriBuilder->setRequest($mainRequest);
-        $uri = $uriBuilder->reset()->setCreateAbsoluteUri(true)->uriFor(
-            $actionName,
-            $controllerArguments,
-            $controllerName,
-            $packageKey,
-            $subPackageKey
-        );
-        // Reset the URIBuilder to the subrequest to not mess with the backend module routing
-        $uriBuilder->setRequest($controllerContext->getRequest());
-
-        return $uri;
     }
 }
