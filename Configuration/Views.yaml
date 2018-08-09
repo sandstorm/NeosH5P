@@ -1,0 +1,18 @@
+-
+  requestFilter: 'isFormat("html") && isPackage("Sandstorm.NeosH5P") && isController("Backend\Content")'
+  options:
+    templatePathAndFilenamePattern: '@templateRoot/@subpackage/backend/content/FullscreenEditor/@action.@format'
+    layoutRootPaths:
+      'Neos.Neos': 'resource://Neos.Neos/Private/Layouts'
+    partialRootPaths:
+      'Neos.Neos': 'resource://Neos.Neos/Private/Partials'
+      'Sandstorm.NeosH5P': 'resource://Sandstorm.NeosH5P/Private/Partials'
+
+-
+  requestFilter: 'parentRequest.isPackage("Neos.Neos") && isFormat("html") && isPackage("Sandstorm.NeosH5P")'
+  options:
+    layoutRootPaths:
+      'Neos.Neos': 'resource://Neos.Neos/Private/Layouts'
+    partialRootPaths:
+      'Neos.Neos': 'resource://Neos.Neos/Private/Partials'
+      'Sandstorm.NeosH5P': 'resource://Sandstorm.NeosH5P/Private/Partials'
