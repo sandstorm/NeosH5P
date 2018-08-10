@@ -1,16 +1,14 @@
 {namespace neos=Neos\Neos\ViewHelpers}
-<f:layout name="BackendSubModule" />
+<f:layout name="BackendSubModule"/>
 
 <f:section name="subtitle">
     <div class="neos-module-container">
-        <h2>Create a new H5P content element</h2>
+        <h2>Edit an H5P content element</h2>
     </div>
 </f:section>
 
 <f:section name="content">
-    <f:comment>
-        TODO: replace this create-action so it will be handled by the React component ContentPickerEditor
-    <f:form action="create" controller="Backend\Content" id="h5p-content-form">
+    <f:form action="update" controller="Backend\Content" id="h5p-content-form">
         <div class="neos-row-fluid">
             <f:comment>
                 Later: Move form to partial
@@ -27,7 +25,7 @@
                     <label class="neos-control-label" for="title">Title</label>
                     <div class="neos-controls">
                         <f:form.textfield required="true" class="neos-span6" id="title" name="title"
-                                          placeholder="Enter a title for your new H5P content"/>
+                                          value="{content.title}" placeholder="Enter a title for your new H5P content"/>
                     </div>
                 </div>
 
@@ -68,9 +66,9 @@
                     </div>
                 </div>
 
-                <f:form.hidden id="h5p-library" name="library" value="0" />
-                <f:form.hidden id="h5p-parameters" name="parameters" value="{}" />
-
+                <f:form.hidden id="h5p-library" name="library" value="{content.library.string}" />
+                <f:form.hidden id="h5p-parameters" name="parameters" value="{content.filtered}" />
+                <f:form.hidden id="h5p-content" name="contentId" value="{content.contentId}" />
             </fieldset>
         </div>
         <div class="neos-footer">
@@ -81,10 +79,9 @@
                 class="neos-button">
                 Cancel
             </neos:link.module>
-            <f:form.submit name="submit" value="Create H5P Content" class="neos-button neos-button-primary"/>
+            <f:form.submit name="submit" value="Save" class="neos-button neos-button-primary"/>
         </div>
     </f:form>
-    </f:comment>
 
     <f:for each="{styles}" as="style">
         <link rel="stylesheet" href="{style -> f:format.raw()}"/>

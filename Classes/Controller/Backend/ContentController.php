@@ -50,6 +50,7 @@ class ContentController extends AbstractModuleController
     {
         $contents = $this->contentRepository->findAll();
         $this->view->assign('contents', $contents);
+        $this->view->assign('isRenderedInFullscreenEditor', $this->request->isMainRequest());
     }
 
     /**
@@ -103,6 +104,7 @@ class ContentController extends AbstractModuleController
         $this->view->assign('settings', json_encode($h5pIntegrationSettings));
         $this->view->assign('scripts', $h5pIntegrationSettings['core']['scripts']);
         $this->view->assign('styles', $h5pIntegrationSettings['core']['styles']);
+        $this->view->assign('isRenderedInFullscreenEditor', $this->request->isMainRequest());
     }
 
     /**
@@ -120,12 +122,14 @@ class ContentController extends AbstractModuleController
         }
 
         $content = $this->contentCRUDService->handleCreateOrUpdate($title, $library, $parameters);
-        if ($content === null) {
-            $this->showH5pErrorMessages();
-            $this->redirect('index');
-        } else {
-            $this->addFlashMessage('The content "%s" has been created.', 'Content created', Message::SEVERITY_OK, [$content->getTitle()]);
-            $this->redirect('display', null, null, ['content' => $content]);
+        if (!$this->request->isMainRequest()) {
+            if ($content === null) {
+                $this->showH5pErrorMessages();
+                $this->redirect('index');
+            } else {
+                $this->addFlashMessage('The content "%s" has been created.', 'Content created', Message::SEVERITY_OK, [$content->getTitle()]);
+                $this->redirect('display', null, null, ['content' => $content]);
+            }
         }
     }
 

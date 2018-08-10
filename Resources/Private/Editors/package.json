@@ -1,0 +1,16 @@
+{
+    "scripts": {
+        "build": "neos-react-scripts build",
+        "watch": "neos-react-scripts watch"
+    },
+    "neos": {
+        "buildTargetDirectory": "../../Public/ContentPickerEditor"
+    },
+    "devDependencies": {
+        "@neos-project/neos-ui-extensibility": "^1.0.0"
+    },
+    "dependencies": {
+        "@neos-project/react-ui-components": "^1.3.2",
+        "react-color": "^2.11.1"
+    }
+}

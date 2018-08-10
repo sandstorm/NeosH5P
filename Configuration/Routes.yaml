@@ -92,3 +92,39 @@
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Frontend\ContentEmbed'
     '@action': 'index'
+
+# neos inspector routes
+-
+  name: 'H5P Neos inspector - Add a new H5P Content'
+  uriPattern: 'neosh5p/content/add'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Backend\Content'
+    '@action': 'new'
+-
+  name: 'H5P Neos inspector - Edit an existing H5P Content'
+  uriPattern: 'neosh5p/content/edit/{content}'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Backend\Content'
+    '@action': 'edit'
+  routeParts:
+      content:
+        objectType: 'Sandstorm\NeosH5P\Domain\Model\Content'
+-
+  name: 'H5P Neos inspector - Display the details screen of a content element'
+  uriPattern: 'neosh5p/content/display/{content}'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Backend\Content'
+    '@action': 'display'
+  routeParts:
+      content:
+        objectType: 'Sandstorm\NeosH5P\Domain\Model\Content'
+-
+  name: 'H5P Neos inspector - Show the list of available contents'
+  uriPattern: 'neosh5p/content/list'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Backend\Content'
+    '@action': 'index'

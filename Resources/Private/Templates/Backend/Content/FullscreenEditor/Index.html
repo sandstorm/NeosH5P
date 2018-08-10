@@ -1,0 +1,21 @@
+{namespace neos=Neos\Neos\ViewHelpers}
+<html>
+<head>
+    <link rel="stylesheet" type="text/css"
+          href="{f:uri.resource(path: 'Styles/Includes-built.css', package: 'Neos.Neos')}?bust={neos:backend.cssBuiltVersion()}"/>
+</head>
+<body class="neos">
+<div class="neos-row-fluid">
+    <f:render partial="ContentTable" arguments="{_all}"/>
+</div>
+<div class="neos-footer">
+    <neos:link.module
+        title="New H5P Content"
+        class="neos-button neos-button-primary"
+        path="h5p/content"
+        action="new">
+        New H5P Content
+    </neos:link.module>
+</div>
+</body>
+</html>

@@ -3,6 +3,7 @@
 namespace Sandstorm\NeosH5P\DataSource;
 
 use Neos\ContentRepository\Domain\Model\NodeInterface;
+use Neos\Flow\Persistence\PersistenceManagerInterface;
 use Neos\Neos\Service\DataSource\AbstractDataSource;
 use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Model\Content;
@@ -22,30 +23,24 @@ class ContentDataSource extends AbstractDataSource
     protected $contentRepository;
 
     /**
+     * @Flow\Inject
+     * @var PersistenceManagerInterface
+     */
+    protected $persistenceManager;
+
+    /**
      * @param NodeInterface|null $node
      * @param array $arguments
      * @return array
      */
     public function getData(NodeInterface $node = null, array $arguments)
     {
-        $contents = $this->contentRepository->findAll()->toArray();
-        return array_map(function ($content) {
-            /** @var Content $content */
-            return [
-                'value' => $content->getContentId(),
-                'label' => $content->getTitle(),
-                'group' => $content->getLibrary()->getTitle()
-            ];
-        }, $contents);
+        $content = $this->contentRepository->findOneByContentId($arguments['contentId']);
 
-
-        $formDefinitions['']['label'] = '';
-        $forms = $this->yamlPersistenceManager->listForms();
-
-        foreach ($forms as $form) {
-            $formDefinitions[$form['identifier']]['label'] = $form['name'];
-        }
-
-        return $formDefinitions;
+        return [
+            'persistenceObjectIdentifier' => $this->persistenceManager->getIdentifierByObject($content),
+            'contentTitle' => $content->getTitle(),
+            'libraryTitle' => $content->getLibrary()->getTitle()
+        ];
     }
 }
