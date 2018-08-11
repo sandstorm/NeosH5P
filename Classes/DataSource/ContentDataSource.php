@@ -35,10 +35,12 @@ class ContentDataSource extends AbstractDataSource
      */
     public function getData(NodeInterface $node = null, array $arguments)
     {
+        /** @var Content $content */
         $content = $this->contentRepository->findOneByContentId($arguments['contentId']);
 
         return [
             'persistenceObjectIdentifier' => $this->persistenceManager->getIdentifierByObject($content),
+            'contentId' => $content->getContentId(),
             'contentTitle' => $content->getTitle(),
             'libraryTitle' => $content->getLibrary()->getTitle()
         ];

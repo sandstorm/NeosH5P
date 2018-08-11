@@ -1,0 +1,24 @@
+<head>
+    <link rel="stylesheet" type="text/css"
+          href="{f:uri.resource(path: 'Styles/Includes-built.css', package: 'Neos.Neos')}?bust={neos:backend.cssBuiltVersion()}"/>
+    <link rel="stylesheet" type="text/css"
+          href="{f:uri.resource(path: 'Styles/FullscreenEditor.css', package: 'Sandstorm.NeosH5P')}"/>
+    <script type="text/javascript">
+        function contentPicked(contentId, contentTitle) {
+            if (window.parent !== window && window.parent.NeosH5PBrowserCallbacks && window.parent.NeosH5PBrowserCallbacks.contentPicked) {
+                window.parent.NeosH5PBrowserCallbacks.contentPicked({contentId, contentTitle});
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.parent.NeosH5PBrowserCallbacks && window.parent.NeosH5PBrowserCallbacks.currentContent) {
+                const selector = '.h5p-content-table tr[data-contentId="' + window.parent.NeosH5PBrowserCallbacks.currentContent.contentId + '"]';
+                const element = document.querySelector(selector);
+                if (element) {
+                    element.classList.add("h5p-current-content");
+                }
+            }
+        });
+
+    </script>
+</head>

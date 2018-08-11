@@ -12,9 +12,9 @@ export default class ContentAddEditScreen extends PureComponent {
     render() {
         // TODO: Remove all inline styles and put them into a css file
         if (this.props.contentPersistenceObjectId !== '') {
-            return <iframe src="http://127.0.0.1:8081/neosh5p/content/add" style={{width: "100%", height: "100%"}}/>
+            return <iframe src="http://127.0.0.1:8081/neosh5p/contentfullscreeneditor/add" style={{width: "100%", height: "100%"}}/>
         } else {
-            return <iframe src={"http://127.0.0.1:8081/neosh5p/content/edit/contentPersistenceObjectId"} style={{width: "100%", height: "100%"}}/>
+            return <iframe src={"http://127.0.0.1:8081/neosh5p/contentfullscreeneditor/edit/contentPersistenceObjectId"} style={{width: "100%", height: "100%"}}/>
         }
     }
 }

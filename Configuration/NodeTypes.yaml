@@ -14,7 +14,7 @@ Sandstorm.NeosH5P:H5PContent:
         h5pcontent:
           label: 'H5P Content'
           tab: 'h5pcontent'
-          position: 1'
+          position: 1
   properties:
     contentId:
       type: string

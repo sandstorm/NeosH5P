@@ -96,34 +96,41 @@
 # neos inspector routes
 -
   name: 'H5P Neos inspector - Add a new H5P Content'
-  uriPattern: 'neosh5p/content/add'
+  uriPattern: 'neosh5p/contentfullscreeneditor/new'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\Content'
     '@action': 'new'
 -
+  name: 'H5P Neos inspector - Add a new H5P Content'
+  uriPattern: 'neosh5p/contentfullscreeneditor/create'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Backend\Content'
+    '@action': 'create'
+-
   name: 'H5P Neos inspector - Edit an existing H5P Content'
-  uriPattern: 'neosh5p/content/edit/{content}'
+  uriPattern: 'neosh5p/contentfullscreeneditor/edit/{content}'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\Content'
     '@action': 'edit'
-  routeParts:
-      content:
-        objectType: 'Sandstorm\NeosH5P\Domain\Model\Content'
+#  routeParts:
+#    content:
+#      objectType: 'Sandstorm\NeosH5P\Domain\Model\Content'
 -
   name: 'H5P Neos inspector - Display the details screen of a content element'
-  uriPattern: 'neosh5p/content/display/{content}'
+  uriPattern: 'neosh5p/contentfullscreeneditor/display/{content}'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\Content'
     '@action': 'display'
-  routeParts:
-      content:
-        objectType: 'Sandstorm\NeosH5P\Domain\Model\Content'
+#  routeParts:
+#    content:
+#      objectType: 'Sandstorm\NeosH5P\Domain\Model\Content'
 -
   name: 'H5P Neos inspector - Show the list of available contents'
-  uriPattern: 'neosh5p/content/list'
+  uriPattern: 'neosh5p/contentfullscreeneditor/index'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\Content'

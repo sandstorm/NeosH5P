@@ -1,21 +1,19 @@
 {namespace neos=Neos\Neos\ViewHelpers}
 <html>
-<head>
-    <link rel="stylesheet" type="text/css"
-          href="{f:uri.resource(path: 'Styles/Includes-built.css', package: 'Neos.Neos')}?bust={neos:backend.cssBuiltVersion()}"/>
-</head>
-<body class="neos">
+<f:render partial="FullscreenEditorHead" arguments="{_all}"/>
+<body class="neos neos-module h5p-fullscreen-editor">
 <div class="neos-row-fluid">
     <f:render partial="ContentTable" arguments="{_all}"/>
 </div>
 <div class="neos-footer">
-    <neos:link.module
+    <f:link.action
         title="New H5P Content"
         class="neos-button neos-button-primary"
-        path="h5p/content"
+        package="Sandstorm.NeosH5P"
+        controller="Backend\Content"
         action="new">
         New H5P Content
-    </neos:link.module>
+    </f:link.action>
 </div>
 </body>
 </html>

@@ -1,0 +1,15 @@
+.neos.neos-module.h5p-fullscreen-editor .neos-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+}
+
+.neos.neos-module.h5p-fullscreen-editor table td > .neos-pull-right > .neos-button.neos-button-primary {
+    background: #444;
+}
+
+.h5p-content-table tr.h5p-current-content td {
+    background: #444;
+}

@@ -20,6 +20,6 @@ export default class ContentDisplayScreen extends PureComponent {
         };
 
         // TODO: Remove all inline styles and put them into a css file
-        return <iframe src={"http://127.0.0.1:8081/neosh5p/content/display/" + this.props.contentPersistenceObjectId} style={{width: "100%", height: "100%"}}/>
+        return <iframe src={"/neosh5p/contentfullscreeneditor/display/" + this.props.contentPersistenceObjectId} style={{width: "100%", height: "100%"}}/>
     }
 }

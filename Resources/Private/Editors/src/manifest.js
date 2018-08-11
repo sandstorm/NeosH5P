@@ -1,8 +1,6 @@
 import manifest from '@neos-project/neos-ui-extensibility'
-import ContentAddEditScreen from './ContentAddEditScreen'
-import ContentDisplayScreen from './ContentDisplayScreen'
-import ContentListScreen from './ContentListScreen'
-import ContentPickerEditor from './ContentPickerEditor'
+import ContentFullscreenEditor from './ContentFullscreenEditor/index'
+import ContentPickerEditor from './ContentPickerEditor/index'
 
 manifest('Sandstorm.NeosH5P:ContentPickerEditor', {}, globalRegistry => {
     const editorsRegistry = globalRegistry.get('inspector').get('editors');
@@ -12,15 +10,7 @@ manifest('Sandstorm.NeosH5P:ContentPickerEditor', {}, globalRegistry => {
         component: ContentPickerEditor
     });
 
-    secondaryEditorsRegistry.set('Sandstorm.NeosH5P/ContentAddEditScreen', {
-        component: ContentAddEditScreen
-    });
-
-    secondaryEditorsRegistry.set('Sandstorm.NeosH5P/ContentDisplayScreen', {
-        component: ContentDisplayScreen
-    });
-
-    secondaryEditorsRegistry.set('Sandstorm.NeosH5P/ContentListScreen', {
-        component: ContentListScreen
+    secondaryEditorsRegistry.set('Sandstorm.NeosH5P/ContentFullscreenEditor', {
+        component: ContentFullscreenEditor
     });
 });

@@ -9,68 +9,9 @@
 
 <f:section name="content">
     <f:form action="update" controller="Backend\Content" id="h5p-content-form">
-        <div class="neos-row-fluid">
-            <f:comment>
-                Later: Move form to partial
-                <f:render partial="Forms\H5PContentElement" arguments="{_all}"/>
-            </f:comment>
-            <fieldset class="neos-span12">
 
-                <f:comment>
-                    <!-- TODO -->
-                    <f:render partial="FormError" arguments="{for:'shortName', sourceObjectName:'centerType'}"/>
-                </f:comment>
+        <f:render partial="ContentForm" />
 
-                <div class="neos-control-group">
-                    <label class="neos-control-label" for="title">Title</label>
-                    <div class="neos-controls">
-                        <f:form.textfield required="true" class="neos-span6" id="title" name="title"
-                                          value="{content.title}" placeholder="Enter a title for your new H5P content"/>
-                    </div>
-                </div>
-
-                <!-- needed by h5p, but not shown to the user -->
-                <div class="neos-control-group" style="display: none;">
-                    <label class="neos-control-label">Select Action</label>
-                    <div class="neos-controls">
-                        <label>
-                            <f:form.radio class="h5p-actions" name="action" value="upload"/>
-                            Upload
-                        </label>
-                        <label>
-                            <f:form.radio class="h5p-actions" name="action" value="create" checked="checked"/>
-                            Create
-                        </label>
-                    </div>
-                </div>
-
-                <!-- needed by h5p, but not shown to the user -->
-                <div class="neos-control-group" style="display: none;">
-                    <label class="neos-control-label" for="h5p-file">Upload File</label>
-                    <div class="neos-controls">
-                        <div id="h5p-upload">
-                            <f:form.upload name="h5p-file" id="h5p-file" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="neos-control-group">
-                    <label class="neos-control-label">Library</label>
-                    <div class="neos-controls">
-                        <!-- H5P Box renders here -->
-                        <div id="h5p-create">
-                            <div id="h5p-editor">
-                                <p>Waiting for H5P JavaScript to load...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <f:form.hidden id="h5p-library" name="library" value="{content.library.string}" />
-                <f:form.hidden id="h5p-parameters" name="parameters" value="{content.filtered}" />
-                <f:form.hidden id="h5p-content" name="contentId" value="{content.contentId}" />
-            </fieldset>
-        </div>
         <div class="neos-footer">
             <neos:link.module
                 title="Back to overview"
@@ -79,39 +20,12 @@
                 class="neos-button">
                 Cancel
             </neos:link.module>
+
             <f:form.submit name="submit" value="Save" class="neos-button neos-button-primary"/>
         </div>
     </f:form>
 
-    <f:for each="{styles}" as="style">
-        <link rel="stylesheet" href="{style -> f:format.raw()}"/>
-    </f:for>
-    <script>
-        window.H5PIntegration = {settings -> f:format.raw()};
-    </script>
-    <f:for each="{scripts}" as="script">
-        <script src="{script -> f:format.raw()}"></script>
-    </f:for>
-    <script src="/_Resources/Static/H5P/h5p-editor/scripts/h5peditor-editor.js?v=dev-master"></script>
-    <script src="/_Resources/Static/H5P/h5p-editor/scripts/h5peditor-init.js?v=dev-master"></script>
-    <script>
-        H5P.jQuery(document).ready(function () {
-            H5PEditor.init(
-                // $form
-                H5P.jQuery('#h5p-content-form'),
-                // $type
-                H5P.jQuery('.h5p-actions'),
-                // $upload
-                H5P.jQuery('#h5p-upload'),
-                // $create
-                H5P.jQuery('#h5p-create'),
-                // $editor
-                H5P.jQuery('#h5p-editor'),
-                // $library
-                H5P.jQuery('#h5p-library'),
-                // $params
-                H5P.jQuery('#h5p-parameters')
-            )
-        });
-    </script>
+    <f:render partial="ContentEditorScriptsAndStyles" arguments="{_all}"/>
 </f:section>
+
+
