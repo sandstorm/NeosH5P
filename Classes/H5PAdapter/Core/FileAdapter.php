@@ -285,7 +285,7 @@ class FileAdapter implements \H5PFileStorage
     private function getContentFromExportFilename(string $filename)
     {
         $matches = [];
-        preg_match('/^.*-*(\d).h5p$/is', $filename, $matches);
+        preg_match('/^([^-]*-)?(\d+)\.h5p$/is', $filename, $matches);
         $contentId = end($matches);
         return $this->contentRepository->findOneByContentId($contentId);
     }
