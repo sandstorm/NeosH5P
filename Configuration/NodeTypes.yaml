@@ -20,7 +20,9 @@ Sandstorm.NeosH5P:H5PContent:
       type: string
       ui:
         label: 'Content'
-        reloadIfChanged: true
+        # As we inject the necessary JS in a plugin that is rendered outside the content element,
+        # we need a full page reload if a different content is selected.
+        reloadPageIfChanged: true
         inspector:
           group: 'h5pcontent'
           editor: 'Sandstorm.NeosH5P/ContentPickerEditor'

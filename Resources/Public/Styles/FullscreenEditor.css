@@ -13,3 +13,7 @@
 .h5p-content-table tr.h5p-current-content td {
     background: #444;
 }
+
+.h5p-content-table tr.h5p-current-content td > .neos-pull-right > .neos-button.neos-button-primary {
+    display: none;
+}

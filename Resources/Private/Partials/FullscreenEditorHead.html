@@ -4,9 +4,9 @@
     <link rel="stylesheet" type="text/css"
           href="{f:uri.resource(path: 'Styles/FullscreenEditor.css', package: 'Sandstorm.NeosH5P')}"/>
     <script type="text/javascript">
-        function contentPicked(contentId, contentTitle) {
+        function contentPicked(persistenceObjectIdentifier, contentId, title) {
             if (window.parent !== window && window.parent.NeosH5PBrowserCallbacks && window.parent.NeosH5PBrowserCallbacks.contentPicked) {
-                window.parent.NeosH5PBrowserCallbacks.contentPicked({contentId, contentTitle});
+                window.parent.NeosH5PBrowserCallbacks.contentPicked({persistenceObjectIdentifier, contentId, title});
             }
         }
 

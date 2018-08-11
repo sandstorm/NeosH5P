@@ -2,8 +2,6 @@ import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {neos} from '@neos-project/neos-ui-decorators';
 import {Button} from '@neos-project/react-ui-components/';
-import ContentAddEditScreen from "./../ContentAddEditScreen";
-import ContentDisplayScreen from "./../ContentDisplayScreen";
 
 @neos(globalRegistry => ({
     secondaryEditorsRegistry: globalRegistry.get('inspector').get('secondaryEditors')
@@ -19,6 +17,7 @@ export default class ContentPickerEditor extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
+            persistenceObjectIdentifier: null,
             contentId: null,
             title: null
         };
@@ -37,26 +36,34 @@ export default class ContentPickerEditor extends PureComponent {
     onContentPicked = content => {
         this.setState(content);
         this.props.commit(content.contentId);
+        // hide fullscreen editor
+        this.props.renderSecondaryInspector('H5P_CONTENT_FULLSCREEN_EDITOR');
     };
 
     handleDisplayContent = () => {
-        this.props.renderSecondaryInspector('H5P_CONTENT_DISPLAY_SCREEN', () =>
-            <ContentDisplayScreen contentPersistenceObjectId={this.state.persistenceObjectIdentifier}
-                                  onContentPicked={this.onContentPicked}
-                                  onContentEdit={this.onContentEdit}
-                                  onContentDelete={this.onContentDelete}/>
+        const {component: ContentFullscreenEditor} = this.props.secondaryEditorsRegistry.get('Sandstorm.NeosH5P/ContentFullscreenEditor');
+        this.props.renderSecondaryInspector('H5P_CONTENT_FULLSCREEN_EDITOR', () =>
+            <ContentFullscreenEditor
+                action='display'
+                currentContent={this.state}
+                onContentPicked={this.onContentPicked}/>
         );
     };
 
     handleNewContent = () => {
-        this.props.renderSecondaryInspector('H5P_CONTENT_ADDEDIT_SCREEN', () =>
-            <ContentAddEditScreen contentPersistenceObjectId={this.state.persistenceObjectIdentifier}/>
+        const {component: ContentFullscreenEditor} = this.props.secondaryEditorsRegistry.get('Sandstorm.NeosH5P/ContentFullscreenEditor');
+        this.props.renderSecondaryInspector('H5P_CONTENT_FULLSCREEN_EDITOR', () =>
+            <ContentFullscreenEditor
+                action='new'
+                currentContent={this.state}
+                doNotAppendToQuery={true}
+                onContentPicked={this.onContentPicked}/>
         );
     };
 
     handleChooseContent = () => {
         const {component: ContentFullscreenEditor} = this.props.secondaryEditorsRegistry.get('Sandstorm.NeosH5P/ContentFullscreenEditor');
-        this.props.renderSecondaryInspector('H5P_CONTENT_LIST_SCREEN', () =>
+        this.props.renderSecondaryInspector('H5P_CONTENT_FULLSCREEN_EDITOR', () =>
             <ContentFullscreenEditor
                 action='index'
                 currentContent={this.state}
@@ -67,7 +74,7 @@ export default class ContentPickerEditor extends PureComponent {
 
     render() {
         return <div>
-            <p><strong>{this.props.value ? this.state.title : 'No Content selected.'}</strong></p>
+            <p><strong>{this.state.title ? this.state.title : 'No Content selected.'}</strong></p>
             <div>
                 <Button style="lighter" onClick={this.handleNewContent}>New</Button>
                 <Button style="lighter" onClick={this.handleChooseContent}>Choose</Button>

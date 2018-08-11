@@ -8,6 +8,7 @@ export default class ContentFullscreenEditor extends PureComponent {
         action: PropTypes.string.isRequired,
         onContentPicked: PropTypes.func.isRequired,
         currentContent: PropTypes.shape({
+            persistenceObjectIdentifier: PropTypes.string.isRequired,
             contentId: PropTypes.string.isRequired,
             title: PropTypes.string.isRequired
         }),
@@ -17,8 +18,6 @@ export default class ContentFullscreenEditor extends PureComponent {
     render() {
         window.NeosH5PBrowserCallbacks = {
             contentPicked: this.props.onContentPicked,
-            contentEdit: this.props.onContentEdit,
-            contentDelete: this.props.onContentDelete,
             currentContent: this.props.currentContent
         };
         return <iframe

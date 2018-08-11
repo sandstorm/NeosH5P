@@ -41,7 +41,7 @@ class ContentDataSource extends AbstractDataSource
         return [
             'persistenceObjectIdentifier' => $this->persistenceManager->getIdentifierByObject($content),
             'contentId' => $content->getContentId(),
-            'contentTitle' => $content->getTitle(),
+            'title' => $content->getTitle(),
             'libraryTitle' => $content->getLibrary()->getTitle()
         ];
     }

@@ -147,137 +147,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 module.exports = (0, _readFromConsumerApi2.default)('NeosProjectPackages')().ReactUiComponents;
 
 /***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.default = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _class, _temp;
-
-var _react = __webpack_require__(1);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = __webpack_require__(2);
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _neosUiDecorators = __webpack_require__(3);
-
-var _reactUiComponents = __webpack_require__(4);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ContentAddEditScreen = (_temp = _class = function (_PureComponent) {
-    _inherits(ContentAddEditScreen, _PureComponent);
-
-    function ContentAddEditScreen() {
-        _classCallCheck(this, ContentAddEditScreen);
-
-        return _possibleConstructorReturn(this, (ContentAddEditScreen.__proto__ || Object.getPrototypeOf(ContentAddEditScreen)).apply(this, arguments));
-    }
-
-    _createClass(ContentAddEditScreen, [{
-        key: 'render',
-        value: function render() {
-            // TODO: Remove all inline styles and put them into a css file
-            if (this.props.contentPersistenceObjectId !== '') {
-                return _react2.default.createElement('iframe', { src: 'http://127.0.0.1:8081/neosh5p/contentfullscreeneditor/add', style: { width: "100%", height: "100%" } });
-            } else {
-                return _react2.default.createElement('iframe', { src: "http://127.0.0.1:8081/neosh5p/contentfullscreeneditor/edit/contentPersistenceObjectId", style: { width: "100%", height: "100%" } });
-            }
-        }
-    }]);
-
-    return ContentAddEditScreen;
-}(_react.PureComponent), _class.propTypes = {
-    contentPersistenceObjectId: _propTypes2.default.string.isRequired
-}, _temp);
-exports.default = ContentAddEditScreen;
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.default = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _class, _temp;
-
-var _react = __webpack_require__(1);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = __webpack_require__(2);
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _neosUiDecorators = __webpack_require__(3);
-
-var _reactUiComponents = __webpack_require__(4);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ContentDisplayScreen = (_temp = _class = function (_PureComponent) {
-    _inherits(ContentDisplayScreen, _PureComponent);
-
-    function ContentDisplayScreen() {
-        _classCallCheck(this, ContentDisplayScreen);
-
-        return _possibleConstructorReturn(this, (ContentDisplayScreen.__proto__ || Object.getPrototypeOf(ContentDisplayScreen)).apply(this, arguments));
-    }
-
-    _createClass(ContentDisplayScreen, [{
-        key: 'render',
-        value: function render() {
-            window.NeosH5PBrowserCallbacks = {
-                contentPicked: this.props.onContentPicked,
-                contentEdit: this.props.onContentEdit,
-                contentDelete: this.props.onContentDelete
-            };
-
-            // TODO: Remove all inline styles and put them into a css file
-            return _react2.default.createElement('iframe', { src: "/neosh5p/contentfullscreeneditor/display/" + this.props.contentPersistenceObjectId, style: { width: "100%", height: "100%" } });
-        }
-    }]);
-
-    return ContentDisplayScreen;
-}(_react.PureComponent), _class.propTypes = {
-    contentPersistenceObjectId: _propTypes2.default.string.isRequired,
-    onContentPicked: _propTypes2.default.func.isRequired,
-    onContentEdit: _propTypes2.default.func.isRequired,
-    onContentDelete: _propTypes2.default.func.isRequired
-}, _temp);
-exports.default = ContentDisplayScreen;
-
-/***/ }),
+/* 5 */,
+/* 6 */,
 /* 7 */,
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -467,8 +338,6 @@ var ContentFullscreenEditor = (_temp = _class = function (_PureComponent) {
         value: function render() {
             window.NeosH5PBrowserCallbacks = {
                 contentPicked: this.props.onContentPicked,
-                contentEdit: this.props.onContentEdit,
-                contentDelete: this.props.onContentDelete,
                 currentContent: this.props.currentContent
             };
             return _react2.default.createElement('iframe', {
@@ -487,6 +356,7 @@ var ContentFullscreenEditor = (_temp = _class = function (_PureComponent) {
     action: _propTypes2.default.string.isRequired,
     onContentPicked: _propTypes2.default.func.isRequired,
     currentContent: _propTypes2.default.shape({
+        persistenceObjectIdentifier: _propTypes2.default.string.isRequired,
         contentId: _propTypes2.default.string.isRequired,
         title: _propTypes2.default.string.isRequired
     }),
@@ -526,14 +396,6 @@ var _neosUiDecorators = __webpack_require__(3);
 
 var _reactUiComponents = __webpack_require__(4);
 
-var _ContentAddEditScreen = __webpack_require__(5);
-
-var _ContentAddEditScreen2 = _interopRequireDefault(_ContentAddEditScreen);
-
-var _ContentDisplayScreen = __webpack_require__(6);
-
-var _ContentDisplayScreen2 = _interopRequireDefault(_ContentDisplayScreen);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -565,28 +427,40 @@ var ContentPickerEditor = (_dec = (0, _neosUiDecorators.neos)(function (globalRe
         _this.onContentPicked = function (content) {
             _this.setState(content);
             _this.props.commit(content.contentId);
+            // hide fullscreen editor
+            _this.props.renderSecondaryInspector('H5P_CONTENT_FULLSCREEN_EDITOR');
         };
 
         _this.handleDisplayContent = function () {
-            _this.props.renderSecondaryInspector('H5P_CONTENT_DISPLAY_SCREEN', function () {
-                return _react2.default.createElement(_ContentDisplayScreen2.default, { contentPersistenceObjectId: _this.state.persistenceObjectIdentifier,
-                    onContentPicked: _this.onContentPicked,
-                    onContentEdit: _this.onContentEdit,
-                    onContentDelete: _this.onContentDelete });
+            var _this$props$secondary = _this.props.secondaryEditorsRegistry.get('Sandstorm.NeosH5P/ContentFullscreenEditor'),
+                ContentFullscreenEditor = _this$props$secondary.component;
+
+            _this.props.renderSecondaryInspector('H5P_CONTENT_FULLSCREEN_EDITOR', function () {
+                return _react2.default.createElement(ContentFullscreenEditor, {
+                    action: 'display',
+                    currentContent: _this.state,
+                    onContentPicked: _this.onContentPicked });
             });
         };
 
         _this.handleNewContent = function () {
-            _this.props.renderSecondaryInspector('H5P_CONTENT_ADDEDIT_SCREEN', function () {
-                return _react2.default.createElement(_ContentAddEditScreen2.default, { contentPersistenceObjectId: _this.state.persistenceObjectIdentifier });
+            var _this$props$secondary2 = _this.props.secondaryEditorsRegistry.get('Sandstorm.NeosH5P/ContentFullscreenEditor'),
+                ContentFullscreenEditor = _this$props$secondary2.component;
+
+            _this.props.renderSecondaryInspector('H5P_CONTENT_FULLSCREEN_EDITOR', function () {
+                return _react2.default.createElement(ContentFullscreenEditor, {
+                    action: 'new',
+                    currentContent: _this.state,
+                    doNotAppendToQuery: true,
+                    onContentPicked: _this.onContentPicked });
             });
         };
 
         _this.handleChooseContent = function () {
-            var _this$props$secondary = _this.props.secondaryEditorsRegistry.get('Sandstorm.NeosH5P/ContentFullscreenEditor'),
-                ContentFullscreenEditor = _this$props$secondary.component;
+            var _this$props$secondary3 = _this.props.secondaryEditorsRegistry.get('Sandstorm.NeosH5P/ContentFullscreenEditor'),
+                ContentFullscreenEditor = _this$props$secondary3.component;
 
-            _this.props.renderSecondaryInspector('H5P_CONTENT_LIST_SCREEN', function () {
+            _this.props.renderSecondaryInspector('H5P_CONTENT_FULLSCREEN_EDITOR', function () {
                 return _react2.default.createElement(ContentFullscreenEditor, {
                     action: 'index',
                     currentContent: _this.state,
@@ -596,6 +470,7 @@ var ContentPickerEditor = (_dec = (0, _neosUiDecorators.neos)(function (globalRe
         };
 
         _this.state = {
+            persistenceObjectIdentifier: null,
             contentId: null,
             title: null
         };
@@ -617,7 +492,7 @@ var ContentPickerEditor = (_dec = (0, _neosUiDecorators.neos)(function (globalRe
                     _react2.default.createElement(
                         'strong',
                         null,
-                        this.props.value ? this.state.title : 'No Content selected.'
+                        this.state.title ? this.state.title : 'No Content selected.'
                     )
                 ),
                 _react2.default.createElement(
