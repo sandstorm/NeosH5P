@@ -1,27 +1,26 @@
 {namespace neos=Neos\Neos\ViewHelpers}
-<html>
-<f:render partial="FullscreenEditorHead" arguments="{_all}"/>
-<body class="neos neos-module h5p-fullscreen-editor">
-<div class="neos-row-fluid">
-    <f:form action="create" controller="Backend\Content" id="h5p-content-form">
+<f:layout name="ContentFullscreenEditor"/>
 
-        <f:render partial="ContentForm"/>
+<f:section name="content">
+    <div class="neos-row-fluid">
+        <f:form action="create" controller="Backend\Content" id="h5p-content-form">
 
-        <div class="neos-footer">
-            <f:link.action
-                title="Back to overview"
-                class="neos-button"
-                package="Sandstorm.NeosH5P"
-                controller="Backend\Content"
-                action="index">
-                Cancel
-            </f:link.action>
+            <f:render partial="ContentForm"/>
 
-            <f:form.submit name="submit" value="Create H5P Content" class="neos-button neos-button-primary"/>
-        </div>
-    </f:form>
+            <div class="neos-footer">
+                <f:link.action
+                    title="Back to overview"
+                    class="neos-button"
+                    package="Sandstorm.NeosH5P"
+                    controller="Backend\Content"
+                    action="index">
+                    Cancel
+                </f:link.action>
 
-    <f:render partial="ContentEditorScriptsAndStyles" arguments="{_all}"/>
-</div>
-</body>
-</html>
+                <f:form.submit name="submit" value="Create H5P Content" class="neos-button neos-button-primary"/>
+            </div>
+        </f:form>
+
+        <f:render partial="ContentEditorScriptsAndStyles" arguments="{_all}"/>
+    </div>
+</f:section>
