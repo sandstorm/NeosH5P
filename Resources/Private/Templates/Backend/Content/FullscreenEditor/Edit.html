@@ -1,31 +1,29 @@
 {namespace neos=Neos\Neos\ViewHelpers}
-<f:layout name="BackendSubModule"/>
-
-<f:section name="subtitle">
-    <div class="neos-module-container">
-        <h2>Edit an H5P content element</h2>
-    </div>
-</f:section>
-
-<f:section name="content">
+{namespace neos=Neos\Neos\ViewHelpers}
+<html>
+<f:render partial="FullscreenEditorHead" arguments="{_all}"/>
+<body class="neos neos-module h5p-fullscreen-editor">
+<div class="neos-row-fluid">
     <f:form action="update" controller="Backend\Content" id="h5p-content-form">
 
-        <f:render partial="ContentForm" />
+        <f:render partial="ContentForm" arguments="{_all}"/>
 
         <div class="neos-footer">
-            <neos:link.module
+            <f:link.action
                 title="Back to overview"
-                path="h5p/content"
-                action="index"
+                controller="Backend\Content"
+                action="display"
+                arguments="{content:content}"
                 class="neos-button">
                 Cancel
-            </neos:link.module>
+            </f:link.action>
 
             <f:form.submit name="submit" value="Save" class="neos-button neos-button-primary"/>
         </div>
     </f:form>
 
     <f:render partial="ContentEditorScriptsAndStyles" arguments="{_all}"/>
-</f:section>
-
+</div>
+</body>
+</html>
 
