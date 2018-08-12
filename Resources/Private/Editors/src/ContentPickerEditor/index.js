@@ -34,7 +34,6 @@ export default class ContentPickerEditor extends PureComponent {
 
 
     handleContentChosen = content => {
-        console.log(content);
         this.setState(content);
         this.props.commit(content.contentId);
         // hide fullscreen editor if content was set.

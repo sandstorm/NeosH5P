@@ -10,7 +10,8 @@
         function commitIfCurrentContentWasDeleted() {
             if (window.parent.NeosH5PBrowserCallbacks &&
                 window.parent.NeosH5PBrowserCallbacks.currentContent &&
-                window.parent.NeosH5PBrowserCallbacks.currentContent.contentId === {content.contentId}) {
+                window.parent.NeosH5PBrowserCallbacks.currentContent.contentId === {content.contentId})
+            {
                 // We only commit here if the currently selected content was deleted.
                 chooseContentAfterSaving('', '', '');
             }
@@ -37,60 +38,60 @@
             </f:case>
         </f:switch>
     </div>
-</div>
 
-<div class="neos-footer">
-    <f:link.action
-        title="Back to overview"
-        controller="Backend\Content"
-        action="index"
-        class="neos-button">
-        Back
-    </f:link.action>
-    <button class="neos-button neos-button-danger" title="Remove this content" data-toggle="modal"
-            href="#remove-content" data-neos-toggle="tooltip">
-        Delete
-    </button>
-    <div class="neos-hide" id="remove-content">
-        <div class="neos-modal-centered">
-            <div class="neos-modal-content">
-                <div class="neos-modal-header">
-                    <button type="button" class="neos-close neos-button" data-dismiss="modal"></button>
-                    <div class="neos-header">
-                        Confirm deletion
-                    </div>
-                    <div>
-                        <div class="neos-subheader">
-                            <p>
-                                {content.title} will be deleted permanently.
-                            </p>
+    <div class="neos-footer">
+        <f:link.action
+            title="Back to overview"
+            controller="Backend\Content"
+            action="index"
+            class="neos-button">
+            Back
+        </f:link.action>
+        <button class="neos-button neos-button-danger" title="Remove this content" data-toggle="modal"
+                href="#remove-content" data-neos-toggle="tooltip">
+            Delete
+        </button>
+        <div class="neos-hide" id="remove-content">
+            <div class="neos-modal-centered">
+                <div class="neos-modal-content">
+                    <div class="neos-modal-header">
+                        <button type="button" class="neos-close neos-button" data-dismiss="modal"></button>
+                        <div class="neos-header">
+                            Confirm deletion
+                        </div>
+                        <div>
+                            <div class="neos-subheader">
+                                <p>
+                                    {content.title} will be deleted permanently.
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="neos-modal-footer">
-                    <a href="#" class="neos-button" data-dismiss="modal">Cancel</a>
-                    <f:form action="delete" arguments="{content: content}" class="neos-inline">
-                        <button type="submit" class="neos-button neos-button-danger" title="Confirm deletion"
-                                onclick="commitIfCurrentContentWasDeleted()">
-                            Delete
-                        </button>
-                    </f:form>
+                    <div class="neos-modal-footer">
+                        <a href="#" class="neos-button" data-dismiss="modal">Cancel</a>
+                        <f:form action="delete" arguments="{content: content}" class="neos-inline">
+                            <button type="submit" class="neos-button neos-button-danger" title="Confirm deletion"
+                                    onclick="commitIfCurrentContentWasDeleted()">
+                                Delete
+                            </button>
+                        </f:form>
+                    </div>
                 </div>
             </div>
+            <div class="neos-modal-backdrop neos-in"></div>
         </div>
-        <div class="neos-modal-backdrop neos-in"></div>
+        <f:link.action
+            title="Edit this content"
+            controller="Backend\Content"
+            action="edit"
+            arguments="{content:content}"
+            class="neos-button neos-button-primary">
+            Edit
+        </f:link.action>
+        <button class="neos-button neos-button-primary"
+                onclick="chooseContent('{content.identifier}', {content.contentId}, '{content.title}')">Choose
+        </button>
     </div>
-    <f:link.action
-        title="Edit this content"
-        controller="Backend\Content"
-        action="edit"
-        arguments="{content:content}"
-        class="neos-button neos-button-primary">
-        Edit
-    </f:link.action>
-    <button class="neos-button neos-button-primary"
-            onclick="chooseContent('{content.identifier}', {content.contentId}, '{content.title}')">Choose
-    </button>
 </div>
 
 </body>

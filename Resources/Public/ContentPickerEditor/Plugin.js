@@ -443,7 +443,6 @@ var ContentPickerEditor = (_dec = (0, _neosUiDecorators.neos)(function (globalRe
         };
 
         _this.handleContentChosen = function (content) {
-            console.log(content);
             _this.setState(content);
             _this.props.commit(content.contentId);
             // hide fullscreen editor if content was set.
