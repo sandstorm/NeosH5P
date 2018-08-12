@@ -17,9 +17,9 @@ export default class ContentPickerEditor extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            persistenceObjectIdentifier: null,
-            contentId: null,
-            title: null
+            persistenceObjectIdentifier: '',
+            contentId: '',
+            title: ''
         };
         if (this.props.value) {
             this.fetchContentDetails(this.props.value);
@@ -33,11 +33,11 @@ export default class ContentPickerEditor extends PureComponent {
     };
 
 
-    onContentPicked = content => {
+    handleContentChosen = content => {
+        console.log(content);
         this.setState(content);
         this.props.commit(content.contentId);
-        // hide fullscreen editor if content was set. content.contentId contains NULL if a "delete" was committed.
-        if(content.contentId)
+        // hide fullscreen editor if content was set.
         this.props.renderSecondaryInspector('H5P_CONTENT_FULLSCREEN_EDITOR');
     };
 
@@ -47,7 +47,7 @@ export default class ContentPickerEditor extends PureComponent {
             <ContentFullscreenEditor
                 action='display'
                 currentContent={this.state}
-                onContentPicked={this.onContentPicked}/>
+                onContentChosen={this.handleContentChosen}/>
         );
     };
 
@@ -58,7 +58,7 @@ export default class ContentPickerEditor extends PureComponent {
                 action='new'
                 currentContent={this.state}
                 doNotAppendToQuery={true}
-                onContentPicked={this.onContentPicked}/>
+                onContentChosen={this.handleContentChosen}/>
         );
     };
 
@@ -69,17 +69,19 @@ export default class ContentPickerEditor extends PureComponent {
                 action='index'
                 currentContent={this.state}
                 doNotAppendToQuery={true}
-                onContentPicked={this.onContentPicked}/>
+                onContentChosen={this.handleContentChosen}/>
         );
     };
 
     render() {
         return <div>
-            <p><strong>{this.state.title ? this.state.title : 'No Content selected.'}</strong></p>
+            <p><strong>
+                {this.state.title ? this.state.title : (this.props.value ? 'Content with ID ' + this.props.value + ' has been deleted.' : 'No Content selected.')}
+            </strong></p>
             <div>
                 <Button style="lighter" onClick={this.handleNewContent}>New</Button>
                 <Button style="lighter" onClick={this.handleChooseContent}>Choose</Button>
-                <Button style="lighter" isDisabled={!this.props.value} onClick={this.handleDisplayContent}>Edit</Button>
+                <Button style="lighter" isDisabled={!this.props.value || !this.state.title} onClick={this.handleDisplayContent}>Edit</Button>
             </div>
         </div>
     }

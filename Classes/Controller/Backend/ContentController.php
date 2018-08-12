@@ -13,6 +13,7 @@ use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ContentResultRepository;
 use Sandstorm\NeosH5P\Domain\Service\CRUD\ContentCRUDService;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
+use Sandstorm\NeosH5P\Domain\Service\UriGenerationService;
 
 class ContentController extends AbstractModuleController
 {
@@ -45,6 +46,12 @@ class ContentController extends AbstractModuleController
      * @var ContentResultRepository
      */
     protected $contentResultRepository;
+
+    /**
+     * @Flow\Inject
+     * @var UriGenerationService
+     */
+    protected $uriGenerationService;
 
     public function indexAction()
     {

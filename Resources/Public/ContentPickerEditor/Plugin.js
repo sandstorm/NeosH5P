@@ -336,12 +336,30 @@ var ContentFullscreenEditor = (_temp = _class = function (_PureComponent) {
     _createClass(ContentFullscreenEditor, [{
         key: 'render',
         value: function render() {
+            var iframe = void 0;
+            var setRef = function setRef(ref) {
+                iframe = ref;
+            };
+            var _props = this.props,
+                onContentChosen = _props.onContentChosen,
+                currentContent = _props.currentContent;
+
+
             window.NeosH5PBrowserCallbacks = {
-                contentPicked: this.props.onContentPicked,
-                currentContent: this.props.currentContent
+                chooseContent: onContentChosen,
+                currentContent: currentContent,
+                chooseContentAfterSaving: function chooseContentAfterSaving() {
+                    var _arguments = arguments;
+
+                    // Wait for iframe to finish saving
+                    iframe.contentWindow.addEventListener('unload', function () {
+                        onContentChosen.apply(undefined, _arguments);
+                    });
+                }
             };
             return _react2.default.createElement('iframe', {
                 src: '/neosh5p/contentfullscreeneditor/' + this.props.action + (this.props.currentContent && !this.props.doNotAppendToQuery ? '/' + this.props.currentContent.persistenceObjectIdentifier : ''),
+                ref: setRef,
                 style: {
                     position: 'absolute',
                     width: '100%',
@@ -354,7 +372,7 @@ var ContentFullscreenEditor = (_temp = _class = function (_PureComponent) {
     return ContentFullscreenEditor;
 }(_react.PureComponent), _class.propTypes = {
     action: _propTypes2.default.string.isRequired,
-    onContentPicked: _propTypes2.default.func.isRequired,
+    onContentChosen: _propTypes2.default.func.isRequired,
     currentContent: _propTypes2.default.shape({
         persistenceObjectIdentifier: _propTypes2.default.string.isRequired,
         contentId: _propTypes2.default.string.isRequired,
@@ -424,11 +442,12 @@ var ContentPickerEditor = (_dec = (0, _neosUiDecorators.neos)(function (globalRe
             });
         };
 
-        _this.onContentPicked = function (content) {
+        _this.handleContentChosen = function (content) {
+            console.log(content);
             _this.setState(content);
             _this.props.commit(content.contentId);
-            // hide fullscreen editor if content was set. content.contentId contains NULL if a "delete" was committed.
-            if (content.contentId) _this.props.renderSecondaryInspector('H5P_CONTENT_FULLSCREEN_EDITOR');
+            // hide fullscreen editor if content was set.
+            _this.props.renderSecondaryInspector('H5P_CONTENT_FULLSCREEN_EDITOR');
         };
 
         _this.handleDisplayContent = function () {
@@ -439,7 +458,7 @@ var ContentPickerEditor = (_dec = (0, _neosUiDecorators.neos)(function (globalRe
                 return _react2.default.createElement(ContentFullscreenEditor, {
                     action: 'display',
                     currentContent: _this.state,
-                    onContentPicked: _this.onContentPicked });
+                    onContentChosen: _this.handleContentChosen });
             });
         };
 
@@ -452,7 +471,7 @@ var ContentPickerEditor = (_dec = (0, _neosUiDecorators.neos)(function (globalRe
                     action: 'new',
                     currentContent: _this.state,
                     doNotAppendToQuery: true,
-                    onContentPicked: _this.onContentPicked });
+                    onContentChosen: _this.handleContentChosen });
             });
         };
 
@@ -465,14 +484,14 @@ var ContentPickerEditor = (_dec = (0, _neosUiDecorators.neos)(function (globalRe
                     action: 'index',
                     currentContent: _this.state,
                     doNotAppendToQuery: true,
-                    onContentPicked: _this.onContentPicked });
+                    onContentChosen: _this.handleContentChosen });
             });
         };
 
         _this.state = {
-            persistenceObjectIdentifier: null,
-            contentId: null,
-            title: null
+            persistenceObjectIdentifier: '',
+            contentId: '',
+            title: ''
         };
         if (_this.props.value) {
             _this.fetchContentDetails(_this.props.value);
@@ -492,7 +511,7 @@ var ContentPickerEditor = (_dec = (0, _neosUiDecorators.neos)(function (globalRe
                     _react2.default.createElement(
                         'strong',
                         null,
-                        this.state.title ? this.state.title : 'No Content selected.'
+                        this.state.title ? this.state.title : this.props.value ? 'Content with ID ' + this.props.value + ' has been deleted.' : 'No Content selected.'
                     )
                 ),
                 _react2.default.createElement(
@@ -510,7 +529,7 @@ var ContentPickerEditor = (_dec = (0, _neosUiDecorators.neos)(function (globalRe
                     ),
                     _react2.default.createElement(
                         _reactUiComponents.Button,
-                        { style: 'lighter', isDisabled: !this.props.value, onClick: this.handleDisplayContent },
+                        { style: 'lighter', isDisabled: !this.props.value || !this.state.title, onClick: this.handleDisplayContent },
                         'Edit'
                     )
                 )

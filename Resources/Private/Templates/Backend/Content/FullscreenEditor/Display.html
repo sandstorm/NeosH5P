@@ -8,16 +8,11 @@
 
     <script type="text/javascript">
         function commitIfCurrentContentWasDeleted() {
-
-            console.log(window.parent.NeosH5PBrowserCallbacks);
-            console.log(window.parent.NeosH5PBrowserCallbacks.currentContent);
-            console.log('{content.contentId}');
-
             if (window.parent.NeosH5PBrowserCallbacks &&
                 window.parent.NeosH5PBrowserCallbacks.currentContent &&
-                window.parent.NeosH5PBrowserCallbacks.currentContent.contentId === '{content.contentId}') {
+                window.parent.NeosH5PBrowserCallbacks.currentContent.contentId === {content.contentId}) {
                 // We only commit here if the currently selected content was deleted.
-                contentPicked(null, null, null);
+                chooseContentAfterSaving('', '', '');
             }
         }
     </script>
@@ -94,7 +89,7 @@
         Edit
     </f:link.action>
     <button class="neos-button neos-button-primary"
-            onclick="contentPicked('{content.identifier}', {content.contentId}, '{content.title}')">Choose
+            onclick="chooseContent('{content.identifier}', {content.contentId}, '{content.title}')">Choose
     </button>
 </div>
 

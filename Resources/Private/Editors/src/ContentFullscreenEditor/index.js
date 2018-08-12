@@ -6,7 +6,7 @@ import {Button} from '@neos-project/react-ui-components/';
 export default class ContentFullscreenEditor extends PureComponent {
     static propTypes = {
         action: PropTypes.string.isRequired,
-        onContentPicked: PropTypes.func.isRequired,
+        onContentChosen: PropTypes.func.isRequired,
         currentContent: PropTypes.shape({
             persistenceObjectIdentifier: PropTypes.string.isRequired,
             contentId: PropTypes.string.isRequired,
@@ -16,12 +16,25 @@ export default class ContentFullscreenEditor extends PureComponent {
     };
 
     render() {
+        let iframe;
+        const setRef = ref => {
+            iframe = ref;
+        };
+        const {onContentChosen, currentContent} = this.props;
+
         window.NeosH5PBrowserCallbacks = {
-            contentPicked: this.props.onContentPicked,
-            currentContent: this.props.currentContent
+            chooseContent: onContentChosen,
+            currentContent: currentContent,
+            chooseContentAfterSaving() {
+                // Wait for iframe to finish saving
+                iframe.contentWindow.addEventListener('unload', () => {
+                    onContentChosen(...arguments);
+                });
+            }
         };
         return <iframe
             src={'/neosh5p/contentfullscreeneditor/' + this.props.action + (this.props.currentContent && !this.props.doNotAppendToQuery ? '/' + this.props.currentContent.persistenceObjectIdentifier : '')}
+            ref={setRef}
             style={{
                 position: 'absolute',
                 width: '100%',

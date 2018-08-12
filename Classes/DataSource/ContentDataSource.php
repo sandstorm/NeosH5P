@@ -37,6 +37,9 @@ class ContentDataSource extends AbstractDataSource
     {
         /** @var Content $content */
         $content = $this->contentRepository->findOneByContentId($arguments['contentId']);
+        if ($content === null) {
+            return [];
+        }
 
         return [
             'persistenceObjectIdentifier' => $this->persistenceManager->getIdentifierByObject($content),

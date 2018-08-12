@@ -2,6 +2,9 @@
 <html>
 <f:render partial="FullscreenEditorHead" arguments="{_all}"/>
 <body class="neos neos-module h5p-fullscreen-editor">
+<div class="neos-module-container">
+    <f:render partial="Module/FlashMessages" />
+</div>
 <div class="neos-row-fluid">
     <f:render partial="ContentTable" arguments="{_all}"/>
 </div>
