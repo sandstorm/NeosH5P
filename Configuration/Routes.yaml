@@ -93,60 +93,13 @@
     '@controller': 'Frontend\ContentEmbed'
     '@action': 'index'
 
-# neos inspector routes
+# neos fullscreen inspector routes
 -
-  name: 'H5P Neos inspector - Add a new H5P Content'
-  uriPattern: 'neosh5p/contentfullscreeneditor/new'
+  name: 'H5P Neos inspector - fullscreen editor content controller routes'
+  uriPattern: 'neosh5p/contentfullscreeneditor/{@action}(/{content})'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\Content'
     '@action': 'new'
     '@format': 'html'
--
-  name: 'H5P Neos inspector - Add a new H5P Content'
-  uriPattern: 'neosh5p/contentfullscreeneditor/create'
-  defaults:
-    '@package': 'Sandstorm.NeosH5P'
-    '@controller': 'Backend\Content'
-    '@action': 'create'
-    '@format': 'html'
--
-  name: 'H5P Neos inspector - Edit an existing H5P Content'
-  uriPattern: 'neosh5p/contentfullscreeneditor/edit/{content}'
-  defaults:
-    '@package': 'Sandstorm.NeosH5P'
-    '@controller': 'Backend\Content'
-    '@action': 'edit'
-    '@format': 'html'
--
-  name: 'H5P Neos inspector - Add a new H5P Content'
-  uriPattern: 'neosh5p/contentfullscreeneditor/update/{content}'
-  defaults:
-    '@package': 'Sandstorm.NeosH5P'
-    '@controller': 'Backend\Content'
-    '@action': 'update'
-    '@format': 'html'
--
-  name: 'H5P Neos inspector - Display the details screen of a content element'
-  uriPattern: 'neosh5p/contentfullscreeneditor/display/{content}'
-  defaults:
-    '@package': 'Sandstorm.NeosH5P'
-    '@controller': 'Backend\Content'
-    '@action': 'display'
-    '@format': 'html'
--
-  name: 'H5P Neos inspector - Edit an existing H5P Content'
-  uriPattern: 'neosh5p/contentfullscreeneditor/delete/{content}'
-  defaults:
-    '@package': 'Sandstorm.NeosH5P'
-    '@controller': 'Backend\Content'
-    '@action': 'delete'
-    '@format': 'html'
--
-  name: 'H5P Neos inspector - Show the list of available contents'
-  uriPattern: 'neosh5p/contentfullscreeneditor/index'
-  defaults:
-    '@package': 'Sandstorm.NeosH5P'
-    '@controller': 'Backend\Content'
-    '@action': 'index'
-    '@format': 'html'
+    'content': ''
