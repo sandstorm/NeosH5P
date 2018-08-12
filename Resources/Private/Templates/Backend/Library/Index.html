@@ -11,8 +11,8 @@
                     <th class="neos-span5">Library</th>
                     <th class="neos-span1">Version</th>
                     <th class="neos-span1">Contents</th>
-                    <th class="neos-span2">Contents using it</th>
-                    <th class="neos-span2">Libraries using it</th>
+                    <th class="neos-span2">Dependent Contents</th>
+                    <th class="neos-span2">Dependent Libraries</th>
                     <th class="neos-span1">&nbsp;</th>
                 </tr>
                 </thead>
@@ -33,13 +33,13 @@
                             {library.versionString}
                         </td>
                         <td>
-                            {library.contentDependencies -> f:count()}
-                        </td>
-                        <td>
                             {library.contents -> f:count()}
                         </td>
                         <td>
-                            {library.librariesUsingThisLibrary -> f:count()}
+                            {library.contentDependencies -> f:count()}
+                        </td>
+                        <td>
+                            {library.dependentLibraries -> f:count()}
                         </td>
                         <td class="neos-action">
                             <div class="neos-pull-right">
@@ -62,7 +62,7 @@
                                     <i class="icon-info-sign icon-white"></i>
                                 </neos:link.module>
 
-                                <f:if condition="{library.contents -> f:count()} > 0 || {library.librariesUsingThisLibrary -> f:count()} > 0">
+                                <f:if condition="{library.contents -> f:count()} > 0 || {library.contentDependencies -> f:count()} > 0 || {library.dependentLibraries -> f:count()} > 0">
                                     <f:then>
                                         <button class="neos-button neos-button-danger neos-disabled"
                                                 title="Contents or other libraries are using this library"

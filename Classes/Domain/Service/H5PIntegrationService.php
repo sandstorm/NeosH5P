@@ -307,7 +307,7 @@ class H5PIntegrationService
             'library' => \H5PCore::libraryToString($contentArray['library']),
             'jsonContent' => $content->getFiltered(),
             'fullScreen' => $contentArray['library']['fullscreen'],
-            'exportUrl' => $this->resourceManager->getPublicPersistentResourceUri($content->getExportFile()),
+            'exportUrl' => $content->getExportFile() === null ? '' : $this->resourceManager->getPublicPersistentResourceUri($content->getExportFile()),
             'embedCode' => '<iframe src="' . $embedUrl . '" width=":w" height=":h" frameborder="0" allowfullscreen="allowfullscreen"></iframe>',
             'resizeCode' => '<script src="' . $h5pCorePublicUrl . '/js/h5p-resizer.js' . '" charset="UTF-8"></script>',
             'url' => $embedUrl,

@@ -1,0 +1,19 @@
+{namespace neos=Neos\Neos\ViewHelpers}
+<f:layout name="ContentFullscreenEditor"/>
+
+<f:section name="content">
+    <div class="neos-row-fluid neos-row-fluid--nopadding">
+        <f:render partial="ContentTable" arguments="{_all}"/>
+
+        <div class="neos-footer">
+            <f:link.action
+                title="New H5P Content"
+                class="neos-button neos-button-primary"
+                package="Sandstorm.NeosH5P"
+                controller="Backend\Content"
+                action="new">
+                New H5P Content
+            </f:link.action>
+        </div>
+    </div>
+</f:section>

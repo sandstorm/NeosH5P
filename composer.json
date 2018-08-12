@@ -5,6 +5,7 @@
     "license": "MIT",
     "require": {
         "neos/neos": "*",
+        "neos/neos-ui": "*",
         "h5p/h5p-core": "~1.17.0",
         "h5p/h5p-editor": "~1.17.0",
         "guzzlehttp/guzzle": "~6.3.0",

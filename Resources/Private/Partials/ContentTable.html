@@ -1,98 +1,137 @@
-<f:widget.paginate objects="{contents}" as="paginatedContents" configuration="{itemsPerPage: 30, maximumNumberOfLinks: 7}">
-    <table class="neos-table">
-        <thead>
-        <tr>
-            <th class="neos-span5">Title</th>
-            <th class="neos-span3">Library</th>
-            <th class="neos-span1">Content&nbsp;ID</th>
-            <th class="neos-span2">Created</th>
-            <th class="neos-span2">Updated</th>
-            <th class="neos-span2">Author</th>
-            <th class="neos-span1">&nbsp;</th>
-        </tr>
-        </thead>
-        <tbody>
+<f:comment>
+    TODO: Re-enable pagination - currently not working for fullscreen editor
+    <f:widget.paginate objects="{contents}" as="paginatedContents"
+                       configuration="{itemsPerPage: 30, maximumNumberOfLinks: 7}"></f:widget.paginate>
+</f:comment>
+<table class="neos-table h5p-content-table">
+    <thead>
+    <tr>
+        <th class="neos-span5">Title</th>
+        <th class="neos-span3">Library</th>
+        <th class="neos-span1">Content&nbsp;ID</th>
+        <f:if condition="{isRenderedInFullscreenEditor}">
+            <f:else>
+                <th class="neos-span2">Created</th>
+                <th class="neos-span2">Updated</th>
+            </f:else>
+        </f:if>
+        <th class="neos-span2">Author</th>
+        <th class="neos-span1">&nbsp;</th>
+    </tr>
+    </thead>
+    <tbody>
 
-        <f:for each="{paginatedContents}" as="content" key="index">
-            <tr>
-                <td>
-                    <neos:link.module
-                        title="View Content"
-                        path="h5p/content"
-                        action="display"
-                        arguments="{content:content}">
-                        {content.title}
-                    </neos:link.module>
-                </td>
-                <td>
-                    {content.library.title}
-                </td>
-                <td>
-                    {content.contentId}
-                </td>
-                <td>
-                    {content.createdAt -> f:format.date(format:'Y-m-d H:i')}
-                </td>
-                <td>
-                    {content.updatedAt -> f:format.date(format:'Y-m-d H:i')}
-                </td>
-                <td>
-                    {content.account.accountIdentifier}
-                </td>
-                <td class="neos-action">
-                    <div class="neos-pull-right">
+    <f:for each="{contents}" as="content" key="index">
+        <tr data-contentid="{content.contentId}">
+            <td>
+                <f:if condition="{isRenderedInFullscreenEditor}">
+                    <f:then>
+                        <f:link.action
+                            title="View Content"
+                            controller="Backend\Content"
+                            action="display"
+                            arguments="{content:content}">
+                            {content.title}
+                        </f:link.action>
+                    </f:then>
+                    <f:else>
                         <neos:link.module
                             title="View Content"
                             path="h5p/content"
                             action="display"
-                            arguments="{content:content}"
-                            additionalAttributes="{data-neos-toggle: 'tooltip', class: 'neos-button neos-button-primary'}">
-                            <i class="icon-info-sign icon-white"></i>
+                            arguments="{content:content}">
+                            {content.title}
                         </neos:link.module>
-                        <neos:link.module
-                            title="Edit Content"
-                            path="h5p/content"
-                            action="edit"
-                            arguments="{content:content}"
-                            additionalAttributes="{data-neos-toggle: 'tooltip', class: 'neos-button neos-button-primary'}">
-                            <i class="icon-pencil icon-white"></i>
-                        </neos:link.module>
-                        <button class="neos-button neos-button-danger" title="Remove this content" data-toggle="modal" href="#remove-{index}" data-neos-toggle="tooltip">
-                            <i class="icon-trash icon-white"></i>
-                        </button>
-                        <div class="neos-hide" id="remove-{index}">
-                            <div class="neos-modal-centered">
-                                <div class="neos-modal-content">
-                                    <div class="neos-modal-header">
-                                        <button type="button" class="neos-close neos-button" data-dismiss="modal"></button>
-                                        <div class="neos-header">
-                                            Confirm deletion
-                                        </div>
-                                        <div>
-                                            <div class="neos-subheader">
-                                                <p>
-                                                    {content.title} will be deleted permanently.
-                                                </p>
+                    </f:else>
+                </f:if>
+            </td>
+            <td>
+                {content.library.title}
+            </td>
+            <td>
+                {content.contentId}
+            </td>
+            <f:if condition="{isRenderedInFullscreenEditor}">
+                <f:else>
+                    <td>
+                        {content.createdAt -> f:format.date(format:'Y-m-d H:i')}
+                    </td>
+                    <td>
+                        {content.updatedAt -> f:format.date(format:'Y-m-d H:i')}
+                    </td>
+                </f:else>
+            </f:if>
+            <td>
+                {content.account.accountIdentifier}
+            </td>
+            <td class="neos-action">
+                <f:if condition="{isRenderedInFullscreenEditor}">
+                    <f:then>
+                        <div class="neos-pull-right">
+                            <button class="neos-button neos-button-primary"
+                                    onclick="chooseContent('{content.identifier}', {content.contentId}, '{content.title}')">Choose
+                            </button>
+                        </div>
+                    </f:then>
+                    <f:else>
+                        <div class="neos-pull-right">
+                            <neos:link.module
+                                title="View Content"
+                                path="h5p/content"
+                                action="display"
+                                arguments="{content:content}"
+                                additionalAttributes="{data-neos-toggle: 'tooltip', class: 'neos-button neos-button-primary'}">
+                                <i class="icon-info-sign icon-white"></i>
+                            </neos:link.module>
+                            <neos:link.module
+                                title="Edit Content"
+                                path="h5p/content"
+                                action="edit"
+                                arguments="{content:content}"
+                                additionalAttributes="{data-neos-toggle: 'tooltip', class: 'neos-button neos-button-primary'}">
+                                <i class="icon-pencil icon-white"></i>
+                            </neos:link.module>
+                            <button class="neos-button neos-button-danger" title="Remove this content"
+                                    data-toggle="modal" href="#remove-{index}" data-neos-toggle="tooltip">
+                                <i class="icon-trash icon-white"></i>
+                            </button>
+                            <div class="neos-hide" id="remove-{index}">
+                                <div class="neos-modal-centered">
+                                    <div class="neos-modal-content">
+                                        <div class="neos-modal-header">
+                                            <button type="button" class="neos-close neos-button"
+                                                    data-dismiss="modal"></button>
+                                            <div class="neos-header">
+                                                Confirm deletion
+                                            </div>
+                                            <div>
+                                                <div class="neos-subheader">
+                                                    <p>
+                                                        {content.title} will be deleted permanently.
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="neos-modal-footer">
-                                        <a href="#" class="neos-button" data-dismiss="modal">Cancel</a>
-                                        <f:form action="delete" arguments="{content: content}" class="neos-inline">
-                                            <button type="submit" class="neos-button neos-button-danger" title="Confirm deletion">
-                                                Delete
-                                            </button>
-                                        </f:form>
+                                        <div class="neos-modal-footer">
+                                            <a href="#" class="neos-button" data-dismiss="modal">Cancel</a>
+                                            <f:form action="delete" arguments="{content: content}"
+                                                    class="neos-inline">
+                                                <button type="submit" class="neos-button neos-button-danger"
+                                                        title="Confirm deletion">
+                                                    Delete
+                                                </button>
+                                            </f:form>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="neos-modal-backdrop neos-in"></div>
                             </div>
-                            <div class="neos-modal-backdrop neos-in"></div>
                         </div>
-                    </div>
-                </td>
-            </tr>
-        </f:for>
+                    </f:else>
+                </f:if>
+            </td>
+        </tr>
+    </f:for>
 
-        </tbody>
-    </table>
-</f:widget.paginate>
+    </tbody>
+</table>

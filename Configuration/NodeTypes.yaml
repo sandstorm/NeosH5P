@@ -14,16 +14,15 @@ Sandstorm.NeosH5P:H5PContent:
         h5pcontent:
           label: 'H5P Content'
           tab: 'h5pcontent'
-          position: 1'
+          position: 1
   properties:
     contentId:
       type: string
       ui:
-        label: 'Select H5P Content'
-        # As we inject the necessary JS in a plugin, we need a full page reload if a different content is selected.
+        label: 'Content'
+        # As we inject the necessary JS in a plugin that is rendered outside the content element,
+        # we need a full page reload if a different content is selected.
         reloadPageIfChanged: true
         inspector:
           group: 'h5pcontent'
-          editor: 'Neos.Neos/Inspector/Editors/SelectBoxEditor'
-          editorOptions:
-            dataSourceIdentifier: 'sandstorm-neosh5p-content'
+          editor: 'Sandstorm.NeosH5P/ContentPickerEditor'

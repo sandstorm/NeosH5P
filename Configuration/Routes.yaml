@@ -92,3 +92,14 @@
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Frontend\ContentEmbed'
     '@action': 'index'
+
+# neos fullscreen inspector routes
+-
+  name: 'H5P Neos inspector - fullscreen editor content controller routes'
+  uriPattern: 'neosh5p/contentfullscreeneditor/{@action}(/{content})'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Backend\Content'
+    '@action': 'new'
+    '@format': 'html'
+    'content': ''

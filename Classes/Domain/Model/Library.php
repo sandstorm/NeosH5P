@@ -6,7 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Neos\Flow\Annotations as Flow;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use Neos\Flow\Persistence\QueryResultInterface;
 use Neos\Flow\ResourceManagement\PersistentResource;
+use Sandstorm\NeosH5P\Domain\Repository\LibraryDependencyRepository;
 use Sandstorm\NeosH5P\Domain\Service\LibraryUpgradeService;
 use Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework;
 
@@ -149,12 +151,6 @@ class Library
     protected $libraryDependencies;
 
     /**
-     * @var Collection<LibraryDependency>
-     * @ORM\OneToMany(mappedBy="requiredLibrary", cascade={"persist", "remove"})
-     */
-    protected $librariesUsingThisLibrary;
-
-    /**
      * @var Collection<LibraryTranslation>
      * @ORM\OneToMany(mappedBy="library", cascade={"persist", "remove"})
      */
@@ -177,6 +173,12 @@ class Library
      * @Flow\Inject
      */
     protected $libraryUpgradeService;
+
+    /**
+     * @Flow\Inject
+     * @var LibraryDependencyRepository
+     */
+    protected $libraryDependencyRepository;
 
     /**
      * Creates a library from a metadata array.
@@ -694,11 +696,11 @@ class Library
     }
 
     /**
-     * @return Collection
+     * @return array
      */
-    public function getLibrariesUsingThisLibrary(): Collection
+    public function getDependentLibraries(): array
     {
-        return $this->librariesUsingThisLibrary;
+        return $this->libraryDependencyRepository->findByRequiredLibrary($this)->toArray();
     }
 
     /**

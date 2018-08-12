@@ -82,6 +82,12 @@ Neos:
             description: 'Make administrative settings for H5P.'
             icon: icon-cogs
 
+    Ui:
+      resources:
+        javascript:
+          'Sandstorm.NeosH5P:ContentPickerEditor':
+            resource: resource://Sandstorm.NeosH5P/Public/ContentPickerEditor/Plugin.js
+
     fusion:
       autoInclude:
         Sandstorm.NeosH5P: true

@@ -234,6 +234,14 @@ class Content
     }
 
     /**
+     * Returns the doctrine identifier.
+     * @return string
+     */
+    public function getIdentifier() {
+        return $this->Persistence_Object_Identifier;
+    }
+
+    /**
      * @param array $contentData
      * @param Library $library
      */

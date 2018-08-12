@@ -1,0 +1,23 @@
+<f:render partial="H5PIntegrationScriptsAndStyles" arguments="{_all}" />
+<script src="/_Resources/Static/H5P/h5p-editor/scripts/h5peditor-editor.js?v=dev-master"></script>
+<script src="/_Resources/Static/H5P/h5p-editor/scripts/h5peditor-init.js?v=dev-master"></script>
+<script>
+    H5P.jQuery(document).ready(function () {
+        H5PEditor.init(
+            // $form
+            H5P.jQuery('#h5p-content-form'),
+            // $type
+            H5P.jQuery('.h5p-actions'),
+            // $upload
+            H5P.jQuery('#h5p-upload'),
+            // $create
+            H5P.jQuery('#h5p-create'),
+            // $editor
+            H5P.jQuery('#h5p-editor'),
+            // $library
+            H5P.jQuery('#h5p-library'),
+            // $params
+            H5P.jQuery('#h5p-parameters')
+        )
+    });
+</script>

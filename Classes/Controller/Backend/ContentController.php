@@ -13,6 +13,7 @@ use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ContentResultRepository;
 use Sandstorm\NeosH5P\Domain\Service\CRUD\ContentCRUDService;
 use Sandstorm\NeosH5P\Domain\Service\H5PIntegrationService;
+use Sandstorm\NeosH5P\Domain\Service\UriGenerationService;
 
 class ContentController extends AbstractModuleController
 {
@@ -47,26 +48,16 @@ class ContentController extends AbstractModuleController
     protected $contentResultRepository;
 
     /**
-     * We add the Neos default partials and layouts here, so we can use them
-     * in our backend modules
-     *
-     * @param ViewInterface $view
-     * @return void
+     * @Flow\Inject
+     * @var UriGenerationService
      */
-    protected function initializeView(ViewInterface $view)
-    {
-        parent::initializeView($view);
-        $view->getTemplatePaths()->setLayoutRootPath('resource://Neos.Neos/Private/Layouts');
-        $view->getTemplatePaths()->setPartialRootPaths(array_merge(
-            ['resource://Neos.Neos/Private/Partials', 'resource://Neos.Neos/Private/Partials'],
-            $view->getTemplatePaths()->getPartialRootPaths()
-        ));
-    }
+    protected $uriGenerationService;
 
     public function indexAction()
     {
         $contents = $this->contentRepository->findAll();
         $this->view->assign('contents', $contents);
+        $this->view->assign('isRenderedInFullscreenEditor', $this->isRenderedInFullscreenEditor());
     }
 
     /**
@@ -120,6 +111,7 @@ class ContentController extends AbstractModuleController
         $this->view->assign('settings', json_encode($h5pIntegrationSettings));
         $this->view->assign('scripts', $h5pIntegrationSettings['core']['scripts']);
         $this->view->assign('styles', $h5pIntegrationSettings['core']['styles']);
+        $this->view->assign('isRenderedInFullscreenEditor', $this->isRenderedInFullscreenEditor());
     }
 
     /**
@@ -133,7 +125,7 @@ class ContentController extends AbstractModuleController
     {
         // We only handle $action == 'create' so far
         if ($action === 'upload') {
-            // TODO
+            // TODO: not implemented yet
         }
 
         $content = $this->contentCRUDService->handleCreateOrUpdate($title, $library, $parameters);
@@ -200,5 +192,10 @@ class ContentController extends AbstractModuleController
         foreach ($this->h5pCore->h5pF->getMessages('error') as $errorMessage) {
             $this->addFlashMessage($errorMessage->message, $errorMessage->code ?: 'H5P error', Message::SEVERITY_ERROR);
         }
+    }
+
+    private function isRenderedInFullscreenEditor()
+    {
+        return $this->request->isMainRequest();
     }
 }

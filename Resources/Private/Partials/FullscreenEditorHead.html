@@ -1,0 +1,43 @@
+<head>
+    <link rel="stylesheet" type="text/css"
+          href="{f:uri.resource(path: 'Styles/Includes-built.css', package: 'Neos.Neos')}?bust={neos:backend.cssBuiltVersion()}"/>
+    <link rel="stylesheet" type="text/css"
+          href="{f:uri.resource(path: 'Styles/FullscreenEditor.css', package: 'Sandstorm.NeosH5P')}"/>
+    <script src="{f:uri.resource(path: 'Library/jquery/jquery-2.0.3.js', package: 'Neos.Neos')}"></script>
+    <script src="{f:uri.resource(path: '2/js/bootstrap.min.js', package: 'Neos.Twitter.Bootstrap')}"></script>
+    <script type="text/javascript">
+        // API to be used for synchronous picking and closing the iframe
+        function chooseContent(persistenceObjectIdentifier, contentId, title) {
+            if (window.parent !== window && window.parent.NeosH5PBrowserCallbacks && window.parent.NeosH5PBrowserCallbacks.chooseContent) {
+                window.parent.NeosH5PBrowserCallbacks.chooseContent({persistenceObjectIdentifier, contentId, title});
+            }
+        }
+
+        // API to be used for asynchronous picking a void content and closing the iframe - currently used if a content should be deleted
+        // We only commit here if the currently selected content was deleted.
+        function commitIfCurrentContentWasDeleted(currentContentId) {
+            if (window.parent.NeosH5PBrowserCallbacks &&
+                window.parent.NeosH5PBrowserCallbacks.currentContent &&
+                window.parent.NeosH5PBrowserCallbacks.currentContent.contentId == currentContentId) {
+                if (window.parent !== window && window.parent.NeosH5PBrowserCallbacks && window.parent.NeosH5PBrowserCallbacks.chooseContentAfterSaving) {
+                    window.parent.NeosH5PBrowserCallbacks.chooseContentAfterSaving({persistenceObjectIdentifier: '', contentId: '', title: ''});
+                }
+            }
+        }
+
+        // Highlight the correctly selected row in the content table, if it exists
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.parent !== window &&
+                window.parent.NeosH5PBrowserCallbacks &&
+                window.parent.NeosH5PBrowserCallbacks.currentContent) {
+
+                const selector = '.h5p-content-table tr[data-contentId="' + window.parent.NeosH5PBrowserCallbacks.currentContent.contentId + '"]';
+                const element = document.querySelector(selector);
+                if (element) {
+                    element.classList.add("h5p-current-content");
+                }
+            }
+        });
+
+    </script>
+</head>
