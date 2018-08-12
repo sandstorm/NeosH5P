@@ -1,4 +1,12 @@
-.neos.neos-module.h5p-fullscreen-editor .neos-footer {
+.neos.neos-module.h5p-fullscreen-editor .neos-row-fluid {
+    padding-left: 16px;
+}
+.neos.neos-module.h5p-fullscreen-editor .neos-row-fluid .neos-row-fluid,
+.neos.neos-module.h5p-fullscreen-editor .neos-row-fluid.neos-row-fluid--nopadding {
+    padding-left: 0;
+}
+
+.neos.neos-module.h5p-fullscreen-editor .neos-row-fluid .neos-footer {
     position: fixed;
     bottom: 0;
     left: 0;

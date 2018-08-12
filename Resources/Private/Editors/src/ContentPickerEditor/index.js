@@ -34,10 +34,11 @@ export default class ContentPickerEditor extends PureComponent {
 
 
     handleContentChosen = content => {
-        this.setState(content);
-        this.props.commit(content.contentId);
-        // hide fullscreen editor if content was set.
+        const {commit} = this.props;
+        // Hide secondary editor
         this.props.renderSecondaryInspector('H5P_CONTENT_FULLSCREEN_EDITOR');
+        // Set state and commit
+        this.setState(content, () => commit(content.contentId));
     };
 
     handleDisplayContent = () => {

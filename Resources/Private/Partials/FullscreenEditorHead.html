@@ -12,10 +12,16 @@
                 window.parent.NeosH5PBrowserCallbacks.chooseContent({persistenceObjectIdentifier, contentId, title});
             }
         }
-        // API to be used for asynchronous picking and closing the iframe - currently used if a content should be deleted
-        function chooseContentAfterSaving(persistenceObjectIdentifier, contentId, title) {
-            if (window.parent !== window && window.parent.NeosH5PBrowserCallbacks && window.parent.NeosH5PBrowserCallbacks.chooseContentAfterSaving) {
-                window.parent.NeosH5PBrowserCallbacks.chooseContentAfterSaving({persistenceObjectIdentifier, contentId, title});
+
+        // API to be used for asynchronous picking a void content and closing the iframe - currently used if a content should be deleted
+        // We only commit here if the currently selected content was deleted.
+        function commitIfCurrentContentWasDeleted(currentContentId) {
+            if (window.parent.NeosH5PBrowserCallbacks &&
+                window.parent.NeosH5PBrowserCallbacks.currentContent &&
+                window.parent.NeosH5PBrowserCallbacks.currentContent.contentId == currentContentId) {
+                if (window.parent !== window && window.parent.NeosH5PBrowserCallbacks && window.parent.NeosH5PBrowserCallbacks.chooseContentAfterSaving) {
+                    window.parent.NeosH5PBrowserCallbacks.chooseContentAfterSaving({persistenceObjectIdentifier: '', contentId: '', title: ''});
+                }
             }
         }
 

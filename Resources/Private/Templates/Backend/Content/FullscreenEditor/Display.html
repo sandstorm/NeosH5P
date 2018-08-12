@@ -6,18 +6,6 @@
 
     <f:render partial="H5PIntegrationScriptsAndStyles" arguments="{_all}"/>
 
-    <script type="text/javascript">
-        function commitIfCurrentContentWasDeleted() {
-            if (window.parent.NeosH5PBrowserCallbacks &&
-                window.parent.NeosH5PBrowserCallbacks.currentContent &&
-                window.parent.NeosH5PBrowserCallbacks.currentContent.contentId === {content.contentId})
-            {
-                // We only commit here if the currently selected content was deleted.
-                chooseContentAfterSaving('', '', '');
-            }
-        }
-    </script>
-
     <legend>{content.title}</legend>
     <div class="h5p-content-wrapper" style="background: #fff; padding: 20px 10px;">
         <f:switch expression="{content.embedType}">
@@ -71,7 +59,7 @@
                         <a href="#" class="neos-button" data-dismiss="modal">Cancel</a>
                         <f:form action="delete" arguments="{content: content}" class="neos-inline">
                             <button type="submit" class="neos-button neos-button-danger" title="Confirm deletion"
-                                    onclick="commitIfCurrentContentWasDeleted()">
+                                    onclick="commitIfCurrentContentWasDeleted({content.contentId})">
                                 Delete
                             </button>
                         </f:form>
