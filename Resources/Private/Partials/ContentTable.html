@@ -26,7 +26,13 @@
             <td>
                 <f:if condition="{isRenderedInFullscreenEditor}">
                     <f:then>
-                        <a href="http://127.0.0.1:8081/neosh5p/content/display/{content.persistenceObjectIdentifier}">{content.title}</a>
+                        <f:link.action
+                            title="View Content"
+                            controller="Backend\Content"
+                            action="display"
+                            arguments="{content:content}">
+                            {content.title}
+                        </f:link.action>
                     </f:then>
                     <f:else>
                         <neos:link.module

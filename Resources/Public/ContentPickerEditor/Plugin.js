@@ -427,8 +427,8 @@ var ContentPickerEditor = (_dec = (0, _neosUiDecorators.neos)(function (globalRe
         _this.onContentPicked = function (content) {
             _this.setState(content);
             _this.props.commit(content.contentId);
-            // hide fullscreen editor
-            _this.props.renderSecondaryInspector('H5P_CONTENT_FULLSCREEN_EDITOR');
+            // hide fullscreen editor if content was set. content.contentId contains NULL if a "delete" was committed.
+            if (content.contentId) _this.props.renderSecondaryInspector('H5P_CONTENT_FULLSCREEN_EDITOR');
         };
 
         _this.handleDisplayContent = function () {

@@ -1,41 +1,26 @@
 {namespace neos=Neos\Neos\ViewHelpers}
-<script type="text/javascript">
-    function contentPicked(contentId) {
-        if (window.parent !== window && window.parent.NeosH5PBrowserCallbacks && window.parent.NeosH5PBrowserCallbacks.contentPicked) {
-            window.parent.NeosH5PBrowserCallbacks.contentPicked(contentId);
-        }
-    }
-
-    function contentEdit(contentId) {
-        if (window.parent !== window && window.parent.NeosH5PBrowserCallbacks && window.parent.NeosH5PBrowserCallbacks.contentEdit) {
-            window.parent.NeosH5PBrowserCallbacks.contentEdit(contentId);
-        }
-    }
-
-    function contentDelete(contentId) {
-        if (window.parent !== window && window.parent.NeosH5PBrowserCallbacks && window.parent.NeosH5PBrowserCallbacks.contentDelete) {
-            window.parent.NeosH5PBrowserCallbacks.contentDelete(contentId);
-        }
-    }
-</script>
-
 <html>
-<head>
-    <link rel="stylesheet" type="text/css"
-          href="{f:uri.resource(path: 'Styles/Includes-built.css', package: 'Neos.Neos')}?bust={neos:backend.cssBuiltVersion()}"/>
-</head>
-<body class="neos">
+<f:render partial="FullscreenEditorHead" arguments="{_all}"/>
+<body class="neos neos-module h5p-fullscreen-editor">
 <div class="neos-row-fluid">
 
-    <f:for each="{styles}" as="style">
-        <link rel="stylesheet" href="{style -> f:format.raw()}"/>
-    </f:for>
-    <script>
-        window.H5PIntegration = {settings -> f:format.raw()};
+    <f:render partial="H5PIntegrationScriptsAndStyles" arguments="{_all}"/>
+
+    <script type="text/javascript">
+        function commitIfCurrentContentWasDeleted() {
+
+            console.log(window.parent.NeosH5PBrowserCallbacks);
+            console.log(window.parent.NeosH5PBrowserCallbacks.currentContent);
+            console.log('{content.contentId}');
+
+            if (window.parent.NeosH5PBrowserCallbacks &&
+                window.parent.NeosH5PBrowserCallbacks.currentContent &&
+                window.parent.NeosH5PBrowserCallbacks.currentContent.contentId === '{content.contentId}') {
+                // We only commit here if the currently selected content was deleted.
+                contentPicked(null, null, null);
+            }
+        }
     </script>
-    <f:for each="{scripts}" as="script">
-        <script src="{script -> f:format.raw()}"></script>
-    </f:for>
 
     <legend>{content.title}</legend>
     <div class="h5p-content-wrapper" style="background: #fff; padding: 20px 10px;">
@@ -58,8 +43,60 @@
         </f:switch>
     </div>
 </div>
-<button class="neos-button neos-button-primary" onclick="contentPicked({content.contentId})">Choose</button>
-<button class="neos-button neos-button-primary" onclick="contentEdit({content.contentId})">Edit</button>
-<button class="neos-button neos-button-danger" onclick="contentDelete({content.contentId})">Delete</button>
+
+<div class="neos-footer">
+    <f:link.action
+        title="Back to overview"
+        controller="Backend\Content"
+        action="index"
+        class="neos-button">
+        Back
+    </f:link.action>
+    <button class="neos-button neos-button-danger" title="Remove this content" data-toggle="modal"
+            href="#remove-content" data-neos-toggle="tooltip">
+        Delete
+    </button>
+    <div class="neos-hide" id="remove-content">
+        <div class="neos-modal-centered">
+            <div class="neos-modal-content">
+                <div class="neos-modal-header">
+                    <button type="button" class="neos-close neos-button" data-dismiss="modal"></button>
+                    <div class="neos-header">
+                        Confirm deletion
+                    </div>
+                    <div>
+                        <div class="neos-subheader">
+                            <p>
+                                {content.title} will be deleted permanently.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="neos-modal-footer">
+                    <a href="#" class="neos-button" data-dismiss="modal">Cancel</a>
+                    <f:form action="delete" arguments="{content: content}" class="neos-inline">
+                        <button type="submit" class="neos-button neos-button-danger" title="Confirm deletion"
+                                onclick="commitIfCurrentContentWasDeleted()">
+                            Delete
+                        </button>
+                    </f:form>
+                </div>
+            </div>
+        </div>
+        <div class="neos-modal-backdrop neos-in"></div>
+    </div>
+    <f:link.action
+        title="Edit this content"
+        controller="Backend\Content"
+        action="edit"
+        arguments="{content:content}"
+        class="neos-button neos-button-primary">
+        Edit
+    </f:link.action>
+    <button class="neos-button neos-button-primary"
+            onclick="contentPicked('{content.identifier}', {content.contentId}, '{content.title}')">Choose
+    </button>
+</div>
+
 </body>
 </html>
