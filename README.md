@@ -83,16 +83,16 @@ Neos:
 ```
 
 ## 3. Integrate xAPI
-* You can control which username and email address is sent in xAPI statements by implementing your own implementation of
-  the `FrontendUserServiceInterface`. Check the default `Sandstorm\NeosH5P\Domain\Service\FrontendUserService` for an
-  example. You need to configure Neos to use your implementation in your site package's `Objects.yaml`. This will give 
-  you the opportunity to interact with your own frontend user model and extract name and email address.
+You can control which username and email address is sent in xAPI statements by implementing your own implementation of
+the `FrontendUserServiceInterface`. Check the default `Sandstorm\NeosH5P\Domain\Service\FrontendUserService` for an
+example. You need to configure Neos to use your implementation in your site package's `Objects.yaml`. This will give 
+you the opportunity to interact with your own frontend user model and extract name and email address.
 
 ## 4. Set up a cronjob to remove temporary H5P editor files
-* Plan a cronjob to remove all EditorTempfiles and associated resources. EditorTempfiles are created e.g. when a user
-  starts creating an H5P content element and has already uploaded assets (such as pictures), then cancels the process.
-  We provide a CLI command for this: `./flow h5p:cleareditortempfiles`. Depending on how many users you have that are
-  creating H5P content, this should be run about once a week.
+Plan a cronjob to remove all EditorTempfiles and associated resources. EditorTempfiles are created e.g. when a user
+starts creating an H5P content element and has already uploaded assets (such as pictures), then cancels the process.
+We provide a CLI command for this: `./flow h5p:cleareditortempfiles`. Depending on how many users you have that are
+creating H5P content, this should be run about once a week.
 
 # Known issues / remaining TODOs
 * Internationalization is not implemented yet.
