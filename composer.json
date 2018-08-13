@@ -1,10 +1,26 @@
 {
     "name": "sandstorm/neos-h5p",
-    "type": "neos-plugin",
     "description": "H5P Platform Integration Plugin for Neos CMS",
+    "type": "neos-plugin",
+    "keywords": ["Neos", "neos plugin", "H5P", "rich content", "LRS", "LMS"],
+    "homepage": "https://github.com/sandstorm/NeosH5P",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Bastian Heist",
+            "email": "bastian.heist@sandstorm.de",
+            "homepage": "https://sandstorm.de",
+            "role": "Developer"
+        },
+        {
+            "name": "Leon Kleffmann",
+            "email": "leon.kleffmann@sandstorm.de",
+            "homepage": "https://sandstorm.de",
+            "role": "Developer"
+        }
+    ],
     "require": {
-        "neos/neos": "*",
+        "neos/neos": ">=4.0.0",
         "neos/neos-ui": "*",
         "h5p/h5p-core": "~1.17.0",
         "h5p/h5p-editor": "~1.17.0",

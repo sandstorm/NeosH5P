@@ -18,8 +18,8 @@ roles:
       -
         privilegeTarget: 'Sandstorm.NeosH5P:PluginControllerActions'
         permission: GRANT
-      # TODO: we should not ship this, as we don't really want to persist results for backend users.
-      # this is for testing only, and needs to be moved to the integrating package.
-      -
-        privilegeTarget: 'Sandstorm.NeosH5P:FrontendControllerActions'
-        permission: GRANT
+
+# This is for development/testing only, and needs to be defined in the integrating package.
+#      -
+#        privilegeTarget: 'Sandstorm.NeosH5P:FrontendControllerActions'
+#        permission: GRANT

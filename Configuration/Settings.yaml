@@ -1,6 +1,6 @@
 Sandstorm:
   NeosH5P:
-    # This is where H5P content will be reachable from outside. You usually do not have to change this.
+    # This is where H5P content will be reachable from outside. You usually do not have to change anything here.
     h5pPublicFolder:
       # URL of the h5p public folder. Can be absolute or relative to the base Uri.
       url: &h5pPublicFolderUrl '/_Resources/Static/H5P/'
@@ -18,25 +18,24 @@ Sandstorm:
         # Directory where temporary editor files are put.
         editorTempfiles: &h5pEditorTempfilesSubfolderName 'editor-temp'
 
-    # These can be generated as ConfigSettings by the flow command
-    # ./flow h5p:generatedefaultconfigsettings. Adapt these to your needs and re-run the command if you
-    # changed anything.
-    defaultConfigSettings:
+    # These can be generated as ConfigSettings by the flow command ./flow h5p:generateconfig.
+    # Adapt these to your needs and re-run the command if you changed anything.
+    configSettings:
       # if TRUE, sends usage statistics (#contents, #authors, #librs, etc) to H5P Hub
-      # with every content type cache refresh
+      # with every content type cache refresh. Not implemented yet!
       send_usage_statistics: false
-      # if TRUE, saves ContentResults for logged-in users
+      # if TRUE, saves ContentResults for logged-in users. These can be seen in the H5P backend.
       track_user: true
       # if TRUE, saves ContentUserData for logged-in users. This saves data that a frontend user
       # enters during his work with a content, and will restore content state on page reloads.
       save_content_state: true
       # interval in seconds for which the ContentUserData is saved
       save_content_frequency: 10
-      # whether or not the H5P hub is enabled.
+      # whether or not the H5P hub is enabled. Should always be TRUE.
       hub_is_enabled: true
-      # Enables LRS content types.
-      enable_lrs_content_types: true
-      # content display options
+      # Enables LRS content types. Set to true if you integrated an LRS.
+      enable_lrs_content_types: false
+      # content display options - controls the frame under each H5P content element.
       frame: true
       export: true
       embed: true
@@ -48,7 +47,7 @@ Sandstorm:
     # If you do not need xAPI, set this to an empty array: "xAPI: []"
     xAPI:
       # set to TRUE to log all xAPI statements to the console.
-      debugMode: true
+      debugMode: false
       # set this to a script path that should be loaded in the xAPI scope. This is the place where you put your
       # custom xAPI integration script.
       integrationScript: 'resource://Sandstorm.NeosH5P/Public/Scripts/xAPIExample.js'
@@ -58,14 +57,14 @@ Sandstorm:
         yourLRSEndpoint: 'http://example.com'
 
     # Setting for the H5PCore->aggregateAssets switch. If set to TRUE, H5P triggers the generation of
-    # aggregated assets (CachedAsset) for each content element.
+    # aggregated assets (CachedAsset) for each content element. This improves page load times, so should
+    # be true unless you have a good reason.
     aggregateAssets: true
     # Set to true to enable the export functionality. This only controls the generation of export files.
     # To make them available for download, you have to enable the "export" config setting above.
     enableExport: true
 
 Neos:
-
   Neos:
     modules:
       'h5p':
@@ -109,8 +108,26 @@ Neos:
       autoInclude:
         Sandstorm.NeosH5P: true
 
-
   Flow:
+    # We add a request pattern for our controllers to the Neos Backend provider,
+    # so that XHR requests that go directly to these controllers (and not through
+    # a ModuleController subrequest) can be authenticated as well
+    security:
+      authentication:
+        providers:
+          'Neos.Neos:Backend':
+            requestPatterns:
+              'Sandstorm.NeosH5P:BackendControllers':
+                pattern: 'ControllerObjectName'
+                patternOptions:
+                  controllerObjectNamePattern: 'Sandstorm\NeosH5P\Controller\Backend\.*'
+
+#              This is for development/testing only, and needs to be defined in the integrating package.
+#              'Sandstorm.NeosH5P:FrontendControllers':
+#                pattern: 'ControllerObjectName'
+#                patternOptions:
+#                  controllerObjectNamePattern: 'Sandstorm\NeosH5P\Controller\Frontend\.*'
+
     # We need the tag "@variable" as an ignored annotation, because otherwise parsing of the
     # H5PFrameworkInterface causes a reflection error
     reflection:
@@ -187,22 +204,3 @@ Neos:
             path: *h5pPublicFolderPath
             baseUri: *h5pPublicFolderUrl
             subdivideHashPathSegment: false
-
-    # We add a request pattern for our controllers to the Neos Backend provider,
-    # so that XHR requests that go directly to these controllers (and not through
-    # a ModuleController subrequest) can be authenticated as well
-    security:
-      authentication:
-        providers:
-          'Neos.Neos:Backend':
-            requestPatterns:
-              'Sandstorm.NeosH5P:BackendControllers':
-                pattern: 'ControllerObjectName'
-                patternOptions:
-                  controllerObjectNamePattern: 'Sandstorm\NeosH5P\Controller\Backend\.*'
-              # TODO: we should not ship this, as we don't really want to persist results for backend users.
-              # this is for testing only, and needs to be moved to the integrating package.
-              'Sandstorm.NeosH5P:FrontendControllers':
-                pattern: 'ControllerObjectName'
-                patternOptions:
-                  controllerObjectNamePattern: 'Sandstorm\NeosH5P\Controller\Frontend\.*'

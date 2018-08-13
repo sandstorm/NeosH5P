@@ -18,7 +18,9 @@ H5P.jQuery(function ($) {
      * with them.
      */
     function onXAPI(event) {
-        console.log('Triggering LRS message!');
+        console.log('An xAPI event was fired.');
+        console.log('To get rid of this message, refer to the "xAPI" section in the Settings.yaml of the Sandstorm.NeosH5P package.');
+        console.log(event);
         // $.ajax({
         //     type: "POST",
         //     // This is the example taken from the config - define your own integration settings here, they will be

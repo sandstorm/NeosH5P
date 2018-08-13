@@ -61,9 +61,9 @@ class H5PCommandController extends CommandController
 
     /**
      * @var array
-     * @Flow\InjectConfiguration(path="defaultConfigSettings")
+     * @Flow\InjectConfiguration(path="configSettings")
      */
-    protected $defaultConfigSettings;
+    protected $configSettings;
 
     /**
      * Clears all EditorTempfiles from the database and file system.
@@ -117,12 +117,12 @@ class H5PCommandController extends CommandController
     }
 
     /**
-     * Generates sane default config values.
+     * Generates config values into the database from the ones given in Settings.yaml.
      */
-    public function generateDefaultConfigSettingsCommand()
+    public function generateConfigCommand()
     {
-        $this->outputLine('Generating the following default settings:');
-        foreach ($this->defaultConfigSettings as $key => $value) {
+        $this->outputLine('Making the following config settings:');
+        foreach ($this->configSettings as $key => $value) {
             $this->h5pFramework->setOption($key, $value);
             $this->outputLine("<b>$key:</b> $value");
         }
