@@ -31,7 +31,7 @@ results and settings.
 **Make sure to read and follow the integration guide below to really make the best use of the H5P package.**
 
 # Usage
-Refer to this video explaining how to use the H5P plugin: **TODO**
+Refer to this video explaining how to use the H5P plugin: https://www.youtube.com/watch?v=eslFaQ3oj7E
 
 # Integration Guide
 ## 1. Adjust Settings to your needs
