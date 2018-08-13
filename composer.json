@@ -1,5 +1,5 @@
 {
-    "name": "sandstorm/neos-h5p",
+    "name": "sandstorm/neosh5p",
     "description": "H5P Platform Integration Plugin for Neos CMS",
     "type": "neos-plugin",
     "keywords": ["Neos", "neos plugin", "H5P", "rich content", "LRS", "LMS"],
