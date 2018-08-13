@@ -14,13 +14,15 @@ Sandstorm.NeosH5P is currently being maintained for the following versions:
 
 | Neos Version  | Sandstorm.NeosH5P | Branch | Maintained |
 |---------------|-------------------|--------|------------|
+| 3.3           | 1.0               | master | Active     |
 | 4.x           | 1.0               | master | Active     |
 
 # Installation
-Installation is simple and consists of three steps:
+Installation is simple and consists of these steps:
 1. Run `composer require sandstorm/neosh5p`
 2. Install the database model via `./flow doctrine:migrate`
 3. Create a default set of configuration via `./flow h5p:generateconfig`
+4. Make sure the H5P core assets (JS and CSS files) are published by running `./flow resource:publish`
 
 That's it - you're good to use H5P content on your site. You new have a new plugin node type "H5P Content" that you
 can use to integrate with H5P. You also have a set of backend modules to create and manage H5P content, libraries,
