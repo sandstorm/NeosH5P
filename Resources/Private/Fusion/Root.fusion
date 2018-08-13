@@ -11,8 +11,6 @@ prototype(Sandstorm.NeosH5P:H5PScriptsAndStyles) < prototype(Neos.Neos:Plugin) {
     action = 'scriptsAndStyles'
 
     h5pContentNodes = ${q(documentNode).find('[instanceof Sandstorm.NeosH5P:H5PContent]')}
-
-    // TODO cache
 }
 
 prototype(Sandstorm.NeosH5P:H5PContent) {

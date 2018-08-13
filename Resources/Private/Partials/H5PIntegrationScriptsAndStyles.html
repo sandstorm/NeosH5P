@@ -4,6 +4,11 @@
 <script>
     window.H5PIntegration = {settings -> f:format.raw()};
 </script>
+<f:if condition="{xAPIIntegrationSettings}">
+    <script>
+        window.NeosH5PxAPI = {xAPIIntegrationSettings -> f:format.raw()};
+    </script>
+</f:if>
 <f:for each="{scripts}" as="script">
     <script src="{script -> f:format.raw()}"></script>
 </f:for>

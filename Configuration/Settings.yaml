@@ -1,5 +1,6 @@
 Sandstorm:
   NeosH5P:
+    # This is where H5P content will be reachable from outside. You usually do not have to change this.
     h5pPublicFolder:
       # URL of the h5p public folder. Can be absolute or relative to the base Uri.
       url: &h5pPublicFolderUrl '/_Resources/Static/H5P/'
@@ -16,8 +17,10 @@ Sandstorm:
         editor: &h5pEditorSubfolderName 'h5p-editor'
         # Directory where temporary editor files are put.
         editorTempfiles: &h5pEditorTempfilesSubfolderName 'editor-temp'
+
     # These can be generated as ConfigSettings by the flow command
-    # ./flow h5p:generatedefaultconfigsettings.
+    # ./flow h5p:generatedefaultconfigsettings. Adapt these to your needs and re-run the command if you
+    # changed anything.
     defaultConfigSettings:
       # if TRUE, sends usage statistics (#contents, #authors, #librs, etc) to H5P Hub
       # with every content type cache refresh
@@ -27,7 +30,7 @@ Sandstorm:
       # if TRUE, saves ContentUserData for logged-in users. This saves data that a frontend user
       # enters during his work with a content, and will restore content state on page reloads.
       save_content_state: true
-      # interval in seconds for whcih the ContentUserData is saved
+      # interval in seconds for which the ContentUserData is saved
       save_content_frequency: 10
       # whether or not the H5P hub is enabled.
       hub_is_enabled: true
@@ -39,6 +42,20 @@ Sandstorm:
       embed: true
       copyright: true
       icon: true
+
+    # These are the xAPI integration settings. Find out more about H5P and xAPI here:
+    # https://h5p.org/documentation/x-api
+    # If you do not need xAPI, set this to an empty array: "xAPI: []"
+    xAPI:
+      # set to TRUE to log all xAPI statements to the console.
+      debugMode: true
+      # set this to a script path that should be loaded in the xAPI scope. This is the place where you put your
+      # custom xAPI integration script.
+      integrationScript: 'resource://Sandstorm.NeosH5P/Public/Scripts/xAPIExample.js'
+      # These settings will be forwarded to your integration script and will be available on the window under
+      # window.NeosH5PxAPI.
+      integrationSettings:
+        yourLRSEndpoint: 'http://example.com'
 
     # Setting for the H5PCore->aggregateAssets switch. If set to TRUE, H5P triggers the generation of
     # aggregated assets (CachedAsset) for each content element.
