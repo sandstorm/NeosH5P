@@ -218,7 +218,7 @@ class ContentTypeCacheEntry
     /**
      * @param string $machineName
      */
-    public function setMachineName(string $machineName): void
+    public function setMachineName(string $machineName)
     {
         $this->machineName = $machineName;
     }
@@ -234,7 +234,7 @@ class ContentTypeCacheEntry
     /**
      * @param int $majorVersion
      */
-    public function setMajorVersion(int $majorVersion): void
+    public function setMajorVersion(int $majorVersion)
     {
         $this->majorVersion = $majorVersion;
     }
@@ -250,7 +250,7 @@ class ContentTypeCacheEntry
     /**
      * @param int $minorVersion
      */
-    public function setMinorVersion(int $minorVersion): void
+    public function setMinorVersion(int $minorVersion)
     {
         $this->minorVersion = $minorVersion;
     }
@@ -266,7 +266,7 @@ class ContentTypeCacheEntry
     /**
      * @param int $patchVersion
      */
-    public function setPatchVersion(int $patchVersion): void
+    public function setPatchVersion(int $patchVersion)
     {
         $this->patchVersion = $patchVersion;
     }
@@ -282,7 +282,7 @@ class ContentTypeCacheEntry
     /**
      * @param int $h5pMajorVersion
      */
-    public function setH5pMajorVersion(int $h5pMajorVersion): void
+    public function setH5pMajorVersion(int $h5pMajorVersion)
     {
         $this->h5pMajorVersion = $h5pMajorVersion;
     }
@@ -298,7 +298,7 @@ class ContentTypeCacheEntry
     /**
      * @param int $h5pMinorVersion
      */
-    public function setH5pMinorVersion(int $h5pMinorVersion): void
+    public function setH5pMinorVersion(int $h5pMinorVersion)
     {
         $this->h5pMinorVersion = $h5pMinorVersion;
     }
@@ -314,7 +314,7 @@ class ContentTypeCacheEntry
     /**
      * @param string $title
      */
-    public function setTitle(string $title): void
+    public function setTitle(string $title)
     {
         $this->title = $title;
     }
@@ -330,7 +330,7 @@ class ContentTypeCacheEntry
     /**
      * @param string $summary
      */
-    public function setSummary(string $summary): void
+    public function setSummary(string $summary)
     {
         $this->summary = $summary;
     }
@@ -346,7 +346,7 @@ class ContentTypeCacheEntry
     /**
      * @param string $description
      */
-    public function setDescription(string $description): void
+    public function setDescription(string $description)
     {
         $this->description = $description;
     }
@@ -362,7 +362,7 @@ class ContentTypeCacheEntry
     /**
      * @param string $icon
      */
-    public function setIcon(string $icon): void
+    public function setIcon(string $icon)
     {
         $this->icon = $icon;
     }
@@ -378,7 +378,7 @@ class ContentTypeCacheEntry
     /**
      * @param \DateTime $createdAt
      */
-    public function setCreatedAt(\DateTime $createdAt): void
+    public function setCreatedAt(\DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
     }
@@ -394,7 +394,7 @@ class ContentTypeCacheEntry
     /**
      * @param \DateTime $updatedAt
      */
-    public function setUpdatedAt(\DateTime $updatedAt): void
+    public function setUpdatedAt(\DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
     }
@@ -410,7 +410,7 @@ class ContentTypeCacheEntry
     /**
      * @param bool $isRecommended
      */
-    public function setIsRecommended(bool $isRecommended): void
+    public function setIsRecommended(bool $isRecommended)
     {
         $this->isRecommended = $isRecommended;
     }
@@ -426,7 +426,7 @@ class ContentTypeCacheEntry
     /**
      * @param int $popularity
      */
-    public function setPopularity(int $popularity): void
+    public function setPopularity(int $popularity)
     {
         $this->popularity = $popularity;
     }
@@ -442,7 +442,7 @@ class ContentTypeCacheEntry
     /**
      * @param string $screenshots
      */
-    public function setScreenshots(string $screenshots): void
+    public function setScreenshots(string $screenshots)
     {
         $this->screenshots = $screenshots;
     }
@@ -458,7 +458,7 @@ class ContentTypeCacheEntry
     /**
      * @param string $license
      */
-    public function setLicense(string $license): void
+    public function setLicense(string $license)
     {
         $this->license = $license;
     }
@@ -474,7 +474,7 @@ class ContentTypeCacheEntry
     /**
      * @param string $example
      */
-    public function setExample(string $example): void
+    public function setExample(string $example)
     {
         $this->example = $example;
     }
@@ -490,7 +490,7 @@ class ContentTypeCacheEntry
     /**
      * @param string $tutorial
      */
-    public function setTutorial(string $tutorial): void
+    public function setTutorial(string $tutorial)
     {
         $this->tutorial = $tutorial;
     }
@@ -506,7 +506,7 @@ class ContentTypeCacheEntry
     /**
      * @param string $keywords
      */
-    public function setKeywords(string $keywords): void
+    public function setKeywords(string $keywords)
     {
         $this->keywords = $keywords;
     }
@@ -522,7 +522,7 @@ class ContentTypeCacheEntry
     /**
      * @param string $categories
      */
-    public function setCategories(string $categories): void
+    public function setCategories(string $categories)
     {
         $this->categories = $categories;
     }
@@ -538,7 +538,7 @@ class ContentTypeCacheEntry
     /**
      * @param string $owner
      */
-    public function setOwner(string $owner): void
+    public function setOwner(string $owner)
     {
         $this->owner = $owner;
     }

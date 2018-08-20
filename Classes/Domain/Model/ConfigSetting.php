@@ -43,7 +43,7 @@ class ConfigSetting {
     /**
      * @param string $configKey
      */
-    public function setConfigKey(string $configKey): void
+    public function setConfigKey(string $configKey)
     {
         $this->configKey = $configKey;
     }

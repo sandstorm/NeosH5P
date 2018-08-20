@@ -386,7 +386,7 @@ class Library
     /**
      * @param \DateTime $createdAt
      */
-    public function setCreatedAt(\DateTime $createdAt): void
+    public function setCreatedAt(\DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
     }
@@ -402,7 +402,7 @@ class Library
     /**
      * @param \DateTime $updatedAt
      */
-    public function setUpdatedAt(\DateTime $updatedAt): void
+    public function setUpdatedAt(\DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
     }
@@ -418,7 +418,7 @@ class Library
     /**
      * @param string $name
      */
-    public function setName(string $name): void
+    public function setName(string $name)
     {
         $this->name = $name;
     }
@@ -434,7 +434,7 @@ class Library
     /**
      * @param string $title
      */
-    public function setTitle(string $title): void
+    public function setTitle(string $title)
     {
         $this->title = $title;
     }
@@ -450,7 +450,7 @@ class Library
     /**
      * @param int $majorVersion
      */
-    public function setMajorVersion(int $majorVersion): void
+    public function setMajorVersion(int $majorVersion)
     {
         $this->majorVersion = $majorVersion;
     }
@@ -466,7 +466,7 @@ class Library
     /**
      * @param int $minorVersion
      */
-    public function setMinorVersion(int $minorVersion): void
+    public function setMinorVersion(int $minorVersion)
     {
         $this->minorVersion = $minorVersion;
     }
@@ -482,7 +482,7 @@ class Library
     /**
      * @param int $patchVersion
      */
-    public function setPatchVersion(int $patchVersion): void
+    public function setPatchVersion(int $patchVersion)
     {
         $this->patchVersion = $patchVersion;
     }
@@ -498,7 +498,7 @@ class Library
     /**
      * @param bool $runnable
      */
-    public function setRunnable(bool $runnable): void
+    public function setRunnable(bool $runnable)
     {
         $this->runnable = $runnable;
     }
@@ -514,7 +514,7 @@ class Library
     /**
      * @param bool $restricted
      */
-    public function setRestricted(bool $restricted): void
+    public function setRestricted(bool $restricted)
     {
         $this->restricted = $restricted;
     }
@@ -530,7 +530,7 @@ class Library
     /**
      * @param bool $fullscreen
      */
-    public function setFullscreen(bool $fullscreen): void
+    public function setFullscreen(bool $fullscreen)
     {
         $this->fullscreen = $fullscreen;
     }
@@ -546,7 +546,7 @@ class Library
     /**
      * @param string $embedTypes
      */
-    public function setEmbedTypes(string $embedTypes): void
+    public function setEmbedTypes(string $embedTypes)
     {
         $this->embedTypes = $embedTypes;
     }
@@ -562,7 +562,7 @@ class Library
     /**
      * @param string $preloadedJs
      */
-    public function setPreloadedJs(string $preloadedJs): void
+    public function setPreloadedJs(string $preloadedJs)
     {
         $this->preloadedJs = $preloadedJs;
     }
@@ -578,7 +578,7 @@ class Library
     /**
      * @param string $preloadedCss
      */
-    public function setPreloadedCss(string $preloadedCss): void
+    public function setPreloadedCss(string $preloadedCss)
     {
         $this->preloadedCss = $preloadedCss;
     }
@@ -594,7 +594,7 @@ class Library
     /**
      * @param string $dropLibraryCss
      */
-    public function setDropLibraryCss(string $dropLibraryCss): void
+    public function setDropLibraryCss(string $dropLibraryCss)
     {
         $this->dropLibraryCss = $dropLibraryCss;
     }
@@ -610,7 +610,7 @@ class Library
     /**
      * @param string $semantics
      */
-    public function setSemantics(string $semantics): void
+    public function setSemantics(string $semantics)
     {
         $this->semantics = $semantics;
     }
@@ -626,7 +626,7 @@ class Library
     /**
      * @param string $tutorialUrl
      */
-    public function setTutorialUrl(string $tutorialUrl): void
+    public function setTutorialUrl(string $tutorialUrl)
     {
         $this->tutorialUrl = $tutorialUrl;
     }
@@ -642,7 +642,7 @@ class Library
     /**
      * @param bool $hasIcon
      */
-    public function setHasIcon(bool $hasIcon): void
+    public function setHasIcon(bool $hasIcon)
     {
         $this->hasIcon = $hasIcon;
     }
@@ -658,7 +658,7 @@ class Library
     /**
      * @param Collection $contents
      */
-    public function setContents(Collection $contents): void
+    public function setContents(Collection $contents)
     {
         $this->contents = $contents;
     }
@@ -674,7 +674,7 @@ class Library
     /**
      * @param Collection $contentDependencies
      */
-    public function setContentDependencies(Collection $contentDependencies): void
+    public function setContentDependencies(Collection $contentDependencies)
     {
         $this->contentDependencies = $contentDependencies;
     }
@@ -690,7 +690,7 @@ class Library
     /**
      * @param Collection $libraryDependencies
      */
-    public function setLibraryDependencies(Collection $libraryDependencies): void
+    public function setLibraryDependencies(Collection $libraryDependencies)
     {
         $this->libraryDependencies = $libraryDependencies;
     }
@@ -714,7 +714,7 @@ class Library
     /**
      * @param Collection $libraryTranslations
      */
-    public function setLibraryTranslations(Collection $libraryTranslations): void
+    public function setLibraryTranslations(Collection $libraryTranslations)
     {
         $this->libraryTranslations = $libraryTranslations;
     }
@@ -730,7 +730,7 @@ class Library
     /**
      * @param Collection $cachedAssets
      */
-    public function setCachedAssets(Collection $cachedAssets): void
+    public function setCachedAssets(Collection $cachedAssets)
     {
         $this->cachedAssets = $cachedAssets;
     }
@@ -738,7 +738,7 @@ class Library
     /**
      * @param CachedAsset $cachedAsset
      */
-    public function addCachedAsset(CachedAsset $cachedAsset): void
+    public function addCachedAsset(CachedAsset $cachedAsset)
     {
         $this->cachedAssets->add($cachedAsset);
     }
@@ -754,7 +754,7 @@ class Library
     /**
      * @param PersistentResource $zippedLibraryFile
      */
-    public function setZippedLibraryFile(PersistentResource $zippedLibraryFile): void
+    public function setZippedLibraryFile(PersistentResource $zippedLibraryFile)
     {
         $this->zippedLibraryFile = $zippedLibraryFile;
     }

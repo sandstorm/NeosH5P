@@ -26,8 +26,7 @@
         "h5p/h5p-editor": "~1.17.0",
         "guzzlehttp/guzzle": "~6.3.0",
 
-        "ext-zip": "*",
-        "php": ">=7.1.0"
+        "ext-zip": "*"
     },
     "autoload": {
         "psr-4": {

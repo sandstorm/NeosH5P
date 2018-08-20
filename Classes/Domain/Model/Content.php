@@ -387,7 +387,7 @@ class Content
     /**
      * @param Library $library
      */
-    public function setLibrary(Library $library): void
+    public function setLibrary(Library $library)
     {
         $this->library = $library;
     }
@@ -403,7 +403,7 @@ class Content
     /**
      * @param Account $account
      */
-    public function setAccount(Account $account): void
+    public function setAccount(Account $account)
     {
         $this->account = $account;
     }
@@ -419,7 +419,7 @@ class Content
     /**
      * @param \DateTime $createdAt
      */
-    public function setCreatedAt(\DateTime $createdAt): void
+    public function setCreatedAt(\DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
     }
@@ -435,7 +435,7 @@ class Content
     /**
      * @param \DateTime $updatedAt
      */
-    public function setUpdatedAt(\DateTime $updatedAt): void
+    public function setUpdatedAt(\DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
     }
@@ -451,7 +451,7 @@ class Content
     /**
      * @param string $title
      */
-    public function setTitle(string $title): void
+    public function setTitle(string $title)
     {
         $this->title = $title;
     }
@@ -467,7 +467,7 @@ class Content
     /**
      * @param string $parameters
      */
-    public function setParameters(string $parameters): void
+    public function setParameters(string $parameters)
     {
         $this->parameters = $parameters;
     }
@@ -483,7 +483,7 @@ class Content
     /**
      * @param string $filtered
      */
-    public function setFiltered(string $filtered): void
+    public function setFiltered(string $filtered)
     {
         $this->filtered = $filtered;
     }
@@ -499,7 +499,7 @@ class Content
     /**
      * @param string $slug
      */
-    public function setSlug(string $slug): void
+    public function setSlug(string $slug)
     {
         $this->slug = $slug;
     }
@@ -515,7 +515,7 @@ class Content
     /**
      * @param string $embedType
      */
-    public function setEmbedType(string $embedType): void
+    public function setEmbedType(string $embedType)
     {
         $this->embedType = $embedType;
     }
@@ -531,7 +531,7 @@ class Content
     /**
      * @param int $disable
      */
-    public function setDisable(int $disable): void
+    public function setDisable(int $disable)
     {
         $this->disable = $disable;
     }
@@ -547,7 +547,7 @@ class Content
     /**
      * @param string $contentType
      */
-    public function setContentType(string $contentType): void
+    public function setContentType(string $contentType)
     {
         $this->contentType = $contentType;
     }
@@ -563,7 +563,7 @@ class Content
     /**
      * @param string $author
      */
-    public function setAuthor(string $author): void
+    public function setAuthor(string $author)
     {
         $this->author = $author;
     }
@@ -579,7 +579,7 @@ class Content
     /**
      * @param string $license
      */
-    public function setLicense(string $license): void
+    public function setLicense(string $license)
     {
         $this->license = $license;
     }
@@ -595,7 +595,7 @@ class Content
     /**
      * @param string $keywords
      */
-    public function setKeywords(string $keywords): void
+    public function setKeywords(string $keywords)
     {
         $this->keywords = $keywords;
     }
@@ -611,7 +611,7 @@ class Content
     /**
      * @param string $description
      */
-    public function setDescription(string $description): void
+    public function setDescription(string $description)
     {
         $this->description = $description;
     }
@@ -627,7 +627,7 @@ class Content
     /**
      * @param Collection $contentDependencies
      */
-    public function setContentDependencies(Collection $contentDependencies): void
+    public function setContentDependencies(Collection $contentDependencies)
     {
         $this->contentDependencies = $contentDependencies;
     }
@@ -643,7 +643,7 @@ class Content
     /**
      * @param Collection $contentUserDatas
      */
-    public function setContentUserDatas(Collection $contentUserDatas): void
+    public function setContentUserDatas(Collection $contentUserDatas)
     {
         $this->contentUserDatas = $contentUserDatas;
     }
@@ -659,7 +659,7 @@ class Content
     /**
      * @param int $contentId
      */
-    public function setContentId(int $contentId): void
+    public function setContentId(int $contentId)
     {
         $this->contentId = $contentId;
     }
@@ -675,7 +675,7 @@ class Content
     /**
      * @param Collection $contentResults
      */
-    public function setContentResults(Collection $contentResults): void
+    public function setContentResults(Collection $contentResults)
     {
         $this->contentResults = $contentResults;
     }
@@ -691,7 +691,7 @@ class Content
     /**
      * @param PersistentResource|null $exportFile
      */
-    public function setExportFile($exportFile): void
+    public function setExportFile($exportFile)
     {
         $this->exportFile = $exportFile;
     }
@@ -707,7 +707,7 @@ class Content
     /**
      * @param PersistentResource|null $zippedContentFile
      */
-    public function setZippedContentFile($zippedContentFile): void
+    public function setZippedContentFile($zippedContentFile)
     {
         $this->zippedContentFile = $zippedContentFile;
     }

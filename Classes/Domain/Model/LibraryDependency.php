@@ -47,7 +47,7 @@ class LibraryDependency {
     /**
      * @param Library $library
      */
-    public function setLibrary(Library $library): void
+    public function setLibrary(Library $library)
     {
         $this->library = $library;
     }
@@ -63,7 +63,7 @@ class LibraryDependency {
     /**
      * @param Library $requiredLibrary
      */
-    public function setRequiredLibrary(Library $requiredLibrary): void
+    public function setRequiredLibrary(Library $requiredLibrary)
     {
         $this->requiredLibrary = $requiredLibrary;
     }
@@ -79,7 +79,7 @@ class LibraryDependency {
     /**
      * @param string $dependencyType
      */
-    public function setDependencyType(string $dependencyType): void
+    public function setDependencyType(string $dependencyType)
     {
         $this->dependencyType = $dependencyType;
     }

@@ -41,7 +41,7 @@ class EditorTempfile {
     /**
      * @param PersistentResource $resource
      */
-    public function setResource(PersistentResource $resource): void
+    public function setResource(PersistentResource $resource)
     {
         $this->resource = $resource;
     }
@@ -57,7 +57,7 @@ class EditorTempfile {
     /**
      * @param \DateTime $createdAt
      */
-    public function setCreatedAt(\DateTime $createdAt): void
+    public function setCreatedAt(\DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
     }
@@ -73,7 +73,7 @@ class EditorTempfile {
     /**
      * @param string $temporaryFilename
      */
-    public function setTemporaryFilename(string $temporaryFilename): void
+    public function setTemporaryFilename(string $temporaryFilename)
     {
         $this->temporaryFilename = $temporaryFilename;
     }

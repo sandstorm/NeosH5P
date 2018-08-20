@@ -54,7 +54,7 @@ class CachedAsset {
     /**
      * @param PersistentResource $resource
      */
-    public function setResource(PersistentResource $resource): void
+    public function setResource(PersistentResource $resource)
     {
         $this->resource = $resource;
     }
@@ -70,7 +70,7 @@ class CachedAsset {
     /**
      * @param Collection $libraries
      */
-    public function setLibraries(Collection $libraries): void
+    public function setLibraries(Collection $libraries)
     {
         $this->libraries = $libraries;
     }
@@ -78,7 +78,7 @@ class CachedAsset {
     /**
      * @param Library $library
      */
-    public function addLibrary(Library $library): void
+    public function addLibrary(Library $library)
     {
         $this->libraries->add($library);
     }
@@ -94,7 +94,7 @@ class CachedAsset {
     /**
      * @param string $hashKey
      */
-    public function setHashKey(string $hashKey): void
+    public function setHashKey(string $hashKey)
     {
         $this->hashKey = $hashKey;
     }
@@ -110,7 +110,7 @@ class CachedAsset {
     /**
      * @param string $type
      */
-    public function setType(string $type): void
+    public function setType(string $type)
     {
         $this->type = $type;
     }

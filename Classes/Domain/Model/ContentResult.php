@@ -79,7 +79,7 @@ class ContentResult
     /**
      * @param Content $content
      */
-    public function setContent(Content $content): void
+    public function setContent(Content $content)
     {
         $this->content = $content;
     }
@@ -95,7 +95,7 @@ class ContentResult
     /**
      * @param Account $account
      */
-    public function setAccount(Account $account): void
+    public function setAccount(Account $account)
     {
         $this->account = $account;
     }
@@ -111,7 +111,7 @@ class ContentResult
     /**
      * @param int $score
      */
-    public function setScore(int $score): void
+    public function setScore(int $score)
     {
         $this->score = $score;
     }
@@ -127,7 +127,7 @@ class ContentResult
     /**
      * @param int $maxScore
      */
-    public function setMaxScore(int $maxScore): void
+    public function setMaxScore(int $maxScore)
     {
         $this->maxScore = $maxScore;
     }
@@ -153,7 +153,7 @@ class ContentResult
     /**
      * @param int $opened
      */
-    public function setOpened(int $opened): void
+    public function setOpened(int $opened)
     {
         $this->opened = $opened;
     }
@@ -179,7 +179,7 @@ class ContentResult
     /**
      * @param int $finished
      */
-    public function setFinished(int $finished): void
+    public function setFinished(int $finished)
     {
         $this->finished = $finished;
     }
@@ -202,7 +202,7 @@ class ContentResult
     /**
      * @param int $time
      */
-    public function setTime(int $time): void
+    public function setTime(int $time)
     {
         $this->time = $time;
     }

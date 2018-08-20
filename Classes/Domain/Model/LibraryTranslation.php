@@ -48,7 +48,7 @@ class LibraryTranslation {
     /**
      * @param Library $library
      */
-    public function setLibrary(Library $library): void
+    public function setLibrary(Library $library)
     {
         $this->library = $library;
     }
@@ -64,7 +64,7 @@ class LibraryTranslation {
     /**
      * @param string $languageCode
      */
-    public function setLanguageCode(string $languageCode): void
+    public function setLanguageCode(string $languageCode)
     {
         $this->languageCode = $languageCode;
     }
@@ -80,7 +80,7 @@ class LibraryTranslation {
     /**
      * @param string $translation
      */
-    public function setTranslation(string $translation): void
+    public function setTranslation(string $translation)
     {
         $this->translation = $translation;
     }

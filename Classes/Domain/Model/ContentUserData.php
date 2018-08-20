@@ -98,7 +98,7 @@ class ContentUserData {
     /**
      * @param Content $content
      */
-    public function setContent(Content $content): void
+    public function setContent(Content $content)
     {
         $this->content = $content;
     }
@@ -114,7 +114,7 @@ class ContentUserData {
     /**
      * @param Account $account
      */
-    public function setAccount(Account $account): void
+    public function setAccount(Account $account)
     {
         $this->account = $account;
     }
@@ -130,7 +130,7 @@ class ContentUserData {
     /**
      * @param string $dataId
      */
-    public function setDataId(string $dataId): void
+    public function setDataId(string $dataId)
     {
         $this->dataId = $dataId;
     }
@@ -146,7 +146,7 @@ class ContentUserData {
     /**
      * @param Content $subContent
      */
-    public function setSubContent($subContent): void
+    public function setSubContent($subContent)
     {
         $this->subContent = $subContent;
     }
@@ -162,7 +162,7 @@ class ContentUserData {
     /**
      * @param string $data
      */
-    public function setData(string $data): void
+    public function setData(string $data)
     {
         $this->data = $data;
     }
@@ -178,7 +178,7 @@ class ContentUserData {
     /**
      * @param bool $preload
      */
-    public function setPreload(bool $preload): void
+    public function setPreload(bool $preload)
     {
         $this->preload = $preload;
     }
@@ -194,7 +194,7 @@ class ContentUserData {
     /**
      * @param bool $invalidate
      */
-    public function setInvalidate(bool $invalidate): void
+    public function setInvalidate(bool $invalidate)
     {
         $this->invalidate = $invalidate;
     }
@@ -210,7 +210,7 @@ class ContentUserData {
     /**
      * @param \DateTime $updatedAt
      */
-    public function setUpdatedAt(\DateTime $updatedAt): void
+    public function setUpdatedAt(\DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
     }

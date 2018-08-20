@@ -73,7 +73,7 @@ class ContentDependency
     /**
      * @param Content $content
      */
-    public function setContent(Content $content): void
+    public function setContent(Content $content)
     {
         $this->content = $content;
     }
@@ -89,7 +89,7 @@ class ContentDependency
     /**
      * @param Library $library
      */
-    public function setLibrary(Library $library): void
+    public function setLibrary(Library $library)
     {
         $this->library = $library;
     }
@@ -105,7 +105,7 @@ class ContentDependency
     /**
      * @param string $dependencyType
      */
-    public function setDependencyType(string $dependencyType): void
+    public function setDependencyType(string $dependencyType)
     {
         $this->dependencyType = $dependencyType;
     }
@@ -121,7 +121,7 @@ class ContentDependency
     /**
      * @param int $weight
      */
-    public function setWeight(int $weight): void
+    public function setWeight(int $weight)
     {
         $this->weight = $weight;
     }
@@ -137,7 +137,7 @@ class ContentDependency
     /**
      * @param bool $dropCss
      */
-    public function setDropCss(bool $dropCss): void
+    public function setDropCss(bool $dropCss)
     {
         $this->dropCss = $dropCss;
     }
