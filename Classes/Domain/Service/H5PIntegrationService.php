@@ -447,6 +447,7 @@ class H5PIntegrationService
      */
     private function getBaseUri(ControllerContext $cc): string
     {
-        return $cc->getRequest()->getMainRequest()->getHttpRequest()->getBaseUri()->__toString();
+        // rtrim to remove any trailing slashes
+        return rtrim($cc->getRequest()->getMainRequest()->getHttpRequest()->getBaseUri()->__toString(), '/');
     }
 }
