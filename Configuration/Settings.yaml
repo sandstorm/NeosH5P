@@ -46,13 +46,15 @@ Sandstorm:
     # https://h5p.org/documentation/x-api
     # If you do not need xAPI, set this to an empty array: "xAPI: []"
     xAPI:
-      # set to TRUE to log all xAPI statements to the console.
+      # Set to TRUE to log all xAPI statements to the console.
       debugMode: false
-      # set this to a script path that should be loaded in the xAPI scope. This is the place where you put your
-      # custom xAPI integration script.
+      # Set this to a script path that should be loaded in the xAPI scope.
+      # Replace this with your custom xAPI integration script.
       integrationScript: 'resource://Sandstorm.NeosH5P/Public/Scripts/xAPIExample.js'
       # These settings will be forwarded to your integration script and will be available on the window under
       # window.NeosH5PxAPI.
+      # "yourLRSEndpoint" is just an example that is used in our example xAPI integration
+      # script. You can configure anything you want here, and remove "yourLRSEndpoint".
       integrationSettings:
         yourLRSEndpoint: 'http://example.com'
 

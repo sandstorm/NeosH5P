@@ -26,7 +26,7 @@ H5P.jQuery(function ($) {
         //     // This is the example taken from the config - define your own integration settings here, they will be
         //     // injected as a JSON object.
         //     url: window.NeosH5PxAPI.yourLRSEndpoint,
-        //     data: event.data.statement,
+        //     data: JSON.stringify(event.data.statement),
         //     dataType: "json",
         //     success: onXAPIPostSuccess,
         //     error: onXAPIPostError
