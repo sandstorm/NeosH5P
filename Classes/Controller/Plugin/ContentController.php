@@ -35,6 +35,13 @@ class ContentController extends ActionController
      */
     protected $xAPISettings;
 
+    /**
+     * CSRF protection is disabled here as Flow requires a CSRF token if the main request was a POST, which
+     * we obviously never have in a plugin request.
+     * @Flow\SkipCsrfProtection
+     *
+     * @throws \Neos\ContentRepository\Exception\NodeException
+     */
     public function contentAction()
     {
         /** @var NodeInterface $node */
@@ -43,6 +50,14 @@ class ContentController extends ActionController
         $this->view->assign('content', $content);
     }
 
+    /**
+     * CSRF protection is disabled here as Flow requires a CSRF token if the main request was a POST, which
+     * we obviously never have in a plugin request.
+     * @Flow\SkipCsrfProtection
+     *
+     * @return bool
+     * @throws \Neos\ContentRepository\Exception\NodeException
+     */
     public function scriptsAndStylesAction()
     {
         /** @var array $h5pContentNodes */
