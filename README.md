@@ -90,6 +90,12 @@ the `FrontendUserServiceInterface`. Check the default `Sandstorm\NeosH5P\Domain\
 example. You need to configure Neos to use your implementation in your site package's `Objects.yaml`. This will give 
 you the opportunity to interact with your own frontend user model and extract name and email address.
 
+To send xAPI statements to a LRS or other external endpoint, you need to provide a JavaScript that handles the sending
+process. This way, you have control over the sending process and can handle any login/routing/statement manipulation 
+requirements in your own package. The script is injected automatically - all you need to do is provide a path to a
+script file under the configuration setting `Sandstorm.NeosH5P.xAPI.integrationScript`. Refer to this package's
+`Settings.yaml` for a detailed explanation (see the comments at the "xAPI" section of the config).
+
 ## 4. Set up a cronjob to remove temporary H5P editor files
 Plan a cronjob to remove all EditorTempfiles and associated resources. EditorTempfiles are created e.g. when a user
 starts creating an H5P content element and has already uploaded assets (such as pictures), then cancels the process.
