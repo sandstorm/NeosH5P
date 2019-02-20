@@ -129,6 +129,18 @@ class Library
      */
     protected $hasIcon;
 
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=false)
+     */
+    protected $metadataSettings;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=false)
+     */
+    protected $addTo;
+
 
     // Inversed relations (not in DB)
 
@@ -186,7 +198,7 @@ class Library
      * @param array $libraryData
      * @return Library
      */
-    public static function createFromMetadata(array &$libraryData)
+    public static function createFromLibraryData(array &$libraryData)
     {
         $libraryData['__preloadedJs'] = self::pathsToCsv($libraryData, 'preloadedJs');
         $libraryData['__preloadedCss'] = self::pathsToCsv($libraryData, 'preloadedCss');
@@ -215,7 +227,7 @@ class Library
         }
 
         $library = new Library();
-        $library->updateFromMetadata($libraryData);
+        $library->updateFromLibraryData($libraryData);
         $library->setCreatedAt(new \DateTime());
         $library->setUpdatedAt(new \DateTime());
         $library->setRestricted(false);
@@ -226,7 +238,7 @@ class Library
     /**
      * @param array $libraryData
      */
-    public function updateFromMetadata(array $libraryData)
+    public function updateFromLibraryData(array $libraryData)
     {
         $this->setUpdatedAt(new \DateTime());
         $this->setName($libraryData['machineName']);
@@ -236,6 +248,8 @@ class Library
         $this->setPatchVersion($libraryData['patchVersion']);
         $this->setRunnable($libraryData['runnable']);
         $this->setHasIcon($libraryData['hasIcon'] ? true : false);
+        $this->setAddTo(empty($libraryData['addTo']) ? null : json_encode($libraryData['addTo']));
+        $this->setMetadataSettings($libraryData['metadataSettings']);
         if (isset($libraryData['semantics'])) {
             $this->setSemantics($libraryData['semantics']);
         }
@@ -773,5 +787,37 @@ class Library
     public function getUpgradeAvailable()
     {
         return $this->libraryUpgradeService->upgradeAvailable($this);
+    }
+
+    /**
+     * @return string
+     */
+    public function getMetadataSettings()
+    {
+        return $this->metadataSettings;
+    }
+
+    /**
+     * @param string $metadataSettings
+     */
+    public function setMetadataSettings($metadataSettings): void
+    {
+        $this->metadataSettings = $metadataSettings;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAddTo()
+    {
+        return $this->addTo;
+    }
+
+    /**
+     * @param string $addTo
+     */
+    public function setAddTo($addTo): void
+    {
+        $this->addTo = $addTo;
     }
 }

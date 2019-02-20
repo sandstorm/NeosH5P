@@ -22,8 +22,8 @@
     "require": {
         "neos/neos": ">=3.3.0",
         "neos/neos-ui": "*",
-        "h5p/h5p-core": "~1.17.0",
-        "h5p/h5p-editor": "~1.17.0",
+        "h5p/h5p-core": "~1.20.0",
+        "h5p/h5p-editor": "~1.20.0",
         "guzzlehttp/guzzle": "~6.3.0",
 
         "ext-zip": "*"

@@ -72,6 +72,7 @@ class EditorFileAdapter implements \H5peditorStorage
                 $libraryData->title = $library->getTitle();
                 $libraryData->runnable = $library->isRunnable();
                 $libraryData->restricted = false; // for now
+                $libraryData->metadataSettings = json_decode($library->getMetadataSettings());
                 // TODO: Implement the below correctly with auth check
                 // $libraryData->restricted = $super_user ? FALSE : $library->isRestricted();
                 $librariesWithDetails[] = $libraryData;

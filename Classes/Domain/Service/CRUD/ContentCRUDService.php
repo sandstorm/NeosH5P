@@ -75,7 +75,7 @@ class ContentCRUDService
             $content['id'] = $contentId;
             $contentObject = $this->contentRepository->findOneByContentId($content['id']);
 
-            if($contentObject !== null) {
+            if ($contentObject !== null) {
                 $oldLibrary = $contentObject->getLibrary()->toAssocArray();
                 $oldParameters = json_decode($contentObject->getParameters());
             }
@@ -86,14 +86,15 @@ class ContentCRUDService
 
         // Get library
         $content['library'] = $this->h5pCore->libraryFromString($library);
-        if (!$content['library']) {
+        if (! $content['library']) {
             $this->h5pCore->h5pF->setErrorMessage('Invalid library.');
             return null;
         }
 
         // Check if library exists.
-        $content['library']['libraryId'] = $this->h5pCore->h5pF->getLibraryId($content['library']['machineName'], $content['library']['majorVersion'], $content['library']['minorVersion']);
-        if (!$content['library']['libraryId']) {
+        $content['library']['libraryId'] = $this->h5pCore->h5pF->getLibraryId($content['library']['machineName'],
+            $content['library']['majorVersion'], $content['library']['minorVersion']);
+        if (! $content['library']['libraryId']) {
             $this->h5pCore->h5pF->setErrorMessage('No such library.');
             return null;
         }
@@ -105,9 +106,11 @@ class ContentCRUDService
             return null;
         }
 
-        $content['id'] = $this->h5pCore->saveContent($content);
-        if (!$content['library']['libraryId']) {
-            $this->h5pCore->h5pF->setErrorMessage('No such library.');
+        // Since H5P core now upgrades content on save, which can throw an exception, we need to be able to handle it.
+        try {
+            $content['id'] = $this->h5pCore->saveContent($content);
+        } catch (\Exception $e) {
+            $this->h5pCore->h5pF->setErrorMessage($e->getMessage());
             return null;
         }
 
@@ -134,7 +137,7 @@ class ContentCRUDService
         $this->contentRepository->update($contentObject);
 
         // If there is a zipped content file now, publish it.
-        if($contentObject->getZippedContentFile() !== null) {
+        if ($contentObject->getZippedContentFile() !== null) {
             $collection = $this->resourceManager->getCollection('h5p-content');
             $target = $collection->getTarget();
             // PublishResource does not work as apparently a different logic is used, so we publish the whole

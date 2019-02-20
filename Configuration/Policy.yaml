@@ -20,6 +20,6 @@ roles:
         permission: GRANT
 
 # This is for development/testing only, and needs to be defined in the integrating package.
-#      -
-#        privilegeTarget: 'Sandstorm.NeosH5P:FrontendControllerActions'
-#        permission: GRANT
+      -
+        privilegeTarget: 'Sandstorm.NeosH5P:FrontendControllerActions'
+        permission: GRANT

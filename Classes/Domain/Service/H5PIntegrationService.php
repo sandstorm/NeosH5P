@@ -35,6 +35,12 @@ class H5PIntegrationService
     protected $h5pCorePublicFolderName;
 
     /**
+     * @Flow\InjectConfiguration(path="h5pPublicFolder.subfolders.libraries")
+     * @var string
+     */
+    protected $h5pLibrariesPublicFolderName;
+
+    /**
      * @Flow\InjectConfiguration(path="h5pPublicFolder.subfolders.editor")
      * @var string
      */
@@ -217,6 +223,12 @@ class H5PIntegrationService
             ],
             'hubIsEnabled' => $this->h5pFramework->getOption('hub_is_enabled') == 1,
             'reportingIsEnabled' => $this->h5pFramework->getOption('enable_lrs_content_types') == 1,
+            // this uses a global constant - once this gets used, we will have an H5P option for it similar to the ones above.
+            'libraryConfig' => $this->h5pFramework->getLibraryConfig(),
+            // this uses a global constant - once this gets used, we will have an H5P option for it similar to the ones above.
+            'crossorigin' => defined('H5P_CROSSORIGIN') ? H5P_CROSSORIGIN : null,
+            'pluginCacheBuster' => $this->getCacheBuster(),
+            'libraryUrl' => $this->h5pPublicFolderUrl . $this->h5pLibrariesPublicFolderName,
             'core' => [
                 'scripts' => $this->getRelativeCoreScriptUrls(),
                 'styles' => $this->getRelativeCoreStyleUrls()
@@ -262,6 +274,7 @@ class H5PIntegrationService
             'ajaxPath' => $editorAjaxAction . '/',
             'libraryUrl' => $this->getBaseUri($controllerContext) . $this->h5pPublicFolderUrl . $this->h5pEditorPublicFolderName . '/',
             'copyrightSemantics' => $this->h5pContentValidator->getCopyrightSemantics(),
+            'metadataSemantics' => $this->h5pContentValidator->getMetadataSemantics(),
             'assets' => [
                 'css' => array_merge($this->getRelativeCoreStyleUrls(), $this->getRelativeEditorStyleUrls()),
                 'js' => array_merge($this->getRelativeCoreScriptUrls(), $this->getRelativeEditorScriptUrls())
@@ -313,7 +326,8 @@ class H5PIntegrationService
             'url' => $embedUrl,
             'title' => $contentArray['title'],
             // TODO: use actual account identifier instead of 0 - this is needed only for an auth check, which we default to true currently.
-            'displayOptions' => $this->h5pCore->getDisplayOptionsForView($contentArray['disable'], 0)
+            'displayOptions' => $this->h5pCore->getDisplayOptionsForView($contentArray['disable'], 0),
+            'metadata' => $contentArray['metadata']
         ];
 
         // Get assets for this content

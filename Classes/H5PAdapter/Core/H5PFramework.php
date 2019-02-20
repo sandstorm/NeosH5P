@@ -213,7 +213,7 @@ class H5PFramework implements \H5PFrameworkInterface
      * @param  [int]           $id         Id need by platform to determine permission
      * @return boolean
      */
-    public function hasPermission($permission, $id = NULL)
+    public function hasPermission($permission, $id = null)
     {
         // TODO: Proper implementation
         return true;
@@ -242,12 +242,12 @@ class H5PFramework implements \H5PFrameworkInterface
      *   Main id for the content if this is a system that supports versions
      * @return string
      */
-    public function insertContent($contentData, $contentMainId = NULL)
+    public function insertContent($contentData, $contentMainId = null)
     {
         /** @var Library $library */
         $library = $this->libraryRepository->findOneByLibraryId($contentData['library']['libraryId']);
         $account = $this->userService->getCurrentUser()->getAccounts()->first();
-        $content = Content::createFromMetadata($contentData, $library, $account);
+        $content = Content::createFromContentData($contentData, $library, $account);
 
         // Persist and re-read the entity to generate the content ID in the DB and fill the field
         $this->contentRepository->add($content);
@@ -271,7 +271,7 @@ class H5PFramework implements \H5PFrameworkInterface
      * @param int $contentMainId
      *   Main id for the content if this is a system that supports versions
      */
-    public function updateContent($contentData, $contentMainId = NULL)
+    public function updateContent($contentData, $contentMainId = null)
     {
         /** @var Content $content */
         $content = $this->contentRepository->findOneByContentId($contentData['id']);
@@ -285,7 +285,7 @@ class H5PFramework implements \H5PFrameworkInterface
             return;
         }
 
-        $content->updateFromMetadata($contentData, $library);
+        $content->updateFromContentData($contentData, $library);
 
         $this->contentRepository->update($content);
     }
@@ -364,8 +364,9 @@ class H5PFramework implements \H5PFrameworkInterface
 
         $dropLibraryCssList = [];
         foreach ($librariesInUse as $dependencyData) {
-            if (!empty($dependencyData['library']['dropLibraryCss'])) {
-                $dropLibraryCssList = array_merge($dropLibraryCssList, explode(', ', $dependencyData['library']['dropLibraryCss']));
+            if (! empty($dependencyData['library']['dropLibraryCss'])) {
+                $dropLibraryCssList = array_merge($dropLibraryCssList,
+                    explode(', ', $dependencyData['library']['dropLibraryCss']));
             }
         }
 
@@ -426,7 +427,7 @@ class H5PFramework implements \H5PFrameworkInterface
      *   - preloadedCss(optional): comma separated sting with css file paths
      *   - dropCss(optional): csv of machine names
      */
-    public function loadContentDependencies($id, $type = NULL)
+    public function loadContentDependencies($id, $type = null)
     {
         $dependencyArray = [];
         /** @var Content $content */
@@ -442,7 +443,8 @@ class H5PFramework implements \H5PFrameworkInterface
             $criteria['dependencyType'] = $type;
         }
 
-        $dependencies = $this->contentDependencyRepository->findBy($criteria, ['weight' => QueryInterface::ORDER_ASCENDING]);
+        $dependencies = $this->contentDependencyRepository->findBy($criteria,
+            ['weight' => QueryInterface::ORDER_ASCENDING]);
         /** @var ContentDependency $dependency */
         foreach ($dependencies as $dependency) {
             $dependencyArray[] = $dependency->toAssocArray();
@@ -565,7 +567,7 @@ class H5PFramework implements \H5PFrameworkInterface
         $installedLibraries = $this->libraryRepository->findAll();
 
         $versionsArray = array();
-        foreach($installedLibraries as $library) {
+        foreach ($installedLibraries as $library) {
             /** @var Library $library */
             $versionsArray[$library->getName()][] = $library->toStdClass();
         }
@@ -586,7 +588,7 @@ class H5PFramework implements \H5PFrameworkInterface
      * @return int
      *   The id of the specified library or FALSE
      */
-    public function getLibraryId($machineName, $majorVersion = NULL, $minorVersion = NULL)
+    public function getLibraryId($machineName, $majorVersion = null, $minorVersion = null)
     {
         $criteria = ['name' => $machineName];
         if ($majorVersion) {
@@ -669,11 +671,11 @@ class H5PFramework implements \H5PFrameworkInterface
      * @throws Exception
      * @return
      */
-    public function saveLibraryData(&$libraryData, $new = TRUE)
+    public function saveLibraryData(&$libraryData, $new = true)
     {
         $library = null;
         if ($new) {
-            $library = Library::createFromMetadata($libraryData);
+            $library = Library::createFromLibraryData($libraryData);
             $this->libraryRepository->add($library);
             // Persist and re-read the entity to generate the library ID in the DB and fill the field
             $this->persistenceManager->persistAll();
@@ -686,7 +688,7 @@ class H5PFramework implements \H5PFrameworkInterface
             if ($library === null) {
                 throw new Exception("Library with ID " . $libraryData['libraryId'] . " could not be found!");
             }
-            $library->updateFromMetadata($libraryData);
+            $library->updateFromLibraryData($libraryData);
             $this->libraryRepository->update($library);
             $this->deleteLibraryDependencies($libraryData['libraryId']);
         }
@@ -773,7 +775,7 @@ class H5PFramework implements \H5PFrameworkInterface
      *   That supports versions. (In this case the content id will typically be
      *   the version id, and the contentMainId will be the frameworks content id
      */
-    public function copyLibraryUsage($contentId, $copyFromId, $contentMainId = NULL)
+    public function copyLibraryUsage($contentId, $copyFromId, $contentMainId = null)
     {
         // TODO: Implement copyLibraryUsage() method.
     }
@@ -791,7 +793,7 @@ class H5PFramework implements \H5PFrameworkInterface
      *   - content: Number of content using the library
      *   - libraries: Number of libraries depending on the library
      */
-    public function getLibraryUsage($libraryId, $skipContent = FALSE)
+    public function getLibraryUsage($libraryId, $skipContent = false)
     {
         // TODO: Implement getLibraryUsage() method.
     }
@@ -838,7 +840,8 @@ class H5PFramework implements \H5PFrameworkInterface
     public function loadLibrary($machineName, $majorVersion, $minorVersion)
     {
         /** @var Library $library */
-        $library = $this->libraryRepository->findOneByNameMajorVersionAndMinorVersion($machineName, $majorVersion, $minorVersion);
+        $library = $this->libraryRepository->findOneByNameMajorVersionAndMinorVersion($machineName, $majorVersion,
+            $minorVersion);
         if ($library === null) {
             return false;
         }
@@ -861,7 +864,8 @@ class H5PFramework implements \H5PFrameworkInterface
     public function loadLibrarySemantics($machineName, $majorVersion, $minorVersion)
     {
         /** @var Library $library */
-        $library = $this->libraryRepository->findOneByNameMajorVersionAndMinorVersion($machineName, $majorVersion, $minorVersion);
+        $library = $this->libraryRepository->findOneByNameMajorVersionAndMinorVersion($machineName, $majorVersion,
+            $minorVersion);
         if ($library === null) {
             return null;
         }
@@ -958,6 +962,28 @@ class H5PFramework implements \H5PFrameworkInterface
     }
 
     /**
+     * Load addon libraries
+     *
+     * @return array
+     */
+    public function loadAddons()
+    {
+        return $this->libraryRepository->getLibraryAddons();
+    }
+
+    /**
+     * Load config for libraries
+     *
+     * @param array $libraries
+     * @return array
+     */
+    public function getLibraryConfig($libraries = null)
+    {
+        // TODO: move to a proper config setting once used
+        return defined('H5P_LIBRARY_CONFIG') ? H5P_LIBRARY_CONFIG : null;
+    }
+
+    /**
      * ================================================================================================================
      * ================================================================================================================
      * Other Models
@@ -976,7 +1002,7 @@ class H5PFramework implements \H5PFrameworkInterface
      * @return mixed
      *   Whatever has been stored as the setting
      */
-    public function getOption($name, $default = NULL)
+    public function getOption($name, $default = null)
     {
         /** @var ConfigSetting $configSetting */
         $configSetting = $this->configSettingRepository->findOneByConfigKey($name);
@@ -1135,7 +1161,7 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function getUploadedH5pFolderPath()
     {
-        if (!$this->uploadedH5pFolderPath) {
+        if (! $this->uploadedH5pFolderPath) {
             $this->uploadedH5pFolderPath = $this->getInjectedH5PCore()->fs->getTmpPath();
         }
         return $this->uploadedH5pFolderPath;
@@ -1149,7 +1175,7 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function getUploadedH5pPath()
     {
-        if (!$this->uploadedH5pPath) {
+        if (! $this->uploadedH5pPath) {
             $this->uploadedH5pPath = $this->getInjectedH5PCore()->fs->getTmpPath() . '.h5p';
         }
         return $this->uploadedH5pPath;
@@ -1206,7 +1232,7 @@ class H5PFramework implements \H5PFrameworkInterface
      * @param string $stream Path to where the file should be saved.
      * @return string The content (response body). NULL if something went wrong
      */
-    public function fetchExternalData($url, $data = NULL, $blocking = TRUE, $stream = NULL)
+    public function fetchExternalData($url, $data = null, $blocking = true, $stream = null)
     {
         $client = new Client();
         $options = [
@@ -1263,7 +1289,7 @@ class H5PFramework implements \H5PFrameworkInterface
      * @param string $message The error message
      * @param string $code An optional code
      */
-    public function setErrorMessage($message, $code = NULL)
+    public function setErrorMessage($message, $code = null)
     {
         $this->messages['error'][] = (object)[
             'code' => $code,
@@ -1320,8 +1346,7 @@ class H5PFramework implements \H5PFrameworkInterface
         foreach ($replacements as $key => $replacement) {
             if ($key[0] === '@') {
                 $replacements[$key] = htmlspecialchars($replacement);
-            }
-            elseif ($key[0] === '%') {
+            } elseif ($key[0] === '%') {
                 $replacements[$key] = '<em>' . htmlspecialchars($replacement) . '</em>';
             }
         }

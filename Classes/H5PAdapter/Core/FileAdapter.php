@@ -566,4 +566,16 @@ class FileAdapter implements \H5PFileStorage
         // TODO: Implement hasWriteAccess() method.
     }
 
+    /**
+     * Check if the library has a presave.js in the root folder
+     *
+     * @param string $libraryName
+     * @param string $developmentPath
+     * @return bool
+     */
+    public function hasPresave($libraryName, $developmentPath = null)
+    {
+        // TODO: Implement hasPresave() method.
+    }
+
 }

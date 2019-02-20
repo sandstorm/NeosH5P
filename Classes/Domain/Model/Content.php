@@ -98,9 +98,27 @@ class Content
 
     /**
      * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected $authors;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected $source;
+
+    /**
+     * @var int
      * @ORM\Column(nullable=true)
      */
-    protected $author;
+    protected $yearFrom;
+
+    /**
+     * @var int
+     * @ORM\Column(nullable=true)
+     */
+    protected $yearTo;
 
     /**
      * @var string
@@ -110,15 +128,27 @@ class Content
 
     /**
      * @var string
-     * @ORM\Column(type="text", nullable=true)
+     * @ORM\Column(nullable=true)
      */
-    protected $keywords;
+    protected $licenseVersion;
 
     /**
      * @var string
      * @ORM\Column(type="text", nullable=true)
      */
-    protected $description;
+    protected $licenseExtras;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected $authorComments;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected $changes;
 
     /**
      * @var PersistentResource
@@ -181,24 +211,21 @@ class Content
      * @param Account $account
      * @return Content
      */
-    public static function createFromMetadata(array $contentData, Library $library, Account $account): Content
+    public static function createFromContentData(array $contentData, Library $library, Account $account): Content
     {
         $content = new Content();
-        $content->setLibrary($library);
-        $content->setAccount($account);
         $content->setCreatedAt(new \DateTime());
-        $content->setUpdatedAt(new \DateTime());
-        $content->setTitle($contentData['title']);
-        $content->setParameters($contentData['params']);
-        $content->setFiltered('');
-        $content->setDisable($contentData['disable']);
+        $content->setAccount($account);
+
+        $content->updateFromContentData($contentData, $library);
+
         // Set by h5p later, but must not be null
         $content->setSlug('');
         /**
          * The Wordpress plugin only determines this at render-time, but it always yields the same result unless the
          * library changes. So we should be fine with setting it here and triggering a re-determine if the
          * library is updated.
-         * @see Library::updateFromMetadata()
+         * @see Library::updateFromLibraryData()
          */
         $content->determineEmbedType();
 
@@ -207,20 +234,44 @@ class Content
 
     /**
      * Returns an associative array containing the content in the form that
-     * \H5PCore->filterParameters() expects.
-     * @see H5PCore::filterParameters()
+     * \H5PFramework->loadContent() expects. Also serves
+     * \H5PCore->filterParameters(), which expects some parameters with different
+     * names (ARGH!!)
+     *
+     * @see H5PFramework::loadContent()
+     * @see \H5PCore::filterParameters()
      */
     public function toAssocArray(): array
     {
         $contentArray = [
-            'id' => $this->getContentId(),
+            'id' => $this->getContentId(), // for filterParameters
+            'contentId' => $this->getContentId(), // for loadContent
             'title' => $this->getTitle(),
             'library' => $this->getLibrary()->toAssocArray(),
-            'slug' => $this->getSlug(),
-            'disable' => $this->getDisable(),
             'embedType' => $this->getEmbedType(),
             'params' => $this->getParameters(),
-            'filtered' => $this->getFiltered()
+            'filtered' => $this->getFiltered(),
+            'disable' => $this->getDisable(),
+            'slug' => $this->getSlug(),
+            'language' => null, // not implemented yet,
+
+            'libraryId' => $this->library->getLibraryId(),
+            'libraryName' => $this->library->getName(),
+            'libraryMajorVersion' => $this->library->getMajorVersion(),
+            'libraryMinorVersion' => $this->library->getMinorVersion(),
+            'libraryEmbedTypes' => $this->library->getEmbedTypes(),
+            'libraryFullscreen' => $this->library->getFullscreen(),
+            'metadata' => [
+                'authors' => json_decode($this->getAuthors()),
+                'source' => $this->getSource(),
+                'yearFrom' => $this->getYearFrom(),
+                'yearTo' => $this->getYearTo(),
+                'license' => $this->getLicense(),
+                'licenseVersion' => $this->getLicenseVersion(),
+                'licenseExtras' => $this->getLicenseExtras(),
+                'authorComments' => $this->getAuthorComments(),
+                'changes' => json_decode($this->getChanges())
+            ]
         ];
 
         return $contentArray;
@@ -237,7 +288,8 @@ class Content
      * Returns the doctrine identifier.
      * @return string
      */
-    public function getIdentifier() {
+    public function getIdentifier()
+    {
         return $this->Persistence_Object_Identifier;
     }
 
@@ -245,10 +297,9 @@ class Content
      * @param array $contentData
      * @param Library $library
      */
-    public function updateFromMetadata(array $contentData, Library $library)
+    public function updateFromContentData(array $contentData, Library $library)
     {
         $this->setUpdatedAt(new \DateTime());
-        $this->setTitle($contentData['title']);
         $this->setFiltered("");
         $this->setLibrary($library);
 
@@ -258,6 +309,19 @@ class Content
         if (isset($contentData['disable'])) {
             $this->setDisable($contentData['disable']);
         }
+
+        // "H5P Metadata"
+        $metadata = $contentData['metadata'];
+        $this->setTitle($metadata['title']);
+        $this->setAuthors(empty($metadata['authors']) ? null : json_encode($metadata['authors']));
+        $this->setSource(empty($metadata['source']) ? null : $metadata['source']);
+        $this->setYearFrom(empty($metadata['yearFrom']) ? null : $metadata['yearFrom']);
+        $this->setYearTo(empty($metadata['yearTo']) ? null : $metadata['yearTo']);
+        $this->setLicense(empty($metadata['license']) ? null : $metadata['license']);
+        $this->setLicenseVersion(empty($metadata['licenseVersion']) ? null : $metadata['licenseVersion']);
+        $this->setLicenseExtras(empty($metadata['licenseExtras']) ? null : $metadata['licenseExtras']);
+        $this->setAuthorComments(empty($metadata['authorComments']) ? null : $metadata['authorComments']);
+        $this->setChanges(empty($metadata['changes']) ? null : json_encode($metadata['changes']));
     }
 
     public function determineEmbedType()
@@ -302,19 +366,20 @@ class Content
 
         // If the directory does not exist now, we set the resource to null and return.
         $hasDirectoryWithExportFiles = true;
-        if (!is_dir($this->buildContentFileTempPath())) {
+        if (! is_dir($this->buildContentFileTempPath())) {
             $hasDirectoryWithExportFiles = false;
         }
 
         // If the directory is empty, we set the resource to null and return.
         if ($hasDirectoryWithExportFiles) {
-            $directoryIterator = new \RecursiveDirectoryIterator($this->buildContentFileTempPath(), \FilesystemIterator::SKIP_DOTS);
+            $directoryIterator = new \RecursiveDirectoryIterator($this->buildContentFileTempPath(),
+                \FilesystemIterator::SKIP_DOTS);
             if (iterator_count($directoryIterator) === 0) {
                 $hasDirectoryWithExportFiles = false;
             }
         }
 
-        if (!$hasDirectoryWithExportFiles) {
+        if (! $hasDirectoryWithExportFiles) {
             if ($this->getZippedContentFile() !== null) {
                 $this->resourceManager->deleteResource($this->getZippedContentFile());
             }
@@ -339,7 +404,7 @@ class Content
 
         foreach ($files as $name => $file) {
             // Skip directories (they will be added automatically)
-            if (!$file->isDir()) {
+            if (! $file->isDir()) {
                 // Get real and relative path for current file
                 $filePath = $file->getRealPath();
                 $relativePath = substr($filePath, strlen($this->buildContentFileTempPath()) + 1);
@@ -555,17 +620,17 @@ class Content
     /**
      * @return string|null
      */
-    public function getAuthor()
+    public function getAuthors()
     {
-        return $this->author;
+        return $this->authors;
     }
 
     /**
-     * @param string $author
+     * @param string $authors
      */
-    public function setAuthor(string $author)
+    public function setAuthors(string $authors)
     {
-        $this->author = $author;
+        $this->authors = $authors;
     }
 
     /**
@@ -710,5 +775,117 @@ class Content
     public function setZippedContentFile($zippedContentFile)
     {
         $this->zippedContentFile = $zippedContentFile;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * @param string $source
+     */
+    public function setSource($source): void
+    {
+        $this->source = $source;
+    }
+
+    /**
+     * @return int
+     */
+    public function getYearFrom()
+    {
+        return $this->yearFrom;
+    }
+
+    /**
+     * @param int $yearFrom
+     */
+    public function setYearFrom($yearFrom): void
+    {
+        $this->yearFrom = $yearFrom;
+    }
+
+    /**
+     * @return int
+     */
+    public function getYearTo()
+    {
+        return $this->yearTo;
+    }
+
+    /**
+     * @param int $yearTo
+     */
+    public function setYearTo($yearTo): void
+    {
+        $this->yearTo = $yearTo;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLicenseVersion()
+    {
+        return $this->licenseVersion;
+    }
+
+    /**
+     * @param string $licenseVersion
+     */
+    public function setLicenseVersion($licenseVersion): void
+    {
+        $this->licenseVersion = $licenseVersion;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLicenseExtras()
+    {
+        return $this->licenseExtras;
+    }
+
+    /**
+     * @param string $licenseExtras
+     */
+    public function setLicenseExtras($licenseExtras): void
+    {
+        $this->licenseExtras = $licenseExtras;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAuthorComments()
+    {
+        return $this->authorComments;
+    }
+
+    /**
+     * @param string $authorComments
+     */
+    public function setAuthorComments($authorComments): void
+    {
+        $this->authorComments = $authorComments;
+    }
+
+    /**
+     * @return string
+     */
+    public function getChanges()
+    {
+        return $this->changes;
+    }
+
+    /**
+     * @param string $changes
+     */
+    public function setChanges(string $changes): void
+    {
+        $this->changes = $changes;
     }
 }
