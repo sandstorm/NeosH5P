@@ -14,8 +14,8 @@ Sandstorm.NeosH5P is currently being maintained for the following versions:
 
 | Neos Version  | Sandstorm.NeosH5P | Branch | Maintained |
 |---------------|-------------------|--------|------------|
-| 3.3           | 1.0               | master | Active     |
-| 4.x           | 1.0               | master | Active     |
+| 3.3           | 1.x               | master | Active     |
+| 4.x           | 1.x               | master | Active     |
 
 # Installation
 Installation is simple and consists of these steps:
