@@ -627,7 +627,7 @@ class Content
     /**
      * @param string $authors
      */
-    public function setAuthors(string $authors)
+    public function setAuthors($authors)
     {
         $this->authors = $authors;
     }
@@ -646,38 +646,6 @@ class Content
     public function setLicense(string $license)
     {
         $this->license = $license;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getKeywords()
-    {
-        return $this->keywords;
-    }
-
-    /**
-     * @param string $keywords
-     */
-    public function setKeywords(string $keywords)
-    {
-        $this->keywords = $keywords;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    /**
-     * @param string $description
-     */
-    public function setDescription(string $description)
-    {
-        $this->description = $description;
     }
 
     /**
