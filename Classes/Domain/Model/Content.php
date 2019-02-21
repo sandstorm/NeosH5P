@@ -308,9 +308,12 @@ class Content
         }
 
         if (isset($contentData['params'])) {
-            $this->setParameters($contentData['params']);
+            // Yes, twice. they added metadata later and didnt rename the top level.
+            $parameters = json_decode($contentData['params'], true);
+            $this->setParameters(json_encode($parameters['params']));
+
             // "H5P Metadata"
-            $metadata = json_decode($this->getParameters(), true)['metadata'];
+            $metadata = $parameters['metadata'];
             $this->setAuthors(empty($metadata['authors']) ? null : json_encode($metadata['authors']));
             $this->setSource(empty($metadata['source']) ? null : $metadata['source']);
             $this->setYearFrom(empty($metadata['yearFrom']) ? null : $metadata['yearFrom']);
