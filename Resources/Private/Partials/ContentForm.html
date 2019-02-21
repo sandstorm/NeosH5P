@@ -48,7 +48,9 @@
         </div>
 
         <f:form.hidden id="h5p-library" name="library" value="{content.library.string}" />
-        <f:form.hidden id="h5p-parameters" name="parameters" value="{content.filtered}" />
+        <!--TODO: Fix filterParameters and make this filtered again!!-->
+        <!--<f:form.hidden id="h5p-parameters" name="parameters" value="{content.filtered}" />-->
+        <f:form.hidden id="h5p-parameters" name="parameters" value="{content.parameters}" />
         <f:form.hidden id="h5p-content" name="contentId" value="{content.contentId}" />
     </fieldset>
 </div>

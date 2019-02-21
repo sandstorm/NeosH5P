@@ -118,6 +118,7 @@ class ContentCRUDService
         $this->h5pEditor->processParameters($content['id'], $content['library'], $params, $oldLibrary, $oldParameters);
 
         // Re-Import the content files as a zipfile for the content element.
+        /** @var Content $contentObject */
         $contentObject = $this->contentRepository->findOneByContentId($content['id']);
         $contentObject->createZippedContentFileFromTemporaryDirectory();
 
