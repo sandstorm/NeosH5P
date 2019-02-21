@@ -463,17 +463,12 @@ class FileAdapter implements \H5PFileStorage
             throw new Exception("Uploading files directly to a Content element is not supported yet.");
         }
 
-        $persistentResource = $this->resourceManager->importResourceFromContent(
-            $file->getData() ?: file_get_contents($_FILES['file']['tmp_name']),
-            $file->getName());
-        $persistentResource->setRelativePublicationPath($file->getType() . 's');
+        $this->createEditorTempFile(
+            file_get_contents($_FILES['file']['tmp_name']),
+            $file->getName(),
+            $file->getType() . 's'
+        );
 
-        $editorTempfile = new EditorTempfile();
-        $editorTempfile->setResource($persistentResource);
-        $editorTempfile->setCreatedAt(new \DateTime());
-        // With this, we can find the editor temp file again later - see below in cloneContentFile
-        $editorTempfile->setTemporaryFilename($file->getName());
-        $this->editorTempfileRepository->add($editorTempfile);
         // Persist all, because this is fetched directly below when we publish
         $this->persistenceManager->persistAll();
 
@@ -485,10 +480,31 @@ class FileAdapter implements \H5PFileStorage
          * @see H5PCommandController::clearEditorTempFilesCommand()
          */
         $collection = $this->resourceManager->getCollection('h5p-editor-tempfiles');
-        $target = $collection->getTarget();
-        $target->publishCollection($collection);
+        $collection->getTarget()->publishCollection($collection);
 
         return $file;
+    }
+
+    /**
+     * @param string $fileContent
+     * @param string $fileName
+     * @param string $relativePublicationPath
+     * @throws \Neos\Flow\Persistence\Exception\IllegalObjectTypeException
+     * @throws \Neos\Flow\ResourceManagement\Exception
+     */
+    private function createEditorTempFile($fileContent, $fileName, $relativePublicationPath)
+    {
+        $persistentResource = $this->resourceManager->importResourceFromContent($fileContent, $fileName);
+        if ($relativePublicationPath) {
+            $persistentResource->setRelativePublicationPath($relativePublicationPath);
+        }
+
+        $editorTempfile = new EditorTempfile();
+        $editorTempfile->setResource($persistentResource);
+        $editorTempfile->setCreatedAt(new \DateTime());
+        // With this, we can find the editor temp file again later - see below in cloneContentFile
+        $editorTempfile->setTemporaryFilename($fileName);
+        $this->editorTempfileRepository->add($editorTempfile);
     }
 
     /**
@@ -513,7 +529,7 @@ class FileAdapter implements \H5PFileStorage
 
         // We can find the asset again by looking for the editortempfile
         /** @var EditorTempfile $editorTempfile */
-        $filenameParts = explode('/', $file);
+        $filenameParts = explode(DIRECTORY_SEPARATOR, $file);
         $editorTempfile = $this->editorTempfileRepository->findOneByTemporaryFilename(end($filenameParts));
 
         // Determine target path
@@ -541,23 +557,43 @@ class FileAdapter implements \H5PFileStorage
         if ($contentId === null || $contentId == 0) {
             $target = $this->h5pPublicFolderPath . $this->h5pEditorTempPublicFolderName;
         } else {
+            // In the current implementation, this can never happen, as the only place where this is called
+            // is from the library upload process, where we do not set a content id. Therefore, we throw
+            // an Exception here - we never expect this code path. (It is taken over from the WP plugin for completeness' sake.)
+            throw new Exception("Upload error - this should never be triggered.");
             // Use content folder
             $target = $this->h5pPublicFolderPath . $this->h5pContentPublicFolderName . DIRECTORY_SEPARATOR . $contentId;
         }
+
+        // In wp, this method copies files from the upload dir to the editor temp file dir. In our implementation
+        // this corresponds to creating an EditorTempfile entity for each file and publishing them.
 
         $contentSource = $source . DIRECTORY_SEPARATOR . 'content';
         $contentFiles = array_diff(scandir($contentSource), array('.', '..', 'content.json'));
         foreach ($contentFiles as $file) {
             $sourcePath = $contentSource . DIRECTORY_SEPARATOR . $file;
-            $targetPath = $target . DIRECTORY_SEPARATOR . $file;
             if (is_dir($sourcePath)) {
-                Files::copyDirectoryRecursively($sourcePath, $targetPath);
+                $subfolderFiles = array_diff(scandir($sourcePath), array('.', '..'));
+                foreach ($subfolderFiles as $subfolderFile) {
+                    $this->createEditorTempFile(file_get_contents($sourcePath . DIRECTORY_SEPARATOR . $subfolderFile), $subfolderFile, $file);
+                }
             } else {
-                copy($sourcePath, $targetPath);
+                $this->createEditorTempFile(file_get_contents($sourcePath), $file);
             }
         }
+        $this->persistenceManager->persistAll();
 
-        // Successfully loaded content json of file into editor
+        /**
+         * We need to publish all resources from the collection 'h5p-editor-tempfiles' before
+         * we can return, as this moves the EditorTempfile asset to the right location so
+         * the H5P editor can find it. This takes a bit, but should not be an issues as
+         * the EditorTempfiles should be cleaned up regularly.
+         * @see H5PCommandController::clearEditorTempFilesCommand()
+         */
+        $collection = $this->resourceManager->getCollection('h5p-editor-tempfiles');
+        $collection->getTarget()->publishCollection($collection);
+
+        // Return the actual content data as JSON, these get handed to the editor for editing by the user
         $h5pJson = $this->getContent($source . DIRECTORY_SEPARATOR . 'h5p.json');
         $contentJson = $this->getContent($contentSource . DIRECTORY_SEPARATOR . 'content.json');
 

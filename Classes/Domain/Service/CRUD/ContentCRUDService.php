@@ -115,7 +115,7 @@ class ContentCRUDService
         }
 
         // Move images and find all content dependencies
-        $this->h5pEditor->processParameters($content['id'], $content['library'], $params, $oldLibrary, $oldParameters);
+        $this->h5pEditor->processParameters($content['id'], $content['library'], $params->params, $oldLibrary, $oldParameters);
 
         // Re-Import the content files as a zipfile for the content element.
         /** @var Content $contentObject */
