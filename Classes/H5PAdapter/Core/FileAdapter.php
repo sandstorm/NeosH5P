@@ -59,6 +59,24 @@ class FileAdapter implements \H5PFileStorage
      */
     protected $persistenceManager;
 
+    /**
+     * @Flow\InjectConfiguration(path="h5pPublicFolder.path")
+     * @var string
+     */
+    protected $h5pPublicFolderPath;
+
+    /**
+     * @Flow\InjectConfiguration(path="h5pPublicFolder.subfolders.editorTempfiles")
+     * @var string
+     */
+    protected $h5pEditorTempPublicFolderName;
+
+    /**
+     * @Flow\InjectConfiguration(path="h5pPublicFolder.subfolders.content")
+     * @var string
+     */
+    protected $h5pContentPublicFolderName;
+
     const H5P_TEMP_DIR = FLOW_PATH_DATA . 'Temporary/H5P';
 
     /**
@@ -348,10 +366,12 @@ class FileAdapter implements \H5PFileStorage
             // whitelist, as this can be called on GET requests
             $this->persistenceManager->whitelistObject($cachedAsset);
 
-            $files[$type] = array((object)array(
-                'path' => $this->resourceManager->getPublicPersistentResourceUri($persistentResource),
-                'version' => ''
-            ));
+            $files[$type] = array(
+                (object)array(
+                    'path' => $this->resourceManager->getPublicPersistentResourceUri($persistentResource),
+                    'version' => ''
+                )
+            );
         }
         // Persist, so the cachedasset objects can be found in H5PFramework->saveCachedAssets
         $this->persistenceManager->persistAll();
@@ -373,16 +393,20 @@ class FileAdapter implements \H5PFileStorage
         /** @var CachedAsset $cachedAsset */
         foreach ($cachedAssets as $cachedAsset) {
             if ($cachedAsset->getType() == 'scripts') {
-                $files['scripts'] = [(object)[
-                    'path' => $this->resourceManager->getPublicPersistentResourceUri($cachedAsset->getResource()),
-                    'version' => ''
-                ]];
+                $files['scripts'] = [
+                    (object)[
+                        'path' => $this->resourceManager->getPublicPersistentResourceUri($cachedAsset->getResource()),
+                        'version' => ''
+                    ]
+                ];
             }
             if ($cachedAsset->getType() == 'styles') {
-                $files['styles'] = [(object)[
-                    'path' => $this->resourceManager->getPublicPersistentResourceUri($cachedAsset->getResource()),
-                    'version' => ''
-                ]];
+                $files['styles'] = [
+                    (object)[
+                        'path' => $this->resourceManager->getPublicPersistentResourceUri($cachedAsset->getResource()),
+                        'version' => ''
+                    ]
+                ];
             }
         }
 
@@ -508,9 +532,39 @@ class FileAdapter implements \H5PFileStorage
      *
      * @return object Object containing h5p json and content json data
      */
-    public function moveContentDirectory($source, $contentId = NULL)
+    public function moveContentDirectory($source, $contentId = null)
     {
-        // TODO: Implement moveContentDirectory() method.
+        if ($source === null) {
+            return null;
+        }
+
+        if ($contentId === null || $contentId == 0) {
+            $target = $this->h5pPublicFolderPath . $this->h5pEditorTempPublicFolderName;
+        } else {
+            // Use content folder
+            $target = $this->h5pPublicFolderPath . $this->h5pContentPublicFolderName . DIRECTORY_SEPARATOR . $contentId;
+        }
+
+        $contentSource = $source . DIRECTORY_SEPARATOR . 'content';
+        $contentFiles = array_diff(scandir($contentSource), array('.', '..', 'content.json'));
+        foreach ($contentFiles as $file) {
+            $sourcePath = $contentSource . DIRECTORY_SEPARATOR . $file;
+            $targetPath = $target . DIRECTORY_SEPARATOR . $file;
+            if (is_dir($sourcePath)) {
+                Files::copyDirectoryRecursively($sourcePath, $targetPath);
+            } else {
+                copy($sourcePath, $targetPath);
+            }
+        }
+
+        // Successfully loaded content json of file into editor
+        $h5pJson = $this->getContent($source . DIRECTORY_SEPARATOR . 'h5p.json');
+        $contentJson = $this->getContent($contentSource . DIRECTORY_SEPARATOR . 'content.json');
+
+        return (object)array(
+            'h5pJson' => $h5pJson,
+            'contentJson' => $contentJson
+        );
     }
 
     /**

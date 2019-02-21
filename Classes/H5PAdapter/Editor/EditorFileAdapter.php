@@ -4,19 +4,22 @@ namespace Sandstorm\NeosH5P\H5PAdapter\Editor;
 
 use H5peditorFile;
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Core\Bootstrap;
+use Neos\Flow\ObjectManagement\ObjectManager;
+use Neos\Flow\ObjectManagement\ObjectManagerInterface;
 use Neos\Flow\Persistence\QueryInterface;
 use Neos\Utility\Exception\FilesException;
 use Neos\Utility\Files;
 use Sandstorm\NeosH5P\Domain\Model\Library;
 use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
 use Sandstorm\NeosH5P\H5PAdapter\Core\FileAdapter;
+use Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework;
 
 /**
  * @Flow\Scope("singleton")
  */
 class EditorFileAdapter implements \H5peditorStorage
 {
-
     /**
      * @Flow\Inject
      * @var LibraryRepository
@@ -51,7 +54,7 @@ class EditorFileAdapter implements \H5peditorStorage
      * @param array $libraries List of library names + version to load info for
      * @return array List of all libraries loaded
      */
-    public function getLibraries($libraries = NULL)
+    public function getLibraries($libraries = null)
     {
         $librariesWithDetails = [];
 
@@ -101,10 +104,10 @@ class EditorFileAdapter implements \H5peditorStorage
                             $libraryData->minorVersion > $existingLibrary->minorVersion) ||
                         ($libraryData->majorVersion > $existingLibrary->majorVersion)) {
                         // This is a newer version
-                        $existingLibrary->isOld = TRUE;
+                        $existingLibrary->isOld = true;
                     } else {
                         // This is an older version
-                        $libraryData->isOld = TRUE;
+                        $libraryData->isOld = true;
                     }
                 }
             }
@@ -160,7 +163,23 @@ class EditorFileAdapter implements \H5peditorStorage
      */
     public static function saveFileTemporarily($data, $move_file)
     {
-        // TODO: Implement saveFileTemporarily() method.
+        // Get temporary path. We need to instantiate the H5PF manually here - no DI in static context.
+        /** @var H5PFramework $h5pF */
+        $h5pF = Bootstrap::$staticObjectManager->get(H5PFramework::class);
+        $path = $h5pF->getUploadedH5pPath();
+
+        if ($move_file) {
+            // Move so core can validate the file extension.
+            rename($data, $path);
+        } else {
+            // Create file from data
+            file_put_contents($path, $data);
+        }
+
+        return (object)array(
+            'dir' => dirname($path),
+            'fileName' => basename($path)
+        );
     }
 
     /**

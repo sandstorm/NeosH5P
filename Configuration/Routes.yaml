@@ -21,6 +21,13 @@
     '@controller': 'Backend\EditorAjax'
     '@action': 'installLibrary'
 -
+  name: 'H5P Backend Editor AJAX - library upload'
+  uriPattern: 'neosh5p/editor/library-upload'
+  defaults:
+    '@package': 'Sandstorm.NeosH5P'
+    '@controller': 'Backend\EditorAjax'
+    '@action': 'uploadLibrary'
+-
   name: 'H5P Backend Editor AJAX - single library details'
   uriPattern: 'neosh5p/editor/libraries'
   defaults:
