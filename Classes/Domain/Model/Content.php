@@ -302,26 +302,25 @@ class Content
         $this->setUpdatedAt(new \DateTime());
         $this->setFiltered("");
         $this->setLibrary($library);
-
-        if (isset($contentData['params'])) {
-            $this->setParameters($contentData['params']);
-        }
+        $this->setTitle($contentData['title']);
         if (isset($contentData['disable'])) {
             $this->setDisable($contentData['disable']);
         }
 
-        // "H5P Metadata"
-        $metadata = $contentData['metadata'];
-        $this->setTitle($metadata['title']);
-        $this->setAuthors(empty($metadata['authors']) ? null : json_encode($metadata['authors']));
-        $this->setSource(empty($metadata['source']) ? null : $metadata['source']);
-        $this->setYearFrom(empty($metadata['yearFrom']) ? null : $metadata['yearFrom']);
-        $this->setYearTo(empty($metadata['yearTo']) ? null : $metadata['yearTo']);
-        $this->setLicense(empty($metadata['license']) ? null : $metadata['license']);
-        $this->setLicenseVersion(empty($metadata['licenseVersion']) ? null : $metadata['licenseVersion']);
-        $this->setLicenseExtras(empty($metadata['licenseExtras']) ? null : $metadata['licenseExtras']);
-        $this->setAuthorComments(empty($metadata['authorComments']) ? null : $metadata['authorComments']);
-        $this->setChanges(empty($metadata['changes']) ? null : json_encode($metadata['changes']));
+        if (isset($contentData['params'])) {
+            $this->setParameters($contentData['params']);
+            // "H5P Metadata"
+            $metadata = json_decode($this->getParameters(), true)['metadata'];
+            $this->setAuthors(empty($metadata['authors']) ? null : json_encode($metadata['authors']));
+            $this->setSource(empty($metadata['source']) ? null : $metadata['source']);
+            $this->setYearFrom(empty($metadata['yearFrom']) ? null : $metadata['yearFrom']);
+            $this->setYearTo(empty($metadata['yearTo']) ? null : $metadata['yearTo']);
+            $this->setLicense(empty($metadata['license']) ? null : $metadata['license']);
+            $this->setLicenseVersion(empty($metadata['licenseVersion']) ? null : $metadata['licenseVersion']);
+            $this->setLicenseExtras(empty($metadata['licenseExtras']) ? null : $metadata['licenseExtras']);
+            $this->setAuthorComments(empty($metadata['authorComments']) ? null : $metadata['authorComments']);
+            $this->setChanges(empty($metadata['changes']) ? null : json_encode($metadata['changes']));
+        }
     }
 
     public function determineEmbedType()
@@ -884,7 +883,7 @@ class Content
     /**
      * @param string $changes
      */
-    public function setChanges(string $changes): void
+    public function setChanges($changes): void
     {
         $this->changes = $changes;
     }

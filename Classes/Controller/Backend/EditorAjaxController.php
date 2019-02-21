@@ -61,13 +61,12 @@ class EditorAjaxController extends ActionController
     }
 
     /**
-     * @param string $queryString
      * @Flow\SkipCsrfProtection
      */
-    public function installLibraryAction(string $queryString)
+    public function installLibraryAction()
     {
-        $queryArguments = $this->resolveQueryString($queryString);
-        $this->h5pEditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $queryArguments['id']);
+        $libraryId = $this->request->getArguments()['id'];
+        $this->h5pEditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $libraryId);
         // Publish the "libraries" collection so we get the unzipped file
         $libraryCollection = $this->resourceManager->getCollection('h5p-libraries');
         $libraryCollection->getTarget()->publishCollection($libraryCollection);
@@ -76,12 +75,9 @@ class EditorAjaxController extends ActionController
         exit;
     }
 
-    /**
-     * @param string $queryString
-     */
-    public function libraryDetailsAction(string $queryString)
+    public function libraryDetailsAction()
     {
-        $queryArguments = $this->resolveQueryString($queryString);
+        $queryArguments = $this->request->getArguments();
 
         /**
          * This call is resolved to:
@@ -153,18 +149,5 @@ class EditorAjaxController extends ActionController
 
         // See above
         exit;
-    }
-
-    private function resolveQueryString(string $queryString): array
-    {
-        $arguments = [];
-        foreach (explode('&', urldecode($queryString)) as $queryParameterString) {
-            if (strlen($queryParameterString) == 0) {
-                continue;
-            }
-            $parameterArray = explode('=', $queryParameterString);
-            $arguments[$parameterArray[0]] = $parameterArray[1];
-        }
-        return $arguments;
     }
 }

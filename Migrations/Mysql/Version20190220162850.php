@@ -28,7 +28,7 @@ class Version20190220162850 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on "mysql".');
 
         $this->addSql('ALTER TABLE sandstorm_neosh5p_domain_model_content ADD authors LONGTEXT DEFAULT NULL, ADD source LONGTEXT DEFAULT NULL, ADD yearfrom INT DEFAULT NULL, ADD yearto INT DEFAULT NULL, ADD licenseextras LONGTEXT DEFAULT NULL, ADD authorcomments LONGTEXT DEFAULT NULL, ADD changes LONGTEXT DEFAULT NULL, DROP keywords, DROP description, CHANGE contentid contentid INT AUTO_INCREMENT UNIQUE, CHANGE createdat createdat DATETIME NOT NULL, CHANGE updatedat updatedat DATETIME NOT NULL, CHANGE author licenseversion VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE sandstorm_neosh5p_domain_model_library ADD metadatasettings LONGTEXT NOT NULL, ADD addto LONGTEXT NOT NULL, CHANGE libraryid libraryid INT AUTO_INCREMENT UNIQUE, CHANGE createdat createdat DATETIME NOT NULL, CHANGE updatedat updatedat DATETIME NOT NULL');
+        $this->addSql('ALTER TABLE sandstorm_neosh5p_domain_model_library ADD metadatasettings LONGTEXT DEFAULT NULL, ADD addto LONGTEXT NOT NULL, CHANGE libraryid libraryid INT AUTO_INCREMENT UNIQUE, CHANGE createdat createdat DATETIME NOT NULL, CHANGE updatedat updatedat DATETIME NOT NULL');
     }
 
     /**

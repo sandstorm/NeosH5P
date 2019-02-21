@@ -30,7 +30,7 @@ Sandstorm:
       # enters during his work with a content, and will restore content state on page reloads.
       save_content_state: true
       # interval in seconds for which the ContentUserData is saved
-      save_content_frequency: 10
+      save_content_frequency: 2
       # whether or not the H5P hub is enabled. Should always be TRUE.
       hub_is_enabled: true
       # Enables LRS content types. Set to true if you integrated an LRS.
