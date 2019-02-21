@@ -1106,8 +1106,7 @@ class H5PFramework implements \H5PFrameworkInterface
             return $removedKeys;
         }
 
-        $cachedAssetsForLibrary = $this->cachedAssetRepository->findByLibrary($library);
-        foreach ($cachedAssetsForLibrary as $cachedAsset) {
+        foreach ($library->getCachedAssets() as $cachedAsset) {
             $removedKeys[] = $this->persistenceManager->getIdentifierByObject($cachedAsset);
             $this->cachedAssetRepository->remove($cachedAsset);
         }
