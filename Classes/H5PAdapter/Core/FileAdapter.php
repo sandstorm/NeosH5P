@@ -597,6 +597,15 @@ class FileAdapter implements \H5PFileStorage
         $h5pJson = $this->getContent($source . DIRECTORY_SEPARATOR . 'h5p.json');
         $contentJson = $this->getContent($contentSource . DIRECTORY_SEPARATOR . 'content.json');
 
+        /**
+         * !!HACK!!: Unfortunately, imported persistent resources always have lowercase file endings.
+         * In case sensitive file systems, uploaded pictures with uppercase endings do not work.
+         * Our only option is to replace them into lowercase. Ew!
+         */
+        $contentJson = preg_replace_callback('/"images.*\.(.*)"/U', function ($matches) {
+            return str_replace($matches[1], strtolower($matches[1]), $matches[0]);
+        }, $contentJson);
+
         return (object)array(
             'h5pJson' => $h5pJson,
             'contentJson' => $contentJson
