@@ -58,20 +58,21 @@ class LibraryRepository extends Repository
      */
     public function getLibraryAddons()
     {
-        $query = $this->createQuery();
+        $qb = $this->entityManager->createQueryBuilder();
+        $qb->select('e.libraryId, e.name AS machineName, e.majorVersion, e.minorVersion, e.patchVersion, e.addTo, e.preloadedJs, e.preloadedCss')
+            ->from(Library::class, 'e')
+            ->leftJoin(
+                Library::class,
+                'l2',
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                'e.name = l2.name AND
+                    (e.majorVersion < l2.majorVersion OR
+                        (e.majorVersion = l2.majorVersion AND e.minorVersion < l2.minorVersion)
+                    )'
+            )
+            ->where('e.addTo IS NOT NULL AND l2.name IS NULL');
 
-        // Load addons
-        // If there are several versions of the same addon, pick the newest one
-        $query->getQueryBuilder()
-            ->select('l1.libraryId, l1.name AS machineName, l1.majorVersion, l1.minorVersion, l1.patchVersion, l1.addTo, l1.preloadedJs, l1.preloadedCss')
-            ->from(Library::class, 'l1')
-            ->leftJoin(Library::class, 'l2', 'ON', 'ON l1.name = l2.name AND
-            (l1.majorVersion < l2.majorVersion OR
-              (l1.majorVersion = l2.majorVersion AND
-               l1.majorVersion < l2.mimajorVersionnor_version))')
-            ->where('l1.addTo IS NOT NULL AND l2.name IS NULL');
-
-        return $query->execute()->toArray();
+        return $qb->getQuery()->execute();
     }
 
 }
