@@ -5,8 +5,6 @@ namespace Sandstorm\NeosH5P\H5PAdapter\Editor;
 use H5peditorFile;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Core\Bootstrap;
-use Neos\Flow\ObjectManagement\ObjectManager;
-use Neos\Flow\ObjectManagement\ObjectManagerInterface;
 use Neos\Flow\Persistence\QueryInterface;
 use Neos\Utility\Exception\FilesException;
 use Neos\Utility\Files;
