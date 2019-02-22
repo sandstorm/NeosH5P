@@ -277,20 +277,38 @@ class Content
             'libraryMinorVersion' => $this->library->getMinorVersion(),
             'libraryEmbedTypes' => $this->library->getEmbedTypes(),
             'libraryFullscreen' => $this->library->getFullscreen(),
-            'metadata' => [
-                'authors' => json_decode($this->getAuthors()),
-                'source' => $this->getSource(),
-                'yearFrom' => $this->getYearFrom(),
-                'yearTo' => $this->getYearTo(),
-                'license' => $this->getLicense(),
-                'licenseVersion' => $this->getLicenseVersion(),
-                'licenseExtras' => $this->getLicenseExtras(),
-                'authorComments' => $this->getAuthorComments(),
-                'changes' => json_decode($this->getChanges())
-            ]
+            'metadata' => $this->getMetadataArray()
         ];
 
         return $contentArray;
+    }
+
+    public function getMetadataArray() : array {
+        return [
+            'authors' => json_decode($this->getAuthors()),
+            'source' => $this->getSource(),
+            'yearFrom' => $this->getYearFrom(),
+            'yearTo' => $this->getYearTo(),
+            'license' => $this->getLicense(),
+            'licenseVersion' => $this->getLicenseVersion(),
+            'licenseExtras' => $this->getLicenseExtras(),
+            'authorComments' => $this->getAuthorComments(),
+            'changes' => json_decode($this->getChanges())
+        ];
+    }
+
+    /**
+     * Returns the params and metadata merged into one array, which is also called params.
+     * Bit of H5P core weirdness there...
+     *
+     * @return array
+     */
+    public function getParamsWithMetadata() : array
+    {
+        return [
+            'params' => json_decode($this->getParameters()),
+            'metadata' => $this->getMetadataArray()
+        ];
     }
 
     /**

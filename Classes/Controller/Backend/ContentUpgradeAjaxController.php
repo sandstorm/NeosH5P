@@ -107,7 +107,7 @@ class ContentUpgradeAjaxController extends ActionController
         ];
 
         foreach ($this->contentRepository->findFirstTenContentsByLibrary($oldLibrary) as $content) {
-            $response['params'][$content->getContentId()] = $content->getParameters();
+            $response['params'][$content->getContentId()] = $content->getParamsWithMetadata();
         }
 
         return json_encode($response);
