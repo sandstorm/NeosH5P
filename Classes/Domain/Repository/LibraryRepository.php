@@ -44,6 +44,17 @@ class LibraryRepository extends Repository
         return $query->execute();
     }
 
+    public function findUnused()
+    {
+        $libs = $this->findAll()->toArray();
+        return array_filter($libs, function ($library) {
+            /** @var Library $library */
+            return $library->getContents()->count() === 0 &&
+                $library->getContentDependencies()->count() === 0 &&
+                count($library->getDependentLibraries()) === 0;
+        });
+    }
+
     /**
      * @param string $libraryName
      * @param int $majorVersion

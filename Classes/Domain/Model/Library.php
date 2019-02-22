@@ -216,13 +216,13 @@ class Library
         if (isset($libraryData['embedTypes'])) {
             $libraryData['__embedTypes'] = implode(', ', $libraryData['embedTypes']);
         }
-        if (!isset($libraryData['semantics'])) {
+        if (! isset($libraryData['semantics'])) {
             $libraryData['semantics'] = '';
         }
-        if (!isset($libraryData['hasIcon'])) {
+        if (! isset($libraryData['hasIcon'])) {
             $libraryData['hasIcon'] = 0;
         }
-        if (!isset($libraryData['fullscreen'])) {
+        if (! isset($libraryData['fullscreen'])) {
             $libraryData['fullscreen'] = 0;
         }
 
@@ -384,7 +384,7 @@ class Library
     /**
      * @return string
      */
-    public function getVersionString() : string
+    public function getVersionString(): string
     {
         return $this->getMajorVersion() . '.' . $this->getMinorVersion() . '.' . $this->getPatchVersion();
     }
@@ -702,6 +702,17 @@ class Library
     }
 
     /**
+     * @return array
+     */
+    public function getDependentLibrariesAsLibraryObjects(): array
+    {
+        return $this->libraryDependencies->map(function ($libraryDependency) {
+            /** @var LibraryDependency $libraryDependency */
+            return $libraryDependency->getRequiredLibrary();
+        })->toArray();
+    }
+
+    /**
      * @param Collection $libraryDependencies
      */
     public function setLibraryDependencies(Collection $libraryDependencies)
@@ -714,7 +725,11 @@ class Library
      */
     public function getDependentLibraries(): array
     {
-        return $this->libraryDependencyRepository->findByRequiredLibrary($this)->toArray();
+        $dependencies = $this->libraryDependencyRepository->findByRequiredLibrary($this)->toArray();
+        return array_map(function ($libraryDependency) {
+            /** @var LibraryDependency $libraryDependency */
+            return $libraryDependency->getLibrary();
+        }, $dependencies);
     }
 
     /**

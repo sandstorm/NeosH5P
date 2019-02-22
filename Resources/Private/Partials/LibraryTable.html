@@ -1,0 +1,81 @@
+<table class="neos-table">
+    <thead>
+    <tr>
+        <th class="neos-span5">Library</th>
+        <th class="neos-span1">Version</th>
+        <th class="neos-span1">Contents</th>
+        <th class="neos-span2">Dependent Contents</th>
+        <th class="neos-span2">Dependent Libraries</th>
+        <th class="neos-span1">&nbsp;</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <f:for each="{paginatedLibraries}" as="library" key="index">
+        <tr>
+            <td>
+                <neos:link.module
+                    title="View Library"
+                    path="h5p/library"
+                    action="display"
+                    arguments="{library:library}">
+                    {library.title}
+                </neos:link.module>
+            </td>
+            <td>
+                {library.versionString}
+            </td>
+            <td>
+                {library.contents -> f:count()}
+            </td>
+            <td>
+                {library.contentDependencies -> f:count()}
+            </td>
+            <td>
+                {library.dependentLibraries -> f:count()}
+            </td>
+            <td class="neos-action">
+                <div class="neos-pull-right">
+                    <f:if condition="{library.upgradeAvailable}">
+                        <neos:link.module
+                            title="Upgrade library"
+                            path="h5p/library"
+                            action="upgrade"
+                            arguments="{library:library}"
+                            additionalAttributes="{data-neos-toggle: 'tooltip', class: 'neos-button neos-button-primary'}">
+                            <i class="icon-arrow-up icon-white fas fa-arrow-up"></i>
+                        </neos:link.module>
+                    </f:if>
+                    <neos:link.module
+                        title="View Library"
+                        path="h5p/library"
+                        action="display"
+                        arguments="{library:library}"
+                        additionalAttributes="{data-neos-toggle: 'tooltip', class: 'neos-button neos-button-primary'}">
+                        <i class="icon-info-sign icon-white fas fa-info-circle"></i>
+                    </neos:link.module>
+
+                    <f:if condition="{library.contents -> f:count()} > 0 || {library.contentDependencies -> f:count()} > 0 || {library.dependentLibraries -> f:count()} > 0">
+                        <f:then>
+                            <button class="neos-button neos-button-danger neos-disabled"
+                                    title="Contents or other libraries are using this library"
+                                    href="#">
+                                <i class="icon-trash icon-white fas fa-trash-alt"></i>
+                            </button>
+                        </f:then>
+                        <f:else>
+                            <button class="neos-button neos-button-danger" title="Remove this library"
+                                    data-toggle="modal" href="#remove-{index}" data-neos-toggle="tooltip">
+                                <i class="icon-trash icon-white fas fa-trash-alt"></i>
+                            </button>
+                        </f:else>
+                    </f:if>
+
+                    <f:render partial="DeleteLibraryModal" arguments="{_all}"/>
+                </div>
+            </td>
+        </tr>
+    </f:for>
+
+    </tbody>
+</table>
