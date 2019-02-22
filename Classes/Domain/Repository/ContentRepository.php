@@ -3,12 +3,18 @@ namespace Sandstorm\NeosH5P\Domain\Repository;
 
 use Neos\Flow\Persistence\Doctrine\Repository;
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Persistence\QueryInterface;
 use Sandstorm\NeosH5P\Domain\Model\Library;
 
 /**
  * @Flow\Scope("singleton")
  */
 class ContentRepository extends Repository {
+
+    /**
+     * @var array
+     */
+    protected $defaultOrderings = ['contentId' => QueryInterface::ORDER_DESCENDING];
 
     /**
      * @param Library $library

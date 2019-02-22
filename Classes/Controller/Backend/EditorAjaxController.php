@@ -66,7 +66,13 @@ class EditorAjaxController extends ActionController
     public function installLibraryAction()
     {
         $libraryId = $this->request->getArgument('id');
+
+        /**
+         * This call is resolved to:
+         * @see \H5peditor::libraryInstall()
+         */
         $this->h5pEditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $libraryId);
+
         // Publish the "libraries" collection so we get the unzipped file
         $libraryCollection = $this->resourceManager->getCollection('h5p-libraries');
         $libraryCollection->getTarget()->publishCollection($libraryCollection);
@@ -82,6 +88,11 @@ class EditorAjaxController extends ActionController
     {
         $h5pFilePath = $this->request->getArgument('h5p')['tmp_name'];
         $contentId = $this->request->getArgument('contentId');
+
+        /**
+         * This call is resolved to:
+         * @see \H5peditor::libraryUpload()
+         */
         $this->h5pEditor->ajax->action(\H5PEditorEndpoints::LIBRARY_UPLOAD, 'dummy', $h5pFilePath, $contentId);
 
         // Publish the "libraries" and "content" collection
@@ -146,7 +157,7 @@ class EditorAjaxController extends ActionController
          * @see \H5peditorAjax::fileUpload()
          */
         $this->h5pEditor->ajax->action(\H5PEditorEndpoints::FILES, 'dummy', null);
-         
+
         // See above
         exit;
     }

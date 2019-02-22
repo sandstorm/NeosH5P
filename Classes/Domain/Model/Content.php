@@ -203,6 +203,22 @@ class Content
      */
     protected $resourceManager;
 
+    public function __construct()
+    {
+        $this->contentDependencies = new ArrayCollection();
+        $this->contentUserDatas = new ArrayCollection();
+        $this->contentResults = new ArrayCollection();
+    }
+
+    /**
+     * Returns the doctrine identifier.
+     * @return string
+     */
+    public function getIdentifier()
+    {
+        return $this->Persistence_Object_Identifier;
+    }
+
     /**
      * Creates a Content from a metadata array.
      *
@@ -275,22 +291,6 @@ class Content
         ];
 
         return $contentArray;
-    }
-
-    public function __construct()
-    {
-        $this->contentDependencies = new ArrayCollection();
-        $this->contentUserDatas = new ArrayCollection();
-        $this->contentResults = new ArrayCollection();
-    }
-
-    /**
-     * Returns the doctrine identifier.
-     * @return string
-     */
-    public function getIdentifier()
-    {
-        return $this->Persistence_Object_Identifier;
     }
 
     /**

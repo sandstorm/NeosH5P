@@ -140,11 +140,11 @@ class ContentCRUDService
         // If there is a zipped content file now, publish it.
         if ($contentObject->getZippedContentFile() !== null) {
             $collection = $this->resourceManager->getCollection('h5p-content');
-            $target = $collection->getTarget();
+
             // PublishResource does not work as apparently a different logic is used, so we publish the whole
             // collection here for now
-            // $target->publishResource($contentObject->getZippedContentFile(), $collection);
-            $target->publishCollection($collection);
+            // $collection->getTarget()->publishResource($contentObject->getZippedContentFile(), $collection);
+            $collection->getTarget()->publishCollection($collection);
         }
 
         return $this->contentRepository->findOneByContentId($content['id']);

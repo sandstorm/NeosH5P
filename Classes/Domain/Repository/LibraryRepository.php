@@ -3,6 +3,7 @@ namespace Sandstorm\NeosH5P\Domain\Repository;
 
 use Neos\Flow\Persistence\Doctrine\Repository;
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Persistence\QueryInterface;
 use Sandstorm\NeosH5P\Domain\Model\Library;
 
 /**
@@ -10,6 +11,11 @@ use Sandstorm\NeosH5P\Domain\Model\Library;
  */
 class LibraryRepository extends Repository
 {
+
+    /**
+     * @var array
+     */
+    protected $defaultOrderings = ['name' => QueryInterface::ORDER_ASCENDING];
 
     /**
      * @param $id
