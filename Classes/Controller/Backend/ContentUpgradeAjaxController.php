@@ -107,7 +107,8 @@ class ContentUpgradeAjaxController extends ActionController
         ];
 
         foreach ($this->contentRepository->findFirstTenContentsByLibrary($oldLibrary) as $content) {
-            $response['params'][$content->getContentId()] = $content->getParamsWithMetadata();
+            // The params of each content object are expected as a JSON string, not a JSON object. They get decoded client-side.
+            $response['params'][$content->getContentId()] = json_encode($content->getParamsWithMetadata());
         }
 
         return json_encode($response);
