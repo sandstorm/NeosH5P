@@ -1,0 +1,25 @@
+<f:form action="index">
+    <table class="neos-table">
+        <thead>
+        <tr>
+            <th class="neos-span1">Sort By</th>
+            <th class="neos-span1">Search Title</th>
+            <th class="neos-span1">&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <f:form.select name="orderBy" value="{orderBy}" options="{possibleOrderBy}"/>
+                <f:form.select name="orderDirection" value="{orderDirection}" options="{possibleOrderDirection}"/>
+            </td>
+            <td>
+                <f:form.textfield name="search" value="{search}" placeholder="Search for a title..."/>
+            </td>
+            <td class="neos-action">
+                <div class="neos-pull-right">
+                    <f:form.submit value="Submit" class="neos-button neos-button-primary"/>
+                </div>
+            </td>
+        </tr>
+</f:form>

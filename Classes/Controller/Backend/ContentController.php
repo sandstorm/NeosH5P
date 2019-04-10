@@ -5,6 +5,7 @@ namespace Sandstorm\NeosH5P\Controller\Backend;
 use Neos\Error\Messages\Message;
 use Neos\Flow\Mvc\Exception\StopActionException;
 use Neos\Flow\Mvc\View\ViewInterface;
+use Neos\Flow\Persistence\QueryInterface;
 use Neos\Neos\Controller\Module\AbstractModuleController;
 use Neos\Flow\Annotations as Flow;
 use Sandstorm\NeosH5P\Domain\Model\Content;
@@ -53,11 +54,32 @@ class ContentController extends AbstractModuleController
      */
     protected $uriGenerationService;
 
-    public function indexAction()
+    /**
+     * @param string $orderBy
+     * @param string $orderDirection
+     * @param string $search
+     */
+    public function indexAction($orderBy = 'contentId', $orderDirection = QueryInterface::ORDER_DESCENDING, $search = '')
     {
-        $contents = $this->contentRepository->findAll();
+        $contents = $this->contentRepository->findByContainsTitle($search, $orderBy, $orderDirection);
+
         $this->view->assign('contents', $contents);
         $this->view->assign('isRenderedInFullscreenEditor', $this->isRenderedInFullscreenEditor());
+        $this->view->assign('orderBy', $orderBy);
+        $this->view->assign('possibleOrderBy', [
+            'title' => 'Title',
+            'library' => 'Library',
+            'contentId' => 'Content ID',
+            'createdAt' => 'Created',
+            'updatedAt' => 'Updated',
+            'account' => 'Author'
+        ]);
+        $this->view->assign('orderDirection', $orderDirection);
+        $this->view->assign('possibleOrderDirection', [
+            QueryInterface::ORDER_DESCENDING => 'Descending',
+            QueryInterface::ORDER_ASCENDING => 'Ascending'
+        ]);
+        $this->view->assign('search', $search);
     }
 
     /**

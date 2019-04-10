@@ -3,6 +3,9 @@
 
 <f:section name="content">
     <div class="neos-row-fluid">
+        <f:render partial="ContentSearchAndSort" arguments="{_all}" />
+    </div>
+    <div class="neos-row-fluid">
         <f:render partial="ContentTable" arguments="{_all}" />
     </div>
     <div class="neos-footer">
