@@ -5,6 +5,7 @@ namespace Sandstorm\NeosH5P\Domain\Service\CRUD;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\ResourceManagement\ResourceManager;
 use Sandstorm\NeosH5P\Domain\Model\Content;
+use Sandstorm\NeosH5P\Domain\Model\Library;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
 use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
 
@@ -127,18 +128,50 @@ class ContentCRUDService
          * We do it here to save performance and avoid writes in GET requests. It expects the full content array to
          * be populated.
          */
-        /** @var Content $contentObject */
-        $content = $contentObject->toAssocArray();
+        $contentArray = $this->generateFilteredParametersAndContentFile($contentObject);
+
+        return $this->contentRepository->findOneByContentId($contentArray['id']);
+    }
+
+    /**
+     * Handles the upgrade process of a content element.
+     *
+     * @param string $contentId
+     * @param string $migratedParams
+     * @param Library $targetLibrary
+     * @return null|Content
+     */
+    public function handleUpgrade($contentId, $migratedParams, Library $targetLibrary)
+    {
+        /** @var Content $content */
+        $content = $this->contentRepository->findOneByContentId($contentId);
+        // Ugh..
+        $content->setParameters(json_encode(json_decode($migratedParams)->params));
+        $content->setUpdatedAt(new \DateTime());
+        $content->setLibrary($targetLibrary);
+        $content->setFiltered('');
+
+        $this->contentRepository->update($content);
+        $this->generateFilteredParametersAndContentFile($content);
+        return $content;
+    }
+
+    /**
+     * @param Content $content
+     * @return array
+     */
+    private function generateFilteredParametersAndContentFile(Content $content) {
+        $contentArray = $content->toAssocArray();
         // If "slug" is not empty, filterParameters thinks that we don't have to delete old exports, so make sure
         // it's empty so it gets repopulated and old exports get removed. Crazy...
-        $content['slug'] = '';
-        $this->h5pCore->filterParameters($content);
+        $contentArray['slug'] = '';
+        $this->h5pCore->filterParameters($contentArray);
 
         // Persist again as the zippedresource object, export file etc. may have changed
-        $this->contentRepository->update($contentObject);
+        $this->contentRepository->update($content);
 
         // If there is a zipped content file now, publish it.
-        if ($contentObject->getZippedContentFile() !== null) {
+        if ($content->getZippedContentFile() !== null) {
             $collection = $this->resourceManager->getCollection('h5p-content');
 
             // PublishResource does not work as apparently a different logic is used, so we publish the whole
@@ -147,7 +180,7 @@ class ContentCRUDService
             $collection->getTarget()->publishCollection($collection);
         }
 
-        return $this->contentRepository->findOneByContentId($content['id']);
+        return $contentArray;
     }
 
     /**
