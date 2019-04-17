@@ -45,7 +45,7 @@ class EditorAjax implements \H5PEditorAjaxInterface
             if(array_key_exists($library->getName(), $versionInformation)) {
                 continue;
             }
-            $versionInformation[] = (object)[
+            $versionInformation[$library->getName()] = (object)[
                 'id' => $library->getLibraryId(),
                 'machine_name' => $library->getName(),
                 'title' => $library->getTitle(),
@@ -56,6 +56,7 @@ class EditorAjax implements \H5PEditorAjaxInterface
                 'has_icon' => $library->hasIcon()
             ];
         }
+
         return $versionInformation;
     }
 
