@@ -321,7 +321,6 @@ class Content
         $this->setUpdatedAt(new \DateTime());
         $this->setFiltered("");
         $this->setLibrary($library);
-        $this->setTitle($contentData['title']);
         if (isset($contentData['disable'])) {
             $this->setDisable($contentData['disable']);
         }
@@ -333,6 +332,7 @@ class Content
 
             // "H5P Metadata"
             $metadata = $parameters['metadata'];
+            $this->setTitle($metadata['title']);
             $this->setAuthors(empty($metadata['authors']) ? null : json_encode($metadata['authors']));
             $this->setSource(empty($metadata['source']) ? null : $metadata['source']);
             $this->setYearFrom(empty($metadata['yearFrom']) ? null : $metadata['yearFrom']);

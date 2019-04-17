@@ -59,13 +59,12 @@ class ContentCRUDService
      *
      * @see \H5PCore::saveContent()
      *
-     * @param string $title
      * @param string $library
      * @param string $parameters
      * @param int $contentId
      * @return null|Content
      */
-    public function handleCreateOrUpdate(string $title, string $library, string $parameters, $contentId = null)
+    public function handleCreateOrUpdate(string $library, string $parameters, $contentId = null)
     {
         $content = [];
         $oldLibrary = null;
@@ -82,7 +81,6 @@ class ContentCRUDService
             }
         }
         $content['disable'] = \H5PCore::DISABLE_NONE;
-        $content['title'] = $title;
         $content['params'] = $parameters;
 
         // Get library

@@ -137,20 +137,19 @@ class ContentController extends AbstractModuleController
     }
 
     /**
-     * @param string $title
      * @param string $action
      * @param string $library
      * @param string $parameters
      * @throws StopActionException
      */
-    public function createAction(string $action, string $title, string $library, string $parameters)
+    public function createAction(string $action, string $library, string $parameters)
     {
         // We only handle $action == 'create' so far
         if ($action === 'upload') {
             // TODO: not implemented yet
         }
 
-        $content = $this->contentCRUDService->handleCreateOrUpdate($title, $library, $parameters);
+        $content = $this->contentCRUDService->handleCreateOrUpdate($library, $parameters);
         if ($content === null) {
             $this->showH5pErrorMessages();
             $this->redirect('index');
@@ -175,15 +174,14 @@ class ContentController extends AbstractModuleController
 
     /**
      * @param int $contentId
-     * @param string $title
      * @param string $library
      * @param string $parameters
      * @throws StopActionException
      * @return bool
      */
-    public function updateAction(int $contentId, string $title, string $library, string $parameters)
+    public function updateAction(int $contentId, string $library, string $parameters)
     {
-        $content = $this->contentCRUDService->handleCreateOrUpdate($title, $library, $parameters, $contentId);
+        $content = $this->contentCRUDService->handleCreateOrUpdate($library, $parameters, $contentId);
         if ($content === null) {
             $this->showH5pErrorMessages();
             $this->redirect('index');
