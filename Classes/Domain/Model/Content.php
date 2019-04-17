@@ -203,6 +203,22 @@ class Content
      */
     protected $resourceManager;
 
+    public function __construct()
+    {
+        $this->contentDependencies = new ArrayCollection();
+        $this->contentUserDatas = new ArrayCollection();
+        $this->contentResults = new ArrayCollection();
+    }
+
+    /**
+     * Returns the doctrine identifier.
+     * @return string
+     */
+    public function getIdentifier()
+    {
+        return $this->Persistence_Object_Identifier;
+    }
+
     /**
      * Creates a Content from a metadata array.
      *
@@ -261,36 +277,39 @@ class Content
             'libraryMinorVersion' => $this->library->getMinorVersion(),
             'libraryEmbedTypes' => $this->library->getEmbedTypes(),
             'libraryFullscreen' => $this->library->getFullscreen(),
-            'metadata' => [
-                'authors' => json_decode($this->getAuthors()),
-                'source' => $this->getSource(),
-                'yearFrom' => $this->getYearFrom(),
-                'yearTo' => $this->getYearTo(),
-                'license' => $this->getLicense(),
-                'licenseVersion' => $this->getLicenseVersion(),
-                'licenseExtras' => $this->getLicenseExtras(),
-                'authorComments' => $this->getAuthorComments(),
-                'changes' => json_decode($this->getChanges())
-            ]
+            'metadata' => $this->getMetadataArray()
         ];
 
         return $contentArray;
     }
 
-    public function __construct()
-    {
-        $this->contentDependencies = new ArrayCollection();
-        $this->contentUserDatas = new ArrayCollection();
-        $this->contentResults = new ArrayCollection();
+    public function getMetadataArray() : array {
+        return [
+            'title' => $this->getTitle(),
+            'authors' => json_decode($this->getAuthors()),
+            'source' => $this->getSource(),
+            'yearFrom' => $this->getYearFrom(),
+            'yearTo' => $this->getYearTo(),
+            'license' => $this->getLicense(),
+            'licenseVersion' => $this->getLicenseVersion(),
+            'licenseExtras' => $this->getLicenseExtras(),
+            'authorComments' => $this->getAuthorComments(),
+            'changes' => json_decode($this->getChanges())
+        ];
     }
 
     /**
-     * Returns the doctrine identifier.
-     * @return string
+     * Returns the params and metadata merged into one array, which is also called params.
+     * Bit of H5P core weirdness there...
+     *
+     * @return array
      */
-    public function getIdentifier()
+    public function getParamsWithMetadata() : array
     {
-        return $this->Persistence_Object_Identifier;
+        return [
+            'params' => json_decode($this->getParameters()),
+            'metadata' => $this->getMetadataArray()
+        ];
     }
 
     /**
@@ -302,7 +321,6 @@ class Content
         $this->setUpdatedAt(new \DateTime());
         $this->setFiltered("");
         $this->setLibrary($library);
-        $this->setTitle($contentData['title']);
         if (isset($contentData['disable'])) {
             $this->setDisable($contentData['disable']);
         }
@@ -314,6 +332,7 @@ class Content
 
             // "H5P Metadata"
             $metadata = $parameters['metadata'];
+            $this->setTitle($metadata['title']);
             $this->setAuthors(empty($metadata['authors']) ? null : json_encode($metadata['authors']));
             $this->setSource(empty($metadata['source']) ? null : $metadata['source']);
             $this->setYearFrom(empty($metadata['yearFrom']) ? null : $metadata['yearFrom']);

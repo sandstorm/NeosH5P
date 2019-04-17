@@ -2,14 +2,6 @@
 <div class="neos-row-fluid">
     <fieldset class="neos-span12">
 
-        <div class="neos-control-group">
-            <label class="neos-control-label" for="title">Title</label>
-            <div class="neos-controls">
-                <f:form.textfield required="true" class="neos-span6" id="title" name="title"
-                                  value="{content.title}" placeholder="Enter a title for your new H5P content"/>
-            </div>
-        </div>
-
         <!-- needed by h5p, but not shown to the user -->
         <div class="neos-control-group" style="display: none;">
             <label class="neos-control-label">Select Action</label>
@@ -48,7 +40,7 @@
         </div>
 
         <f:form.hidden id="h5p-library" name="library" value="{content.library.string}" />
-        <f:form.hidden id="h5p-parameters" name="parameters" value="{content.filtered}" />
+        <f:form.hidden id="h5p-parameters" name="parameters" value="{content.paramsWithMetaData -> f:format.json()}" />
         <f:form.hidden id="h5p-content" name="contentId" value="{content.contentId}" />
     </fieldset>
 </div>

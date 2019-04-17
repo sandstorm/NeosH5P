@@ -3,16 +3,24 @@ namespace Sandstorm\NeosH5P\Domain\Repository;
 
 use Neos\Flow\Persistence\Doctrine\Repository;
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Persistence\QueryInterface;
+use Neos\Flow\Persistence\QueryResultInterface;
 use Sandstorm\NeosH5P\Domain\Model\Library;
 
 /**
  * @Flow\Scope("singleton")
  */
-class ContentRepository extends Repository {
+class ContentRepository extends Repository
+{
+
+    /**
+     * @var array
+     */
+    protected $defaultOrderings = ['contentId' => QueryInterface::ORDER_DESCENDING];
 
     /**
      * @param Library $library
-     * @return \Neos\Flow\Persistence\QueryResultInterface
+     * @return QueryResultInterface
      */
     public function findFirstTenContentsByLibrary(Library $library)
     {
@@ -25,10 +33,30 @@ class ContentRepository extends Repository {
         return $query->execute();
     }
 
+
+    /**
+     * @param string $title
+     * @param string $orderBy
+     * @param string $orderDirection
+     * @return QueryResultInterface
+     */
+    public function findByContainsTitle($title, $orderBy, $orderDirection)
+    {
+        $query = $this->createQuery();
+
+        $query->getQueryBuilder()
+            ->where('e.title LIKE :title')
+            ->orderBy('e.' . $orderBy, $orderDirection)
+            ->setParameters(['title' => '%' . $title . '%']);
+
+        return $query->execute();
+    }
+
     /**
      * @param $id
      */
-    public function removeByContentId($id) {
+    public function removeByContentId($id)
+    {
         $content = $this->findOneByContentId($id);
         if ($content !== null) {
             $this->remove($content);

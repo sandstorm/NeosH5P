@@ -10,6 +10,7 @@ use Sandstorm\NeosH5P\Domain\Model\Content;
 use Sandstorm\NeosH5P\Domain\Model\Library;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
 use Sandstorm\NeosH5P\Domain\Repository\LibraryRepository;
+use Sandstorm\NeosH5P\Domain\Service\CRUD\ContentCRUDService;
 use Sandstorm\NeosH5P\H5PAdapter\Core\H5PFramework;
 
 class ContentUpgradeAjaxController extends ActionController
@@ -57,6 +58,12 @@ class ContentUpgradeAjaxController extends ActionController
     protected $contentRepository;
 
     /**
+     * @Flow\Inject
+     * @var ContentCRUDService
+     */
+    protected $contentCRUDService;
+
+    /**
      * @Flow\SkipCsrfProtection
      * @param int $oldLibraryId
      * @param int $libraryId
@@ -69,32 +76,17 @@ class ContentUpgradeAjaxController extends ActionController
 
         // $params is null in the first request because the client does not yet know them
         if ($params !== null) {
-            $decodedParams = json_decode($params);
-
             /** @var Library $targetLibrary */
             $targetLibrary = $this->libraryRepository->findOneByLibraryId($libraryId);
 
+            $decodedParams = json_decode($params);
             foreach ($decodedParams as $id => $migratedParams) {
-                /** @var Content $content */
-                $content = $this->contentRepository->findOneByContentId($id);
-                $content->setParameters($migratedParams);
-                $content->setUpdatedAt(new \DateTime());
-                $content->setLibrary($targetLibrary);
-                $content->setFiltered('');
-
-                $this->contentRepository->update($content);
-
-                $contentArray = $content->toAssocArray();
-                // If "slug" is not empty, filterParameters thinks that we don't have to delete old exports, so make sure
-                // it's empty so it gets repopulated and old exports get removed. Crazy...
-                $contentArray['slug'] = '';
-                $this->h5pCore->filterParameters($contentArray);
-
+                $this->contentCRUDService->handleUpgrade($id, $migratedParams, $targetLibrary);
                 $this->persistenceManager->persistAll();
-                $this->persistenceManager->clearState();
             }
         }
 
+        $this->persistenceManager->clearState();
         $remainingContentForOldLibrary = $this->h5pFramework->getNumContent($oldLibraryId);
 
         /** @var Library $oldLibrary */
@@ -107,7 +99,8 @@ class ContentUpgradeAjaxController extends ActionController
         ];
 
         foreach ($this->contentRepository->findFirstTenContentsByLibrary($oldLibrary) as $content) {
-            $response['params'][$content->getContentId()] = $content->getParameters();
+            // The params of each content object are expected as a JSON string, not a JSON object. They get decoded client-side.
+            $response['params'][$content->getContentId()] = json_encode($content->getParamsWithMetadata());
         }
 
         return json_encode($response);

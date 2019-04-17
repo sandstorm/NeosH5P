@@ -75,7 +75,9 @@ class LibraryController extends AbstractModuleController
     public function indexAction()
     {
         $libraries = $this->libraryRepository->findAll();
+        $unusedLibraries = $this->libraryRepository->findUnused();
         $this->view->assign('libraries', $libraries);
+        $this->view->assign('unusedLibraries', $unusedLibraries);
     }
 
     /**
@@ -123,6 +125,22 @@ class LibraryController extends AbstractModuleController
             $this->addFlashMessage('The content type cache was refreshed successfully.');
         }
         $this->redirect('index');
+        return false;
+    }
+
+    /**
+     * @throws StopActionException
+     * @return bool
+     */
+    public function deleteUnusedAction()
+    {
+        $unusedLibraries = $this->libraryRepository->findUnused();
+        foreach ($unusedLibraries as $library) {
+            $this->libraryCRUDService->handleDelete($library);
+        }
+
+        $this->addFlashMessage('%s unused libraries have been deleted.', 'Libraries deleted', Message::SEVERITY_OK, [count($unusedLibraries)]);
+        $this->redirect('index', null, null);
         return false;
     }
 
