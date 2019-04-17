@@ -285,6 +285,7 @@ class Content
 
     public function getMetadataArray() : array {
         return [
+            'title' => $this->getTitle(),
             'authors' => json_decode($this->getAuthors()),
             'source' => $this->getSource(),
             'yearFrom' => $this->getYearFrom(),

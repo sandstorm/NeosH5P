@@ -145,11 +145,9 @@ class ContentCRUDService
     {
         /** @var Content $content */
         $content = $this->contentRepository->findOneByContentId($contentId);
-        // Ugh..
-        $content->setParameters(json_encode(json_decode($migratedParams)->params));
-        $content->setUpdatedAt(new \DateTime());
-        $content->setLibrary($targetLibrary);
-        $content->setFiltered('');
+
+        $contentData = json_decode($migratedParams, true);
+        $content->updateFromContentData($contentData, $targetLibrary);
 
         $this->contentRepository->update($content);
         $this->generateFilteredParametersAndContentFile($content);

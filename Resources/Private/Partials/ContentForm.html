@@ -48,7 +48,7 @@
         </div>
 
         <f:form.hidden id="h5p-library" name="library" value="{content.library.string}" />
-        <f:form.hidden id="h5p-parameters" name="parameters" value="{content.filtered}" />
+        <f:form.hidden id="h5p-parameters" name="parameters" value="{content.paramsWithMetaData -> f:format.json()}" />
         <f:form.hidden id="h5p-content" name="contentId" value="{content.contentId}" />
     </fieldset>
 </div>
