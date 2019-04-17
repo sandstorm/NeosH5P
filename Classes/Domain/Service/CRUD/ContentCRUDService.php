@@ -144,7 +144,7 @@ class ContentCRUDService
         /** @var Content $content */
         $content = $this->contentRepository->findOneByContentId($contentId);
 
-        $contentData = json_decode($migratedParams, true);
+        $contentData = ['params' => $migratedParams];
         $content->updateFromContentData($contentData, $targetLibrary);
 
         $this->contentRepository->update($content);
