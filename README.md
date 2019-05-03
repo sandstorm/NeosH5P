@@ -1,5 +1,7 @@
 # H5P Platform Integration Plugin for Neos CMS
 
+[Watch this video for an introduction to H5P in Neos!](https://www.youtube.com/watch?v=eslFaQ3oj7E)
+
 # What is H5P?
 H5P is an open standard for rich content in browsers, mainly - but certainly not limited to - for learning use cases and
 environments. It provides a variety of reusable content types, such as Memory Games, Fill in the Blanks, Multiple Choice
