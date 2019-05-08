@@ -87,6 +87,7 @@ class EditorAjaxController extends ActionController
     public function uploadLibraryAction()
     {
         $h5pFilePath = $this->request->getArgument('h5p')['tmp_name'];
+        // ContentId is empty here! This is just here as a reminder that it could be used in the future, since WP has it too
         $contentId = $this->request->getArgument('contentId');
 
         /**

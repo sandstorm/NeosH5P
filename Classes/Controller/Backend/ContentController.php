@@ -144,9 +144,9 @@ class ContentController extends AbstractModuleController
      */
     public function createAction(string $action, string $library, string $parameters)
     {
-        // We only handle $action == 'create' so far
         if ($action === 'upload') {
-            // TODO: not implemented yet
+            // This is just here to remind that this parameter exists and is being used in WP. We do not use it,
+            // but handle uploads and creates the same way.
         }
 
         $content = $this->contentCRUDService->handleCreateOrUpdate($library, $parameters);
