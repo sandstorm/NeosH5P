@@ -494,10 +494,11 @@ class H5PFramework implements \H5PFrameworkInterface
             throw new Exception("Library with ID " . $library_id . " could not be found!");
         }
         $contentsOfThisLibrary = $this->contentRepository->findByLibrary($library);
+
         /** @var Content $content */
         foreach ($contentsOfThisLibrary as $content) {
-            $content->setFiltered('');
-            $this->contentRepository->update($content);
+            // TODO: Actually make sure params are regenrated. This is a hotfix.
+            // $content->setFiltered('');
         }
     }
 
