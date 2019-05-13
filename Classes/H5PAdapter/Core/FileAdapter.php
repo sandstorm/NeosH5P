@@ -554,17 +554,6 @@ class FileAdapter implements \H5PFileStorage
             return null;
         }
 
-        if ($contentId === null || $contentId == 0) {
-            $target = $this->h5pPublicFolderPath . $this->h5pEditorTempPublicFolderName;
-        } else {
-            // In the current implementation, this can never happen, as the only place where this is called
-            // is from the library upload process, where we do not set a content id. Therefore, we throw
-            // an Exception here - we never expect this code path. (It is taken over from the WP plugin for completeness' sake.)
-            throw new Exception("Upload error - this should never be triggered.");
-            // Use content folder
-            $target = $this->h5pPublicFolderPath . $this->h5pContentPublicFolderName . DIRECTORY_SEPARATOR . $contentId;
-        }
-
         // In wp, this method copies files from the upload dir to the editor temp file dir. In our implementation
         // this corresponds to creating an EditorTempfile entity for each file and publishing them.
 
