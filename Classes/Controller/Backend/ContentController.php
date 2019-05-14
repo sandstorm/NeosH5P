@@ -137,18 +137,13 @@ class ContentController extends AbstractModuleController
     }
 
     /**
-     * @param string $action
+     * @param string $action - not used anymore, but part of API still
      * @param string $library
      * @param string $parameters
      * @throws StopActionException
      */
     public function createAction(string $action, string $library, string $parameters)
     {
-        // We only handle $action == 'create' so far
-        if ($action === 'upload') {
-            // TODO: not implemented yet
-        }
-
         $content = $this->contentCRUDService->handleCreateOrUpdate($library, $parameters);
         if ($content === null) {
             $this->showH5pErrorMessages();

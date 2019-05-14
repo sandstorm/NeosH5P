@@ -44,6 +44,22 @@ class LibraryRepository extends Repository
         return $query->execute();
     }
 
+    public function getPatchedLibrary($name, $majorVersion, $minorVersion, $patchVersion)
+    {
+        $query = $this->createQuery();
+
+        $query->getQueryBuilder()
+            ->where('e.name = ?0 AND e.majorVersion = ?1 AND e.minorVersion = ?2 AND e.patchVersion > ?3')
+            ->setParameters([
+                $name,
+                $majorVersion,
+                $minorVersion,
+                $patchVersion
+            ]);
+
+        return $query->execute();
+    }
+
     public function findUnused()
     {
         $libs = $this->findAll()->toArray();

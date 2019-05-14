@@ -69,7 +69,7 @@ class EditorAjaxController extends ActionController
 
         /**
          * This call is resolved to:
-         * @see \H5peditor::libraryInstall()
+         * @see \H5PEditorAjax::libraryInstall()
          */
         $this->h5pEditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $libraryId);
 
@@ -91,7 +91,7 @@ class EditorAjaxController extends ActionController
 
         /**
          * This call is resolved to:
-         * @see \H5peditor::libraryUpload()
+         * @see \H5PEditorAjax::libraryUpload()
          */
         $this->h5pEditor->ajax->action(\H5PEditorEndpoints::LIBRARY_UPLOAD, 'dummy', $h5pFilePath, $contentId);
 

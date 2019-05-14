@@ -631,14 +631,12 @@ class H5PFramework implements \H5PFrameworkInterface
      */
     public function isPatchedLibrary($library)
     {
-        $criteria = [
-            'name' => $library['machineName'],
-            'majorVersion' => $library['majorVersion'],
-            'minorVersion' => $library['minorVersion'],
-            'patchVersion' => $library['patchVersion']
-        ];
-
-        $existingLibraries = $this->libraryRepository->findBy($criteria);
+        $existingLibraries = $this->libraryRepository->getPatchedLibrary(
+            $library['machineName'],
+            $library['majorVersion'],
+            $library['minorVersion'],
+            $library['patchVersion']
+        );
 
         return count($existingLibraries) > 0;
     }
