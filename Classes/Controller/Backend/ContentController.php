@@ -137,18 +137,13 @@ class ContentController extends AbstractModuleController
     }
 
     /**
-     * @param string $action
+     * @param string $action - not used anymore, but part of API still
      * @param string $library
      * @param string $parameters
      * @throws StopActionException
      */
     public function createAction(string $action, string $library, string $parameters)
     {
-        if ($action === 'upload') {
-            // This is just here to remind that this parameter exists and is being used in WP. We do not use it,
-            // but handle uploads and creates the same way.
-        }
-
         $content = $this->contentCRUDService->handleCreateOrUpdate($library, $parameters);
         if ($content === null) {
             $this->showH5pErrorMessages();
