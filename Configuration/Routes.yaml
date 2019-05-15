@@ -80,7 +80,6 @@
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Frontend\ContentResults'
     '@action': 'save'
-  httpMethods: ['POST']
 -
   name: 'H5P Frontend AJAX - save content user data'
   uriPattern: 'neosh5p/contentuserdata/save/{queryString}'
@@ -89,7 +88,6 @@
     '@controller': 'Frontend\ContentUserData'
     '@action': 'save'
     'queryString': 'contentId=:contentId&dataType=:dataType&subContentId=:subContentId'
-  httpMethods: ['POST']
 
 # embed route for content
 -
