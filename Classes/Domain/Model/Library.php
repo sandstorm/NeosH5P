@@ -176,7 +176,7 @@ class Library
 
     /**
      * @var PersistentResource
-     * @ORM\OneToOne(cascade={"persist", "remove"})
+     * @ORM\OneToOne(cascade={"persist", "remove"}, fetch="EAGER")
      */
     protected $zippedLibraryFile;
 

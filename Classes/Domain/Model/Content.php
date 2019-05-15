@@ -152,7 +152,7 @@ class Content
 
     /**
      * @var PersistentResource
-     * @ORM\OneToOne(cascade={"persist", "remove"})
+     * @ORM\OneToOne(cascade={"persist", "remove"}, fetch="EAGER")
      * @ORM\Column(nullable=true)
      */
     protected $zippedContentFile;
