@@ -78,11 +78,8 @@ class ContentController extends ActionController
         $h5pIntegrationSettings = $this->h5pIntegrationService->getSettings($this->controllerContext, $contentIds);
 
         $mergedScripts = $this->h5pIntegrationService->getMergedScripts($h5pIntegrationSettings);
-        // If xAPI settinga are provided, load the debugging script and integration script too
-        if (array_key_exists('debugMode', $this->xAPISettings) && $this->xAPISettings['debugMode']) {
-            $debuggingScriptPath = 'resource://Sandstorm.NeosH5P/Public/Scripts/xAPIDebug.js';
-            array_push($mergedScripts, $this->resourceManager->getPublicPackageResourceUriByPath($debuggingScriptPath));
-        }
+
+        // If xAPI settinga are provided, load the integration script too
         if (array_key_exists('integrationScript', $this->xAPISettings) && file_exists($this->xAPISettings['integrationScript'])) {
             $integrationScriptPath = $this->xAPISettings['integrationScript'];
             array_push($mergedScripts, $this->resourceManager->getPublicPackageResourceUriByPath($integrationScriptPath));

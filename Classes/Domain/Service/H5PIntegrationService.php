@@ -113,6 +113,12 @@ class H5PIntegrationService
     protected $uriGenerationService;
 
     /**
+     * @Flow\InjectConfiguration(path="xAPI")
+     * @var array
+     */
+    protected $xAPISettings;
+
+    /**
      * Returns an array with a set of core settings that the H5P JavaScript needs
      * to do its thing. Can also include editor settings.
      *
@@ -157,6 +163,11 @@ class H5PIntegrationService
                     $scripts[] = $script;
                 }
             }
+        }
+        // Add the debugging script if we're in debugging mode to show xapi statements in the backend console too
+        if (array_key_exists('debugMode', $this->xAPISettings) && $this->xAPISettings['debugMode']) {
+            $debuggingScriptPath = 'resource://Sandstorm.NeosH5P/Public/Scripts/xAPIDebug.js';
+            array_push($scripts, $this->resourceManager->getPublicPackageResourceUriByPath($debuggingScriptPath));
         }
         return $scripts;
     }
