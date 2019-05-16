@@ -8,7 +8,7 @@ use Neos\Flow\Cli\Request;
 use Neos\Flow\Cli\Response;
 use Neos\Flow\Exception;
 use Neos\Flow\Mvc\Dispatcher;
-use Neos\Flow\ResourceManagement\ResourceManager;
+use Neos\Utility\Files;
 use Sandstorm\NeosH5P\Domain\Model\EditorTempfile;
 use Sandstorm\NeosH5P\Domain\Repository\CachedAssetRepository;
 use Sandstorm\NeosH5P\Domain\Repository\ConfigSettingRepository;
@@ -72,7 +72,7 @@ class H5PCommandController extends CommandController
     {
         /** @var EditorTempfile $editorTempFile */
         foreach ($this->editorTempfileRepository->findAll() as $editorTempFile) {
-            $this->outputLine("Removing ".$editorTempFile->getResource()->getFilename());
+            $this->outputLine("Removing " . $editorTempFile->getResource()->getFilename());
             $this->editorTempfileRepository->remove($editorTempFile);
         }
         $this->outputLine("Done.");
@@ -89,9 +89,9 @@ class H5PCommandController extends CommandController
         // Setup, needed for CLI request
         $_SERVER['REQUEST_METHOD'] = 'POST';
 
-        // Start the library import
+        // Start the library installation
         $this->h5peditor->ajax->action(\H5PEditorEndpoints::LIBRARY_INSTALL, 'dummy', $machineName);
-        //TODO: generate meaningful error output if installation fails
+
         $this->outputLine("");
         $this->outputLine("=======================================");
         $this->outputLine("Done installing libraries.");
@@ -102,6 +102,56 @@ class H5PCommandController extends CommandController
         $cliRequest->setControllerCommandName('publish');
         $cliRequest->setArguments([
             'collection' => 'h5p-libraries'
+        ]);
+        $cliResponse = new Response();
+        $this->dispatcher->dispatch($cliRequest, $cliResponse);
+    }
+
+    /**
+     * Uploads a H5P into the system.
+     *
+     * @param string $fileName
+     * @throws Exception
+     */
+    public function importFileCommand(string $fileName)
+    {
+        if (! file_exists($fileName)) {
+            $this->outputLine('The file "' . $fileName . '" does not exist.');
+            $this->quit(1);
+        }
+
+        // Setup, needed for CLI request
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+
+        // Copy the file to a temporary location, as the h5p core actually deletes it after import.
+        $copyPath = FLOW_PATH_DATA . 'Temporary/H5P/__import';
+        $copyFilename = $copyPath . '/currentimport.h5p';
+        Files::createDirectoryRecursively($copyPath);
+        copy($fileName, $copyFilename);
+
+        // Start the library import
+        $this->h5peditor->ajax->action(\H5PEditorEndpoints::LIBRARY_UPLOAD, 'dummy', $copyFilename, null);
+
+        $this->outputLine("");
+        $this->outputLine("=======================================");
+        $this->outputLine("Done importing H5P file.");
+
+        // Publish the h5p library collection so the library files are made available
+        $cliRequest = new Request();
+        $cliRequest->setControllerObjectName('Neos\Flow\Command\ResourceCommandController');
+        $cliRequest->setControllerCommandName('publish');
+        $cliRequest->setArguments([
+            'collection' => 'h5p-libraries'
+        ]);
+        $cliResponse = new Response();
+        $this->dispatcher->dispatch($cliRequest, $cliResponse);
+
+        // Publish the h5p content collection so the library files are made available
+        $cliRequest = new Request();
+        $cliRequest->setControllerObjectName('Neos\Flow\Command\ResourceCommandController');
+        $cliRequest->setControllerCommandName('publish');
+        $cliRequest->setArguments([
+            'collection' => 'h5p-content'
         ]);
         $cliResponse = new Response();
         $this->dispatcher->dispatch($cliRequest, $cliResponse);
