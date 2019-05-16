@@ -4,7 +4,7 @@
 H5P.jQuery(function ($) {
     $(document).ready(function () {
         if (H5P.externalDispatcher) {
-            H5P.externalDispatcher.on('xAPI', e => console.log(e));
+            H5P.externalDispatcher.on('xAPI', e => console.log(e.data.statement));
         }
     });
 });
