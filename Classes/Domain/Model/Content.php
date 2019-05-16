@@ -332,12 +332,12 @@ class Content
 
             // "H5P Metadata"
             $metadata = $parameters['metadata'];
-            $this->setTitle($metadata['title']);
+            $this->setTitle(html_entity_decode($metadata['title']));
             $this->setAuthors(empty($metadata['authors']) ? null : json_encode($metadata['authors']));
             $this->setSource(empty($metadata['source']) ? null : $metadata['source']);
             $this->setYearFrom(empty($metadata['yearFrom']) ? null : $metadata['yearFrom']);
             $this->setYearTo(empty($metadata['yearTo']) ? null : $metadata['yearTo']);
-            $this->setLicense(empty($metadata['license']) ? null : $metadata['license']);
+            $this->setLicense(empty($metadata['license']) ? '' : $metadata['license']);
             $this->setLicenseVersion(empty($metadata['licenseVersion']) ? null : $metadata['licenseVersion']);
             $this->setLicenseExtras(empty($metadata['licenseExtras']) ? null : $metadata['licenseExtras']);
             $this->setAuthorComments(empty($metadata['authorComments']) ? null : $metadata['authorComments']);
@@ -665,7 +665,7 @@ class Content
     /**
      * @param string $license
      */
-    public function setLicense(string $license)
+    public function setLicense($license)
     {
         $this->license = $license;
     }
