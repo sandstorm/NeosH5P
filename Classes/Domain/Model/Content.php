@@ -481,7 +481,7 @@ class Content
     /**
      * @return Account
      */
-    public function getAccount(): Account
+    public function getAccount()
     {
         return $this->account;
     }
@@ -489,7 +489,7 @@ class Content
     /**
      * @param Account $account
      */
-    public function setAccount(Account $account)
+    public function setAccount($account)
     {
         $this->account = $account;
     }
