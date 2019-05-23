@@ -106,7 +106,6 @@ creating H5P content, this should be run about once a week.
 
 # Known issues / remaining TODOs
 * Internationalization is not implemented yet.
-* Upload of content and libraries is not implemented yet.
 * Form validation in the H5P editor is not taken into account.
 * Flash messages do not work in the fullscreen content editor.
 * Methods for usage statistics are not implemented yet.
