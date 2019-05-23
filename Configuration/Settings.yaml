@@ -124,12 +124,6 @@ Neos:
                 patternOptions:
                   controllerObjectNamePattern: 'Sandstorm\NeosH5P\Controller\Backend\.*'
 
-#              This is for development/testing only, and needs to be defined in the integrating package.
-              'Sandstorm.NeosH5P:FrontendControllers':
-                pattern: 'ControllerObjectName'
-                patternOptions:
-                  controllerObjectNamePattern: 'Sandstorm\NeosH5P\Controller\Frontend\.*'
-
     # We need the tag "@variable" as an ignored annotation, because otherwise parsing of the
     # H5PFrameworkInterface causes a reflection error
     reflection:
