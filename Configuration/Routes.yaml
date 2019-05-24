@@ -1,35 +1,35 @@
 # backend editor ajax routes
 -
   name: 'H5P Backend Editor AJAX'
-  uriPattern: 'neosh5p/editor'
+  uriPattern: 'h5p/editor'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\EditorAjax'
     '@action': 'index'
 -
   name: 'H5P Backend Editor AJAX - content type cache'
-  uriPattern: 'neosh5p/editor/content-type-cache'
+  uriPattern: 'h5p/editor/content-type-cache'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\EditorAjax'
     '@action': 'contentTypeCache'
 -
   name: 'H5P Backend Editor AJAX - library install'
-  uriPattern: 'neosh5p/editor/library-install'
+  uriPattern: 'h5p/editor/library-install'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\EditorAjax'
     '@action': 'installLibrary'
 -
   name: 'H5P Backend Editor AJAX - library upload'
-  uriPattern: 'neosh5p/editor/library-upload'
+  uriPattern: 'h5p/editor/library-upload'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\EditorAjax'
     '@action': 'uploadLibrary'
 -
   name: 'H5P Backend Editor AJAX - single library details'
-  uriPattern: 'neosh5p/editor/libraries'
+  uriPattern: 'h5p/editor/libraries'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\EditorAjax'
@@ -37,7 +37,7 @@
   httpMethods: ['GET']
 -
   name: 'H5P Backend Editor AJAX - multiple libraries'
-  uriPattern: 'neosh5p/editor/libraries'
+  uriPattern: 'h5p/editor/libraries'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\EditorAjax'
@@ -45,7 +45,7 @@
   httpMethods: ['POST']
 -
   name: 'H5P Backend Editor AJAX - editor file upload'
-  uriPattern: 'neosh5p/editor/files'
+  uriPattern: 'h5p/editor/files'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\EditorAjax'
@@ -55,7 +55,7 @@
 # backend content upgrade ajax routes
 -
   name: 'H5P Backend content upgrade AJAX - execute content upgrade'
-  uriPattern: 'neosh5p/contentupgrade/migrate/{oldLibraryId}'
+  uriPattern: 'h5p/contentupgrade/migrate/{oldLibraryId}'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\ContentUpgradeAjax'
@@ -63,7 +63,7 @@
   httpMethods: ['POST']
 -
   name: 'H5P Backend content upgrade AJAX - get library info'
-  uriPattern: 'neosh5p/contentupgrade/libraryinfo(/{libraryName}/{majorVersion}/{minorVersion})'
+  uriPattern: 'h5p/contentupgrade/libraryinfo(/{libraryName}/{majorVersion}/{minorVersion})'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\ContentUpgradeAjax'
@@ -75,14 +75,14 @@
 # frontend ajax routes
 -
   name: 'H5P Frontend AJAX - save results'
-  uriPattern: 'neosh5p/contentresults/save'
+  uriPattern: 'h5p/contentresults/save'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Frontend\ContentResults'
     '@action': 'save'
 -
   name: 'H5P Frontend AJAX - save content user data'
-  uriPattern: 'neosh5p/contentuserdata/save/{queryString}'
+  uriPattern: 'h5p/contentuserdata/save/{queryString}'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Frontend\ContentUserData'
@@ -92,7 +92,7 @@
 # embed route for content
 -
   name: 'H5P Frontend - embed content as iframe'
-  uriPattern: 'neosh5p/content/embed/{contentId}'
+  uriPattern: 'h5p/content/embed/{contentId}'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Frontend\ContentEmbed'
@@ -101,7 +101,7 @@
 # neos fullscreen inspector routes
 -
   name: 'H5P Neos inspector - fullscreen editor content controller routes'
-  uriPattern: 'neosh5p/contentfullscreeneditor/{@action}(/{content})'
+  uriPattern: 'h5p/contentfullscreeneditor/{@action}(/{content})'
   defaults:
     '@package': 'Sandstorm.NeosH5P'
     '@controller': 'Backend\Content'

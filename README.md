@@ -51,12 +51,12 @@ H5P supports persisting content state (e.g. the currently selected answers to mu
 results (e.g. answers given by a user to a multiple choice question). In order for this to work in Neos, we need to
 add a few settings. 
 
-1. In your site package's `Policy.yaml`, provide the permission to use the controller actions to the role which you
-   want to be able to use them. If you're using a frontend login package like [Sandstorm.UserManagement](https://github.com/sandstorm/UserManagement),
-   your config could look like below. Replace the role `Sandstorm.UserManagement:User` with the one your frontend users
-   actually have. If you want to save content results and user data even for non-logged-in users, set this to
-   `Neos.Flow:Everybody`. Mind the GDPR implications of this, as you're then persisting data of every user that
-   interacts with H5P content on your site. 
+In your site package's `Policy.yaml`, provide the permission to use the controller actions to the role which you
+want to be able to use them. If you're using a frontend login package like [Sandstorm.UserManagement](https://github.com/sandstorm/UserManagement),
+your config could look like below. Replace the role `Sandstorm.UserManagement:User` with the one your frontend users
+actually have. If you want to save content results and user data even for non-logged-in users, set this to
+`Neos.Flow:Everybody`. Mind the GDPR implications of this, as you're then persisting data of every user that
+interacts with H5P content on your site. 
 
 ```YAML
 roles:
@@ -65,25 +65,6 @@ roles:
       -
         privilegeTarget: 'Sandstorm.NeosH5P:FrontendControllerActions'
         permission: GRANT
-```
-
-2. In your site package's `Settings.yaml`, you need to add a request pattern so our controllers can recognize the correct
-authenticated account. Again, the exact setting is dependent on which frontend login package you use. If you're using 
-[Sandstorm.UserManagement](https://github.com/sandstorm/UserManagement), the setting looks like this. If you're using
-a different package or created your own frontend login, replace the provider `Sandstorm.UserManagement:Login` with the
-one you are using.
-```YAML
-Neos:
-  Flow:
-    security:
-      authentication:
-        providers:
-          'Sandstorm.UserManagement:Login':
-            requestPatterns:
-              'Sandstorm.NeosH5P:FrontendControllers':
-                pattern: 'ControllerObjectName'
-                patternOptions:
-                  controllerObjectNamePattern: 'Sandstorm\NeosH5P\Controller\Frontend\.*'
 ```
 
 ## 3. Integrate xAPI
