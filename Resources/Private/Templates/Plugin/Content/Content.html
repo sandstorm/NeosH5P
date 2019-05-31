@@ -17,6 +17,13 @@
                 </div>
             </f:case>
         </f:switch>
+        <p class="h5p-not-initialized-warning">
+            <strong>This H5P content cannot be shown right now.</strong>
+            <f:if condition="{neos:rendering.inBackend}">
+                <br>
+                Did you just move this element? Reload the page to attempt to fix the problem.
+            </f:if>
+        </p>
     </f:then>
     <f:else>
         <p><strong>No content chosen - please choose or create an H5P content element in the inspector.</strong></p>
