@@ -2,6 +2,11 @@ prototype(Neos.Neos:Page) {
     head {
         javascripts.h5p = Sandstorm.NeosH5P:H5PScriptsAndStyles
     }
+    body {
+        javascripts.h5p = Neos.Fusion:Template {
+            templatePath = 'resource://Sandstorm.NeosH5P/Private/Templates/Frontend/H5PNotInitializedWarning.html'
+        }
+    }
 }
 
 
