@@ -78,7 +78,7 @@ class H5PIntegrationService
 
     /**
      * @Flow\Inject
-     * @var PackageManager
+     * @var PackageManager 
      */
     protected $packageManager;
 
