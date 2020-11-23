@@ -25,7 +25,6 @@
         "h5p/h5p-core": "~1.24.0",
         "h5p/h5p-editor": "~1.24.1",
         "guzzlehttp/guzzle": "~6.3.0",
-
         "ext-zip": "*"
     },
     "autoload": {
