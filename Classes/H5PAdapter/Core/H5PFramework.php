@@ -64,7 +64,7 @@ class H5PFramework implements \H5PFrameworkInterface
 
     /**
      * @Flow\Inject
-     * @var PackageManager
+     * @var PackageManager 
      */
     protected $packageManager;
 
