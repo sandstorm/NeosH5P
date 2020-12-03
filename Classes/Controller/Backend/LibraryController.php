@@ -5,7 +5,7 @@ namespace Sandstorm\NeosH5P\Controller\Backend;
 use Neos\Error\Messages\Message;
 use Neos\Flow\Mvc\Exception\StopActionException;
 use Neos\Flow\Mvc\View\ViewInterface;
-use Neos\Flow\Package\PackageManagerInterface;
+use Neos\Flow\Package\PackageManager;
 use Neos\Neos\Controller\Module\AbstractModuleController;
 use Sandstorm\NeosH5P\Domain\Model\Library;
 use Sandstorm\NeosH5P\Domain\Repository\ContentRepository;
@@ -62,7 +62,7 @@ class LibraryController extends AbstractModuleController
 
     /**
      * @Flow\Inject
-     * @var PackageManagerInterface
+     * @var PackageManager
      */
     protected $packageManager;
 

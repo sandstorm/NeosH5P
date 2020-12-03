@@ -22,10 +22,9 @@
     "require": {
         "neos/neos": ">=4.0.0",
         "neos/neos-ui": "*",
-        "h5p/h5p-core": "~1.20.0",
-        "h5p/h5p-editor": "~1.20.0",
+        "h5p/h5p-core": "~1.24.0",
+        "h5p/h5p-editor": "~1.24.1",
         "guzzlehttp/guzzle": "~6.3.0",
-
         "ext-zip": "*"
     },
     "autoload": {
