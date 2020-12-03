@@ -6,6 +6,7 @@ use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\Controller\ControllerContext;
 use Neos\Flow\Package\PackageManager;
 use Neos\Flow\ResourceManagement\ResourceManager;
+use Neos\Flow\Http\BaseUriProvider;
 use Neos\Flow\Security\Account;
 use Neos\Flow\Security\Context;
 use Sandstorm\NeosH5P\Domain\Model\Content;
@@ -88,6 +89,12 @@ class H5PIntegrationService
      */
     protected $resourceManager;
 
+    /**
+     * @Flow\Inject
+     * @var BaseUriProvider
+     */
+    protected $baseUriProvider;    
+    
     /**
      * @Flow\Inject
      * @var Context
@@ -472,7 +479,6 @@ class H5PIntegrationService
      */
     private function getBaseUri(ControllerContext $cc): string
     {
-        // rtrim to remove any trailing slashes
-        return rtrim($cc->getRequest()->getMainRequest()->getHttpRequest()->getBaseUri()->__toString(), '/');
+        return $this->baseUriProvider->getConfiguredBaseUriOrFallbackToCurrentRequest();
     }
 }
