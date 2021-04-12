@@ -7,7 +7,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Neos\Flow\Exception;
 use Neos\Flow\ObjectManagement\DependencyInjection\DependencyProxy;
 use Neos\Flow\ObjectManagement\ObjectManagerInterface;
-use Neos\Flow\Package\PackageManagerInterface;
+use Neos\Flow\Package\PackageManager;
 use Neos\Flow\Persistence\Exception\IllegalObjectTypeException;
 use Neos\Flow\Persistence\PersistenceManagerInterface;
 use Neos\Flow\Persistence\QueryInterface;
@@ -64,7 +64,7 @@ class H5PFramework implements \H5PFrameworkInterface
 
     /**
      * @Flow\Inject
-     * @var PackageManagerInterface
+     * @var PackageManager
      */
     protected $packageManager;
 
