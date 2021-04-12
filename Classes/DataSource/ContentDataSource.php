@@ -33,7 +33,7 @@ class ContentDataSource extends AbstractDataSource
      * @param array $arguments
      * @return array
      */
-    public function getData(NodeInterface $node = null, array $arguments)
+    public function getData(NodeInterface $node = null, array $arguments = [])
     {
         /** @var Content $content */
         $content = $this->contentRepository->findOneByContentId($arguments['contentId']);
