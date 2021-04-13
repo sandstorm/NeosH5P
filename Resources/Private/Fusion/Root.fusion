@@ -18,7 +18,8 @@ prototype(Sandstorm.NeosH5P:H5PScriptsAndStyles) < prototype(Neos.Neos:Plugin) {
     h5pContentNodes = ${q(documentNode).find('[instanceof Sandstorm.NeosH5P:H5PContent]')}
 }
 
-prototype(Sandstorm.NeosH5P:H5PContent) {
+prototype(Sandstorm.NeosH5P:H5PContent) < prototype(Neos.Neos:Plugin) {
+    package = 'Sandstorm.NeosH5P'
     controller = 'Plugin\\Content'
     action = 'content'
 }
