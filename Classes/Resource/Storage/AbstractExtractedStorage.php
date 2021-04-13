@@ -171,7 +171,6 @@ abstract class AbstractExtractedStorage implements StorageInterface
                 $object = new StorageObject();
                 $object->setFilename($pathAndFilenameInZip);
                 $object->setSha1(sha1($fileContents));
-                $object->setMd5(md5($fileContents));
                 $object->setFileSize(strlen($fileContents));
                 $object->setStream($stream);
                 $itemFolderNameMethod = $this->options['itemFolderNameMethod'];

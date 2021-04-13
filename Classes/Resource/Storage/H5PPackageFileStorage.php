@@ -163,7 +163,6 @@ class H5PPackageFileStorage implements StorageInterface
         $object = new StorageObject();
         $object->setFilename($pathInfo['basename']);
         $object->setSha1(sha1_file($resourcePathAndFilename));
-        $object->setMd5(md5_file($resourcePathAndFilename));
         $object->setFileSize(filesize($resourcePathAndFilename));
         if (isset($pathInfo['dirname'])) {
             $object->setRelativePublicationPath($relativeSubfolderPath. DIRECTORY_SEPARATOR . $relativePublicationPath . DIRECTORY_SEPARATOR);
