@@ -3,6 +3,7 @@
 namespace Sandstorm\NeosH5P\Domain\Service;
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Http\BaseUriProvider;
 use Neos\Flow\Mvc\Controller\ControllerContext;
 use Neos\Flow\Package\PackageManager;
 use Neos\Flow\ResourceManagement\ResourceManager;
@@ -111,6 +112,12 @@ class H5PIntegrationService
      * @var UriGenerationService
      */
     protected $uriGenerationService;
+
+    /**
+     * @Flow\Inject
+     * @var BaseUriProvider
+     */
+    protected $baseUriProvider;
 
     /**
      * @Flow\InjectConfiguration(path="xAPI")
@@ -473,6 +480,6 @@ class H5PIntegrationService
     private function getBaseUri(ControllerContext $cc): string
     {
         // rtrim to remove any trailing slashes
-        return rtrim($cc->getRequest()->getMainRequest()->getHttpRequest()->getBaseUri()->__toString(), '/');
+        return rtrim($this->baseUriProvider->getConfiguredBaseUriOrFallbackToCurrentRequest($cc->getRequest()->getMainRequest()->getHttpRequest()), '/');
     }
 }
