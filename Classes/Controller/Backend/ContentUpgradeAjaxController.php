@@ -71,8 +71,8 @@ class ContentUpgradeAjaxController extends ActionController
      */
     public function migrateContentAction(int $oldLibraryId, int $libraryId, string $params = null)
     {
-        $this->response->setHeader('Cache-Control', 'no-cache');
-        $this->response->setHeader('Content-Type', 'application/json');
+        $this->response->addHttpHeader('Cache-Control', 'no-cache');
+        $this->response->addHttpHeader('Content-Type', 'application/json');
 
         // $params is null in the first request because the client does not yet know them
         if ($params !== null) {
@@ -116,8 +116,8 @@ class ContentUpgradeAjaxController extends ActionController
      */
     public function libraryInfoAction(string $libraryName, int $majorVersion, int $minorVersion)
     {
-        $this->response->setHeader('Cache-Control', 'no-cache');
-        $this->response->setHeader('Content-Type', 'application/json');
+        $this->response->addHttpHeader('Cache-Control', 'no-cache');
+        $this->response->addHttpHeader('Content-Type', 'application/json');
 
         $library = $this->libraryRepository->findOneByNameMajorVersionAndMinorVersion($libraryName, $majorVersion, $minorVersion);
 
