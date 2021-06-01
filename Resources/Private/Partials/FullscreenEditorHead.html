@@ -6,6 +6,7 @@
     <script src="{f:uri.resource(path: 'Library/jquery/jquery-2.0.3.js', package: 'Neos.Neos')}"></script>
     <script src="{f:uri.resource(path: '2/js/bootstrap.min.js', package: 'Neos.Twitter.Bootstrap')}"></script>
     <script type="text/javascript">
+        <![CDATA[
         // API to be used for synchronous picking and closing the iframe
         function chooseContent(persistenceObjectIdentifier, contentId, title) {
             if (window.parent !== window && window.parent.NeosH5PBrowserCallbacks && window.parent.NeosH5PBrowserCallbacks.chooseContent) {
@@ -38,6 +39,6 @@
                 }
             }
         });
-
+        ]]>
     </script>
 </head>
