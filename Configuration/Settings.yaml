@@ -201,3 +201,10 @@ Neos:
             path: *h5pPublicFolderPath
             baseUri: *h5pPublicFolderUrl
             subdivideHashPathSegment: false
+
+        # !!! the H5P Plugin only works with URLs like /_Resources/Persistent/294da7a7be7d18d4a0127cbbb685229960f93d48/76c5ee3b2d5c5f5510b2fd562211a05353555ef2.css
+        # !!! instead of /_Resources/Persistent/2/9/4/d/294da7a7be7d18d4a0127cbbb685229960f93d48/76c5ee3b2d5c5f5510b2fd562211a05353555ef2.css
+        # !!! so subdivideHashPathSegment must be OFF
+        localWebDirectoryPersistentResourcesTarget:
+          targetOptions:
+            subdivideHashPathSegment: false
