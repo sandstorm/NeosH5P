@@ -1,3 +1,6 @@
+THIS PACKAGE IS NO LONGER MAINTANED
+
+
 # H5P Platform Integration Plugin for Neos CMS
 
 [Watch this video for an introduction to H5P in Neos!](https://www.youtube.com/watch?v=eslFaQ3oj7E)
