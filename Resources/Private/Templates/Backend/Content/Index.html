@@ -6,7 +6,13 @@
         <f:render partial="ContentSearchAndSort" arguments="{_all}" />
     </div>
     <div class="neos-row-fluid">
-        <f:render partial="ContentTable" arguments="{_all}" />
+        { "data": [
+        <f:for each="{contents}" as="content">
+            <f:if condition="{content.exportUrl}">
+                {content.metadataArray},
+            </f:if>
+        </f:for>
+        ]}
     </div>
     <div class="neos-footer">
         Es können keine neuen Inhalte angelegt werden!

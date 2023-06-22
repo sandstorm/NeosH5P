@@ -283,19 +283,14 @@ class Content
         return $contentArray;
     }
 
-    public function getMetadataArray() : array {
-        return [
+    public function getMetadataArray() : string {
+        $array = [
+            'id' => $this->getContentId(),
+            'exportUrl' => $this->getExportUrl(),
             'title' => $this->getTitle(),
-            'authors' => json_decode($this->getAuthors()),
-            'source' => $this->getSource(),
-            'yearFrom' => $this->getYearFrom(),
-            'yearTo' => $this->getYearTo(),
-            'license' => $this->getLicense(),
-            'licenseVersion' => $this->getLicenseVersion(),
-            'licenseExtras' => $this->getLicenseExtras(),
-            'authorComments' => $this->getAuthorComments(),
-            'changes' => json_decode($this->getChanges())
         ];
+
+        return json_encode($array);
     }
 
     /**
@@ -465,7 +460,7 @@ class Content
     /**
      * @return Library
      */
-    public function getLibrary(): Library
+        public function getLibrary(): Library
     {
         return $this->library;
     }
@@ -476,6 +471,17 @@ class Content
     public function setLibrary(Library $library)
     {
         $this->library = $library;
+    }
+
+    public function getExportUrl()
+    {
+        $exportFile = $this->getExportFile();
+
+        if (!$exportFile) {
+            return null;
+        }
+
+        return $this->resourceManager->getPublicPersistentResourceUri($exportFile);
     }
 
     /**
